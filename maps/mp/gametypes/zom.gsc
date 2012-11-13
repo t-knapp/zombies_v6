@@ -1,0 +1,4 @@
+main()
+{
+	zombies\main::init();
+}
