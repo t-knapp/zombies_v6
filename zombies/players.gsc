@@ -262,17 +262,17 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	self.health = self.maxhealth;
     
     self detachall();
-	
+/*	
 	if(!isdefined(self.pers["savedmodel"]))
 		self [[ level.call ]]( "teams_model" );
 	else
 		self [[ level.call ]]( "load_model", self.pers["savedmodel"] );
-        
+*/      
     self [[ level.call ]]( "classes_loadout" );
 	
     if ( self.pers[ "team" ] == "allies" )
     {
-        //[[game["allies_model"] ]]();
+        [[game["allies_model"] ]]();
         self.voicetype = game[ "allies" ];
         self.headicon = game["headicon_allies"];
         self.headiconteam = "allies";
@@ -280,7 +280,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     }
     else if ( self.pers[ "team" ] == "axis" )
     {
-    	//[[game["axis_model"] ]]();
+    	[[game["axis_model"] ]]();
         self.voicetype = game[ "axis" ];
         self.headicon = game["headicon_axis"];
         self.headiconteam = "axis";
