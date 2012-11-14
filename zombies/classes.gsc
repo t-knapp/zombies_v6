@@ -315,7 +315,7 @@ selectClass_timeout()
 	
 	self notify( "select class notify stop" );
     
-    self iPrintLnBold( "Moved to spectator for AFK" );
+    self [[ level.call ]]( "print", "Moved to spectator for AFK", true );
     self [[ level.call ]]( "spawn_spectator" );
 }
 
@@ -458,7 +458,7 @@ hunterClasses() {
 	
 	weapon = "";
 	
-	iPrintLn( self.class );
+	//iPrintLn( self.class );
 		
 	switch ( self.class ) {
 		default:/*
@@ -658,7 +658,7 @@ ammobox()
     mybox = spawn( "script_model", self getOrigin() );
     mybox setModel( boxmodels[ modeli ] );
     
-    self iprintlnbold( "double tap [f] to place ammobox" );
+    self [[ level.call ]]( "print", "double tap [f] to place ammobox", true );
     
     while ( isAlive( self ) )
     {  
@@ -718,7 +718,7 @@ ammobox()
     trace = bullettrace( mybox.origin, mybox.origin + ( 0, 0, -1024 ), false, undefined );
     mybox moveto( trace[ "position" ], 0.1 );
     
-    self iprintln( "ammobox placed!" );
+    self [[ level.call ]]( "print", "ammobox placed!" );
     
     self switchToWeapon( self getWeaponSlotWeapon( "primary" ) );
     self setWeaponSlotWeapon( "grenade", "none" );

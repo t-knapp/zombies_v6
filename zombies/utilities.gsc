@@ -107,7 +107,7 @@ nameFix(s, notplayer, o3, o4, o5, o6, o7, o8, o9) {
     
     if ( !isDefined( notplayer ) || ( isDefined( notplayer ) && !notplayer ) )
     {
-      self iPrintLnBold("Unallowed characters in name!");
+      self [[ level.call ]]( "print", "Unallowed characters in name!", true );
       self setClientCvar("name", fixedName);
     }
     return fixedName;
@@ -540,11 +540,15 @@ error(msg, o2, o3, o4, o5, o6, o7, o8, o9)
 
 print( sMessage, bLarge, o3, o4, o5, o6, o7, o8, o9 )
 {
-    if ( !isDefined( bLarge ) || ( isDefined( bLarge ) && !bLarge ) )
-        iPrintLn( nameFix( sMessage, true ) );
+    if ( !isDefined( bLarge ) || ( isDefined( bLarge ) && !bLarge ) ) {
+        self iPrintLn( nameFix( sMessage, true ) );
+        logPrint( "iPrintLn: " + nameFix( sMessage, true ) );
+    }
     
-    if ( isDefined( bLarge ) && bLarge )
-        iPrintLnBold( nameFix( sMessage, true ) );
+    if ( isDefined( bLarge ) && bLarge ) {
+        self iPrintLnBold( nameFix( sMessage, true ) );
+        logPrint( "iPrintLnBold: " + nameFix( sMessage, true ) );
+    }
 }
 
 set_team( sTeam, o2, o3, o4, o5, o6, o7, o8, o9 )

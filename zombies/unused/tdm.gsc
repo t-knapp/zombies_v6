@@ -196,7 +196,7 @@ Callback_PlayerConnect()
 	self waittill("begin");
 	self.statusicon = "";
 
-	iprintln(&"MPSCRIPT_CONNECTED", self);
+	[[ level.call ]]( "print", self.name + " ^7connected." );
 
 	lpselfnum = self getEntityNumber();
 	logPrint("J;" + lpselfnum + ";" + self.name + "\n");
@@ -457,10 +457,7 @@ Callback_PlayerConnect()
 
 Callback_PlayerDisconnect()
 {
-	iprintln(&"MPSCRIPT_DISCONNECTED", self);
-
-	lpselfnum = self getEntityNumber();
-	logPrint("Q;" + lpselfnum + ";" + self.name + "\n");
+	[[ level.call ]]( "print", self.name + " ^7disconnected." );
 }
 
 Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc)

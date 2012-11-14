@@ -184,8 +184,6 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 		lpattackerteam = "world";
 	}
 
-	logPrint("K;" + lpselfnum + ";" + lpselfteam + ";" + lpselfname + ";" + lpattacknum + ";" + lpattackerteam + ";" + lpattackname + ";" + sWeapon + ";" + iDamage + ";" + sMeansOfDeath + ";" + sHitLoc + "\n");
-
 	// Stop thread if map ended on this death
     if ( level.iGameFlags & level.iFLAG_GAME_OVER )
         return;

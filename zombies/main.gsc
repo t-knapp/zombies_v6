@@ -91,7 +91,7 @@ call_owner( sFunctionName, o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     {
         if ( level.bDebug )
         {
-            iPrintLn( "CODE BUG: Unknown function \'" + sFunctionName + "\'." );
+            [[ level.call ]]( "print", "CODE BUG: Unknown function \'" + sFunctionName + "\'." );
             // logprint
         }
         return;
