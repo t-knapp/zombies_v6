@@ -29,15 +29,15 @@ player_connect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     
     level notify( "player_connected", self );
     
-    self.isRegistered = true;
+    self [[ level.call ]]( "get_stats" );
     
     // remove "box" chars from name that crash linux servers
-    [[ level.call ]]( "name_fix", self.name );
+    self [[ level.call ]]( "name_fix", self.name );
     
     // force them to the scoreboard if they joined on map change
     if ( level.iGameFlags & level.iFLAG_GAME_INTERMISSION )
     {
-        [[ level.call ]]( "spawn_intermission" );
+        self [[ level.call ]]( "spawn_intermission" );
         return;
     }
     
@@ -49,10 +49,9 @@ player_connect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     if(!isdefined(self.pers["team"]))
         self openMenu(game["menu_team"]);
         
-    [[ level.call ]]( "set_team", "spectator" );
-
-    [[ level.call ]]( "spawn_spectator" );
-    [[ level.call ]]( "menu_handler" );
+    self [[ level.call ]]( "set_team", "spectator" );
+    self [[ level.call ]]( "spawn_spectator" );
+    self [[ level.call ]]( "menu_handler" );
 }
 
 player_disconnect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )

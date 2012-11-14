@@ -16,6 +16,7 @@ init()
     register_module( "menus", zombies\menus::init, ::blank );
     register_module( "classes", zombies\classes::init, ::blank );
     register_module( "players", zombies\players::init, ::blank );
+    register_module( "socket", zombies\socket::init, ::blank );
     register_module( "stats", zombies\stats::init, ::blank );
     register_module( "killcam", zombies\killcam::init, ::blank );
     register_module( "gamemodes", zombies\gamemodes::init, ::blank );
