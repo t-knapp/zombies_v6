@@ -1,3 +1,10 @@
+/*
+    File:           _teams.gsc
+    Author:         Infinity Ward (modified by Cheese)
+    Last update:    11/14/2012
+*/
+
+
 init()
 {
     [[ level.register ]]( "teams_modeltype", ::modeltype );

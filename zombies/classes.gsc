@@ -1,3 +1,10 @@
+/*
+    File:           classes.gsc
+    Author:         Cheese
+    Last update:    11/14/2012
+*/
+
+
 init()
 {
     setCvar( "g_TeamColor_Allies", "1 0 0" );
@@ -168,6 +175,7 @@ selectClass()
     startx = 106;
 	starty = 90;
 	
+    // fill out class list
 	for ( i = 0; i < myclasses.size; i++ ) {
 		m = myclasses[ i ];
 		s = self.chud[ "classes" ].size;
@@ -375,6 +383,8 @@ zombieClasses()
 	self setSpawnWeapon( weapon );
 }
 
+// original code from brax's 1.5 zombie mod
+// heavily modified by Cheese :)
 zombieClass_jumper() 
 {
 	self endon( "death" );
@@ -461,7 +471,6 @@ hunterClasses() {
 	// base class values
 	self.health = 100;
 	self.maxhealth = 100;
-	self.damageMult = 1;
 	
 	if ( !isDefined( self.class ) )
 		return;
@@ -514,6 +523,7 @@ hunterClass_default() {
 	{
 		self waittill( "menuresponse", menu, response );
 		
+        // don't allow 'default' players to exit out of a weapon choice
 		if ( response == "open" )
 			continue;
 		
@@ -542,7 +552,6 @@ hunterClass_default() {
 	
 	self.maxhealth = 100;
 	self.health = self.maxhealth;
-	self.damageMult = 1;
 }
 
 hunterClass_scout() {

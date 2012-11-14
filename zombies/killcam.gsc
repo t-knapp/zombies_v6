@@ -1,7 +1,7 @@
 /*
     File:           killcam.gsc
-    Author:         Cheese
-    Last update:    8/10/2012
+    Author:         Infinity Ward (modified by Cheese)
+    Last update:    11/14/2012
 */
 
 init()
@@ -13,10 +13,6 @@ killcam(attackerNum, delay)
 {
 	self endon("spawned");
 
-//	previousorigin = self.origin;
-//	previousangles = self.angles;
-	
-	// killcam
 	if(attackerNum < 0)
 		return;
 
@@ -106,7 +102,6 @@ killcam(attackerNum, delay)
 	self.archivetime = 0;
 	self.sessionstate = "dead";
 
-	//self thread spawnSpectator(previousorigin + (0, 0, 60), previousangles);
 	self [[ level.call ]]( "respawn" );
 }
 

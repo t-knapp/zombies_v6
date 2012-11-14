@@ -1,7 +1,7 @@
 /*
     File:           base.gsc
     Author:         Cheese
-    Last update:    9/10/2012
+    Last update:    11/14/2012
 */
 
 init()
@@ -101,7 +101,6 @@ main()
     
     hWarmUp destroy();
     
-    
     [[ level.call ]]( "pick_zombie" );
     
     wait 2;
@@ -184,6 +183,7 @@ end_map( sWinner )
     
     level.iGameFlags = level.iFLAG_GAME_OVER;
 	
+    // TODO: actual winner logic
 	if ( winner == "zombies" )
     {
         [[ level.call ]]( "print", "Zombies win!", true );

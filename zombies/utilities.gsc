@@ -1,7 +1,7 @@
 /*
     File:           utilities.gsc
     Author:         Cheese & Cato
-    Last update:    9/10/2012
+    Last update:    11/14/2012
 */
 
 init()
