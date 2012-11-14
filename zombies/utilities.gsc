@@ -422,11 +422,14 @@ getPlayer( iID, o2, o3, o4, o5, o6, o7, o8, o9 ) {
 	return eGuy;
 }
 
-getGoodPlayers( o1, o2, o3, o4, o5, o6, o7, o8, o9 ) {
+getGoodPlayers( bIgnorePlaying, o2, o3, o4, o5, o6, o7, o8, o9 ) {
 	players = getEntArray( "player", "classname" );
 	good = [];
 	for ( i = 0; i < players.size; i++ ) {
-		if ( players[ i ].pers[ "team" ] != "spectator" && players[ i ].sessionstate == "playing" )
+        if ( players[ i ].sessionstate != "playing" && !isDefined( bIgnorePlaying ) )
+            continue;
+            
+		if ( players[ i ].pers[ "team" ] != "spectator" )
 			good[ good.size ] = players[ i ];
 	}
 	

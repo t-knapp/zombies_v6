@@ -139,6 +139,42 @@ start_gametype( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 
 game_logic()
 {
+    level endon( "intermission" );
+    
+    while ( 1 )
+    {
+        // returns all players, including ones who do not have a sessionstate of 'playing'
+        aPlayers = [[ level.call ]]( "get_good_players", true );
+        
+        aZombies =[];
+        aHunters = [];
+        
+        for ( i = 0; i < aPlayers.size; i++ )
+        {
+            if ( aPlayers.pers[ "team" ] == "allies" )
+                aZombies[ aZombies.size ] = aPlayers[ i ];
+            else if ( aPlayers.pers[ "team" ] == "axis" )
+                aHunters[ aHunters.size ] = aPlayers[ i ];
+        }
+        
+        // have all the zombies left? pick a new one
+        if ( aZombies.size == 0 && aHunters.size > 0 )
+        {
+            [[ level.call ]]( "pick_zombie" );
+            wait 1;
+        }
+        
+        // only one hunter left? last hunter time!
+        
+        // have all the hunters died?
+        if ( aHunters.size == 0 && aZombies.size > 0 )
+        {
+            thread end_map( "zombies" );
+            break;
+        }
+        
+        wait 1;
+    }
 }
 
 end_map( sWinner )

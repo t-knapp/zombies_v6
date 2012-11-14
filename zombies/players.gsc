@@ -246,7 +246,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	resettimeout();
     
     self.bSkipRespawn = undefined;
-    
+    self.pickedFirst = undefined;
 	self.sessionstate = "playing";
 		
 	spawnpointname = "mp_teamdeathmatch_spawn";
@@ -435,6 +435,7 @@ pick_zombie( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     
     [[ level.call ]]( "print", eGuy.name + "^7 was randomly selected to be the zombie!", true );
     eGuy.bSkipRespawn = true;
+    eGuy.pickedFirst = true;
     eGuy [[ level.call ]]( "make_zombie" );
 }
 

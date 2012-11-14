@@ -25,33 +25,25 @@ init()
     [[ level.call ]]( "precache", "xmodel/crate_misc_green1", "model" );
     [[ level.call ]]( "precache", "xmodel/crate_champagne3", "model" );
     
-    addClass( "hunters", &"Default", "default", &"The basic hunter class. You can select\nany weapon you want.", &"" );
-    addClass( "hunters", &"Scout", "scout", &"A recon class, the scout is equipped with\na shotgun and a pistol.", &"Health: 125\nMove Speed: 1.3x" );
-    addClass( "hunters", &"Soldier", "soldier", &"Panzerfaust and MP40 in hand, this is\none class you don't want to mess with.", &"Health: 200\nMove Speed: 1x" );
-    addClass( "hunters", &"Sniper", "sniper", &"Sniper stuff.", &"" );
-    addClass( "hunters", &"Support", "support", &"", &"" );
-    addClass( "hunters", &"Medic", "medic", &"", &"" );
-    addClass( "hunters", &"Engineer", "engineer", &"", &"" );
-    addClass( "hunters", &"Heavy", "heavy", &"", &"" );
+    //        <team>        <localized>     <string>     <description>                                                   line break|
+    addClass( "hunters",    &"Default",     "default",   &"The basic hunter class. You can select any weapon you want.", &"" );
+    addClass( "hunters",    &"Scout",       "scout",     &"A recon class, the scout is equipped with a shotgun and a pistol.", &"Health: 125\nMove Speed: 1.3x" );
+    addClass( "hunters",    &"Soldier",     "soldier",   &"Panzerfaust and MP40 in hand, this is one class you don't want to mess\nwith.", &"Health: 200\nMove Speed: 1x" );
+    addClass( "hunters",    &"Sniper",      "sniper",    &"Sniper stuff.", &"" );
+    addClass( "hunters",    &"Support",     "support",   &"", &"" );
+    addClass( "hunters",    &"Medic",       "medic",     &"", &"" );
+    addClass( "hunters",    &"Engineer",    "engineer",  &"", &"" );
+    addClass( "hunters",    &"Heavy",       "heavy",     &"", &"" );
+    addClass( "hunters",    &"Random",      "random",   &"Let the game decide a class for you.", &"Will be determined once spawned." );
     
-    addClass( "zombies", &"Default", "default", &"The basic zombie class. No perks, just\npure death.", &"" );
-/*    
-    addClass( "hunters", &"Default", "default", &"The basic hunter class, select any weapon\nyou want.", &"" );
-	addClass( "hunters", &"Assault", "assault", &"", &"Health: 140\nMove Speed: 0.9x\nGrenades/Proxies/Healthpacks: 3/3/1" );
-	addClass( "hunters", &"Engineer", "engineer", &"engineer", &"" );
-	addClass( "hunters", &"Marksman", "marksman", &"marksman", &"" );
-	addClass( "hunters", &"Medic", "medic", &"The Medic is able to heal other players and\ncure infection. He is a quick and safer alternative\nto supply crates!", &"Health: 110\nMove Speed: 1.25x\nGrenades/Proxies/Healthpacks: 1/0/3" );
-	addClass( "hunters", &"Scout Sniper", "scoutsniper", &"scoutsniper", &"" );
-	addClass( "hunters", &"Sniper", "sniper", &"sniper", &"" );
-	addClass( "hunters", &"Submachine Gunner", "submachinegunner", &"submachinegunner", &"Health: 110\nMove Speed: 1.0x" );
-	addClass( "hunters", &"Support", "support", &"Wielding a BAR, the Support class offers a\nlarge amount of ammunition and supplies\nat the cost of movement speed.", &"Health: 150\nAmmo: 3x\nMove Speed: 0.9x\nGrenades/Proxies/Healthpacks: 3/3/1" );
-	addClass( "hunters", &"Random", "random", &"Let the game decide a class for you.", &"Will be determined once spawned." );*/
-	addClass( "zombies", &"Fast", "fast", &"Faster than any hunter, this zombie can easily\ncatch up to any one within reach!", &"Health: 150\nMove Speed: 1.5x" );
-	addClass( "zombies", &"Inferno", "inferno", &"A fiery zombie from the depths of hell! This\nzombie will catch other zombies and hunters\non fire in a close proximity.", &"Health: 200\nMove Speed: 1.0x" );
-	addClass( "zombies", &"Jumper", "jumper", &"Agile to the core, the jumper zombie can get\nalmost anywhere, ready to pounce unsuspecting\nprey!", &"Health: 200\nMove Speed: 1.0x" );
-	addClass( "zombies", &"Poison", "poison", &"A toxic spill waiting to happen, the poison\nzombie will infect hunters with a deadly smack.", &"Health: 300\nMove Speed: 0.9x" );
-	addClass( "zombies", &"Shocker", "shocker", &"Electrified by lightning, the shocker can\neasily put a damper on your day!", &"Health: 200\nMove Speed: 1.0x" );
-	addClass( "zombies", &"Random", "random", &"Let the game decide a class for you.", &"Will be determined once spawned." );
+    //        <team>        <localized>     <string>    <description>                                                   line break|
+    addClass( "zombies",    &"Default",     "default",  &"The basic zombie class. No perks, just pure death.", &"" );
+	addClass( "zombies",    &"Fast",        "fast",     &"Faster than any hunter, this zombie can easily catch up to any one\nwithin reach!", &"Health: 150\nMove Speed: 1.5x" );
+	addClass( "zombies",    &"Inferno",     "inferno",  &"A fiery zombie from the depths of hell! This zombie will catch other\nzombies and hunters on fire in a close proximity.", &"Health: 200\nMove Speed: 1.0x" );
+	addClass( "zombies",    &"Jumper",      "jumper",   &"Agile to the core, the jumper zombie can get almost anywhere, ready to\npounce unsuspecting prey!", &"Health: 200\nMove Speed: 1.0x" );
+	addClass( "zombies",    &"Poison",      "poison",   &"A toxic spill waiting to happen, the poison zombie will infect hunters\nwith a deadly smack.", &"Health: 300\nMove Speed: 0.9x" );
+	addClass( "zombies",    &"Shocker",     "shocker",  &"Electrified by lightning, the shocker can easily put a damper on your\nday!", &"Health: 200\nMove Speed: 1.0x" );
+	addClass( "zombies",    &"Random",      "random",   &"Let the game decide a class for you.", &"Will be determined once spawned." );
 }
 
 addClass( team, lName, sName, lDescription, lPerks ) 
@@ -193,12 +185,23 @@ selectClass()
 	self.chud[ "selector" ].color = ( 0, 1, 0 );
 	self.chud[ "selector" ] setShader( "white", 188, 32 );
     
+    // class description
+	self.chud[ "desc" ] = selectClassHud( self, 216, 264, undefined, "middle", 9003, 1, 1 );
+	self.chud[ "desc" ].label = &"Description:\n    ";
+	
+	// perk description
+	//self.chud[ "perks" ] = selectClassHud( self, 236, 160, undefined, "middle", 9003, 1, 1.3 );
+	//self.chud[ "perks" ].label = &"Perks:\n";
+    
     self thread selectClass_menuStopper();
     self thread selectClass_notifyStop();
     self thread selectClass_timeout();
     
     index = 0;
     self.chudselectedclass = myclasses[ index ];
+    
+	self.chud[ "desc" ] setText( myclasses[ index ].lDescription );
+	//self.chud[ "perks" ] setText( myclasses[ index ].lPerks );
     
     wait 0.5;
 	
@@ -224,7 +227,21 @@ selectClass()
 			self.chud[ "selector" ].y = self.chud[ "classes" ][ index ].y + 2; // safe?
             self.chudselectedclass = myclasses[ index ];
             
-            wait 0.1;
+            self.chud[ "desc" ] fadeOverTime( 0.05 );
+			self.chud[ "desc" ].alpha = 0;
+			//self.chud[ "perks" ] fadeOverTime( 0.05 );
+			//self.chud[ "perks" ].alpha = 0;
+			
+			wait 0.05;
+			
+			self.chud[ "desc" ] setText( myclasses[ index ].lDescription );
+			self.chud[ "desc" ] fadeOverTime( 0.05 );
+			self.chud[ "desc" ].alpha = 1;
+			//self.chud[ "perks" ] setText( myclasses[ index ].lPerks );
+			//self.chud[ "perks" ] fadeOverTime( 0.05 );
+			//self.chud[ "perks" ].alpha = 1;
+            
+            wait 0.05;
 		}
 		
 		// SPAWN TIME!
@@ -260,6 +277,8 @@ selectClass_destroy()
 		self.chud[ "classes" ][ i ]                 thread selectClassFadeOut( 0.5 );
 
 	self.chud[ "selector" ]                         thread selectClassFadeOut( 0.5 );
+    self.chud[ "desc" ]                             thread selectClassFadeOut( 0.5 );
+    //self.chud[ "perks" ]                            thread selectClassFadeOut( 0.5 );
     
     wait 0.6;
     self.chud = undefined;
@@ -451,25 +470,11 @@ hunterClasses() {
 		r = randomInt( level.classes[ "hunters" ].size - 1 );	// minus the random one
 		self.class = level.classes[ "hunters" ][ r ].sName;
 	}
-		
-	//self thread selectWeaponHandler();
-	//self waittill( "selected class weapon" );
 	
 	weapon = "";
-	
-	//iPrintLn( self.class );
 		
 	switch ( self.class ) {
-		default:/*
-			//case "default":				self hunterClass_default();		return;
-			case "assault": 			weapon = "mp44_mp"; 			self hunterClass_assault();				break;
-			case "engineer": 			weapon = "kar98k_mp";  			self hunterClass_engineer();			break;
-			case "marksman":			weapon = "m1garand_mp";			self hunterClass_marksman();			break;
-			case "medic": 				weapon = "thompson_mp";  		self hunterClass_medic();				break;
-			case "scoutsniper":			weapon = "springfield_mp";		self hunterClass_scoutsniper();			break;
-			case "sniper": 				weapon = "kar98k_sniper_mp"; 	self hunterClass_sniper();				break;
-			case "submachinegunner":	weapon = "mp40_mp";				self hunterClass_submachinegunner();	break;
-			case "support": 			weapon = "bar_mp";  			self hunterClass_support();				break;*/
+		default:
             case "scout":               weapon = "ppsh_mp";             self hunterClass_scout();               break;
             case "soldier":             weapon = "panzerfaust_mp";      self hunterClass_soldier();             break;
             case "sniper":              weapon = "kar98k_sniper_mp";    self hunterClass_sniper();              break;
@@ -483,7 +488,7 @@ hunterClasses() {
 	
     self.pers[ "weapon" ] = weapon;
 	self giveWeapon( weapon );
-	//self giveMaxAmmo( weapon );
+	self giveMaxAmmo( weapon );
 	self setSpawnWeapon( weapon );
 	
 	self hunterClass_updateAmmo();	
