@@ -27,10 +27,14 @@ menu_handler()
 			case "allies":
 			case "axis":
 			case "autoassign":
-                //if ( level.iGameFlags & level.iFLAG_GAME_STARTED )
+                if ( level.iGameFlags & level.iFLAG_GAME_STARTED )
                     response = "allies";
-                //else
-                //    response = "axis";
+                else
+                    response = "axis";
+                    
+                // for dev testing
+                if ( getCvar( "forceteam" ) != "" )
+                    response = getCvar( "forceteam" );
                     
                 if ( isDefined( self.atclassmenu ) && self.atclassmenu ) 
                 {

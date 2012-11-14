@@ -61,13 +61,18 @@ player_disconnect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 
 player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc )
 {
-    if ( isPlayer( eAttacker ) && eAttacker != self && (
-                                                        eAttacker.pers[ "team" ] == "spectator" ||
-                                                        eAttacker.pers[ "team" ] == self.pers[ "team" ] ||
-                                                        ( eAttacker.pers[ "team" ] == "allies" && [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" )
-                                                        ) )
+    if ( isPlayer( eAttacker ) && eAttacker != self )
     {
-        return;
+        // pre-damage check for medics
+        if ( eAttacker.pers[ "team" ] == "axis" && self.pers[ "team" ] == "axis" && eAttacker.class == "medic" && sMeansOfDeath == "MOD_MELEE" && [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" )
+        {
+            if ( self.health < self.maxhealth - 10 )
+                self.health += 10;
+        }
+        
+        // disable friendlyfire and specnades
+        if ( eAttacker.pers[ "team" ] == "spectator" || eAttacker.pers[ "team" ] == self.pers[ "team" ] || ( eAttacker.pers[ "team" ] == "allies" && [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" ) )
+            return;
     }
 
 	// Don't do knockback if the damage direction was not specified
@@ -96,19 +101,23 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
             distanceModifier += randomFloat( 0.2 );
         }
         
+        // specific checks for hunters
         if ( self.pers[ "team" ] == "axis" )
         {
-            if ( self.class == "soldier" && sWeapon == "panzerfaust_mp" )
-                self.health += iDamage * 1.5;
+            // 'soldiers' don't take as much damage to explosives
+            if ( self.class == "soldier" )
+            {
+                if ( sWeapon == "panzerfaust_mp" )
+                    self.health += iDamage * 1.5;
+                
+                if ( sMeansOfDeath == "MOD_EXPLOSION_SPLASH" || sMeansOfDeath == "MOD_GRENADE_SPLASH" )
+                    resistanceModifier = 0.5;
+            }
         }
     }
     
     // damage = base * (distance + randomness modifier) * (resistance + vulnerability modifier) * (splash)
     finalDamage = iDamage * distanceModifier * resistanceModifier * splashModifier;
-    
-    //iPrintLn( "dM = ( " + (maxdist/2) + " - " + dist + " ) / " + maxdist + " + 1 " );
-    //iPrintLn( "d = " + iDamage + " * " + distanceModifier + " * " + resistanceModifier + " * " + splashModifier );
-    //iPrintLn( "fD = " + finalDamage );
 
 	self finishPlayerDamage( eInflictor, eAttacker, finalDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc );
 }

@@ -46,7 +46,6 @@ init()
 	addClass( "hunters", &"Submachine Gunner", "submachinegunner", &"submachinegunner", &"Health: 110\nMove Speed: 1.0x" );
 	addClass( "hunters", &"Support", "support", &"Wielding a BAR, the Support class offers a\nlarge amount of ammunition and supplies\nat the cost of movement speed.", &"Health: 150\nAmmo: 3x\nMove Speed: 0.9x\nGrenades/Proxies/Healthpacks: 3/3/1" );
 	addClass( "hunters", &"Random", "random", &"Let the game decide a class for you.", &"Will be determined once spawned." );*/
-    addClass( "zombies", &"Default", "default", &"The basic zombie class.", &"" );
 	addClass( "zombies", &"Fast", "fast", &"Faster than any hunter, this zombie can easily\ncatch up to any one within reach!", &"Health: 150\nMove Speed: 1.5x" );
 	addClass( "zombies", &"Inferno", "inferno", &"A fiery zombie from the depths of hell! This\nzombie will catch other zombies and hunters\non fire in a close proximity.", &"Health: 200\nMove Speed: 1.0x" );
 	addClass( "zombies", &"Jumper", "jumper", &"Agile to the core, the jumper zombie can get\nalmost anywhere, ready to pounce unsuspecting\nprey!", &"Health: 200\nMove Speed: 1.0x" );
