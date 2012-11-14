@@ -262,6 +262,8 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	self.health = self.maxhealth;
     
     self detachall();
+    
+    // test comment
 /*	
 	if(!isdefined(self.pers["savedmodel"]))
 		self [[ level.call ]]( "teams_model" );
