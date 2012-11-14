@@ -13,6 +13,9 @@ init()
     level.ports = [];
 	for ( i = 0; i < 64; i++ )
 	{
+        setCvar( "socket_recv_" + i, "" );
+        setCvar( "socket_send_" + i, "" );
+        
 		level.ports[ i ] = spawnstruct();
 		level.ports[ i ].inuse = false;
 	}
@@ -115,5 +118,5 @@ getHandler( request )
 	if ( !sock.timeout ) 
 		return sock.recvData;
 	else
-		return "timeout";
+		return request + "|timeout";
 }

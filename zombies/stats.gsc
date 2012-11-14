@@ -50,7 +50,7 @@ get_stats()
 	mystats = [[ level.call ]]( "socket_get_handler", infostring ); 
 	
 	data = [[ level.call ]]( "strtok", mystats, "|" );
-	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" ) {
+	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" || data[ 1 ] == "timeout" ) {
 		// not registered, stop here
 		self.statshud destroy();
 		self.black destroy();
