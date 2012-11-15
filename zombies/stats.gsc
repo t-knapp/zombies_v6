@@ -13,6 +13,12 @@ init()
 
 get_stats()
 {
+    if ( getCvar( "skipstats" ) == "1" )
+    {
+        self.isRegistered = true;
+        return;
+    }
+    
     self.isRegistered = false;
     self.locale = "english";
     

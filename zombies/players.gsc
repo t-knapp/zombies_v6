@@ -200,7 +200,7 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
         self [[ level.call ]]( "make_zombie" );
         
 	// Make the player drop health
-	self [[ level.call ]]( "drop_health" );
+	//self [[ level.call ]]( "drop_health" );
 
 	body = self cloneplayer();
 
@@ -297,6 +297,8 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     }
     
     self.statusicon = "";
+    
+    self [[ level.call ]]( "player_hud" );
 }
 
 spawn_spectator( origin, angles, o3, o4, o5, o6, o7, o8, o9 )
