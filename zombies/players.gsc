@@ -82,9 +82,10 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
     resistanceModifier = 1;
     splashModifier = 1;   
     
+    /*
     if ( sMeansOfDeath == "MOD_FALLING" && self.pers[ "team" ] == "allies" && self.class == "jumper" )
         iDamage = iDamage / 2;
-    
+    */
     if ( sMeansOfDeath != "MOD_FALLING" )
     {
         // since melee damage is up close anyways, we'll do the full amount
