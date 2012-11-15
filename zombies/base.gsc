@@ -48,6 +48,8 @@ main()
 {
     level.iGameFlags = level.iFLAG_GAME_PREGAME;
     
+    thread rotate_if_empty();
+    
     hPlayersNeeded = newHudElem();
     hPlayersNeeded.x = 320;
     hPlayersNeeded.y = 240;
@@ -66,6 +68,8 @@ main()
             
         wait 0.05;
     }
+    
+    level notify( "stop_rotate_if_empty" );
     
     hPlayersNeeded setValue( 0 );
     hPlayersNeeded fadeOverTime( 2 );
@@ -128,6 +132,21 @@ main()
 		check_time_limit();
 		wait 1;
 	}
+}
+
+rotate_if_empty()
+{
+	level endon( "stop_rotate_if_empty" );
+	
+	time = 0;
+	
+	while ( time < 1200 )
+	{
+		time++;
+		wait 1;
+	}
+	
+	exitLevel( false );
 }
 
 // basically, i don't use this at all
