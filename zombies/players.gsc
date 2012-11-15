@@ -277,6 +277,12 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
         self.headicon = game["headicon_allies"];
         self.headiconteam = "allies";
 		//self thread explodeFromGround();
+        
+        if ( level.bFirstZombie ) 
+        {
+            self.maxhealth += 1000;
+            self.health = self.maxhealth;
+        }
     }
     else if ( self.pers[ "team" ] == "axis" )
     {

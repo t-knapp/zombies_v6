@@ -18,7 +18,7 @@ init()
     level.aHealthQueue = [];
     level.iHealthQueueCurrent = 0;
     level.aSpawnedObjects = [];
-    level.bMapEnded = false;
+    level.bFirstZombie = false;
     
     // no better place to put this :>
     setCvar( "g_TeamColor_Allies", "1 0 0" );
@@ -181,6 +181,12 @@ game_logic()
             [[ level.call ]]( "pick_zombie" );
             wait 1;
         }
+        
+        // only one zombie? give them a health bonus!
+        if ( aZombies.size == 1 && !level.bFirstZombie )
+            level.bFirstZombie = true;
+        if ( aZombies.size > 1 && level.bFirstZombie )
+            level.bFirstZombie = false;
         
         // only one hunter left? last hunter time!
         
