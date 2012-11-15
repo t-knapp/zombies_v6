@@ -169,9 +169,9 @@ game_logic()
         
         for ( i = 0; i < aPlayers.size; i++ )
         {
-            if ( aPlayers.pers[ "team" ] == "allies" )
+            if ( aPlayers[ i ].pers[ "team" ] == "allies" )
                 aZombies[ aZombies.size ] = aPlayers[ i ];
-            else if ( aPlayers.pers[ "team" ] == "axis" )
+            else if ( aPlayers[ i ].pers[ "team" ] == "axis" )
                 aHunters[ aHunters.size ] = aPlayers[ i ];
         }
         

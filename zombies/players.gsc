@@ -309,6 +309,7 @@ spawn_spectator( origin, angles, o3, o4, o5, o6, o7, o8, o9 )
 
 	resettimeout();
 
+    self.sessionteam = "spectator";
 	self.sessionstate = "spectator";
 	self.spectatorclient = -1;
 	self.archivetime = 0;

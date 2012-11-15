@@ -557,33 +557,33 @@ hunterClass_default() {
 }
 
 hunterClass_scout() {
-    self.haelth = 125;
+    self.maxhealth = 125;
     
     self giveWeapon( "colt_mp" );
 }
 
 hunterClass_soldier() {
-    self.health = 200;
+    self.maxhealth = 200;
     
     self setWeaponSlotWeapon( "primaryb", "mp40_mp" );
     self giveMaxAmmo( "mp40_mp" );
 }
 
 hunterClass_heavy() {
-	self.health = 300;
+	self.maxhealth = 300;
     
     self setWeaponSlotWeapon( "primaryb", "bar_mp" );
     self giveMaxAmmo( "bar_mp" );
 }
 
 hunterClass_engineer() {
-    self.health = 125;
+    self.maxhealth = 125;
     self setWeaponSlotWeapon( "grenade", "mk1britishfrag_mp" );
     self setWeaponSlotAmmo( "grenade", 0 );
 }
 
 hunterClass_medic() {
-    self.health = 150;
+    self.maxhealth = 150;
     
     self setWeaponSlotWeapon( "grenade", "mk1britishfrag_mp" );
     self setWeaponSlotAmmo( "grenade", 0 );
@@ -643,13 +643,13 @@ dohealing( mypack )
 }
 
 hunterClass_sniper() {
-    self.health = 150;
+    self.maxhealth = 150;
     
     self setWeaponSlotAmmo( "grenade", 1 );
 }
 
 hunterClass_support() {
-	self.health = 175;
+	self.maxhealth = 175;
     
     self setWeaponSlotWeapon( "grenade", "mk1britishfrag_mp" );
     self setWeaponSlotAmmo( "grenade", 0 );
