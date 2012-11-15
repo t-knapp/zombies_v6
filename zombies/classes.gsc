@@ -26,6 +26,8 @@ init()
     [[ level.call ]]( "precache", &"Hunter", "string" );
     [[ level.call ]]( "precache", &"Zombie", "string" );
     [[ level.call ]]( "precache", &"Timeout in: ", "string" );
+    [[ level.call ]]( "precache", &"Hold [{+activate}] to get ammo", "string" );
+    [[ level.call ]]( "precache", &"Ammo left until depleted: ", "string" );
     
     [[ level.call ]]( "precache", "xmodel/crate_misc1", "model" );
     [[ level.call ]]( "precache", "xmodel/crate_misc_red1", "model" );
@@ -737,6 +739,7 @@ ammobox()
     self setWeaponSlotWeapon( "grenade", "none" );
     
     self thread ammobox_remove();
+    self thread ammobox_remove_count( mybox );
     self thread ammobox_think( mybox );
     
     self waittill( "remove ammobox" );
@@ -749,8 +752,173 @@ ammobox_remove()
     self notify( "remove ammobox" );
 }
 
+// removes ammobox after it's depleted
+ammobox_remove_count( box )
+{
+    self endon( "remove ammobox" );
+   
+    box.ammocount = randomInt( 20 ) + 10;
+    
+    while ( box.ammocount > 0 )
+        wait 1;
+        
+    self notify( "remove ammobox" );
+}
+
 ammobox_think( box )
 {
+    self endon( "remove ammobox" );
+    
+	while ( 1 )
+	{
+		players = [[ level.call ]]( "get_good_players" );
+		for ( i = 0; i < players.size; i++ )
+		{
+			if ( distance( box.origin, players[ i ].origin ) < 32 && players[ i ].pers[ "team" ] == "axis" && !isDefined( players[ i ].gettingammo ) )
+				players[ i ] thread getammo( box );
+		}
+		
+		wait 0.1;
+	}
+}
+
+getammo( box )
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	self.gettingammo = true;
+	
+	while ( isDefined( box ) && distance( box.origin, self.origin ) < 32 && isAlive( self ) )
+	{	
+		if ( !isDefined( self.ammonotice ) || !isDefined( self.boxnotice ) )
+		{
+			self.ammonotice = newClientHudElem( self );
+			self.ammonotice.alignX = "center";
+			self.ammonotice.alignY = "middle";
+			self.ammonotice.x = 320;
+			self.ammonotice.y = 320;
+			self.ammonotice.alpha = 1;
+			self.ammonotice setText( &"Hold [{+activate}] to get ammo" );
+            
+            self.boxnotice = newClientHudElem( self );
+			self.boxnotice.alignX = "center";
+			self.boxnotice.alignY = "middle";
+			self.boxnotice.x = 320;
+			self.boxnotice.y = 330;
+			self.boxnotice.alpha = 1;
+			self.boxnotice.label = &"Ammo left until depleted: ";
+		}
+        
+        self.boxnotice setValue( box.ammocount );
+		
+		while ( !isDefined( self.givenammo ) && self usebuttonpressed() && self isOnGround() && isAlive( self ) )
+		{
+			org = spawn( "script_origin", self.origin );
+			if ( !isdefined( self.progressbackground ) )
+			{
+				self.progressbackground = newClientHudElem( self );				
+				self.progressbackground.alignX = "center";
+				self.progressbackground.alignY = "middle";
+				self.progressbackground.x = 320;
+				self.progressbackground.y = 385;
+				self.progressbackground.alpha = 0.75;
+			}
+			self.progressbackground setShader( "black", ( 288 + 4 ), 12 );		
+
+			if ( !isdefined( self.progressbar ) )
+			{
+				self.progressbar = newClientHudElem( self );				
+				self.progressbar.alignX = "left";
+				self.progressbar.alignY = "middle";
+				self.progressbar.x = ( 320 - ( 288 / 2.0 ) );
+				self.progressbar.y = 385;
+				self.progressbar.alpha = 1;
+			}
+			self.progressbar setShader( "white", 0, 8 );
+			self.progressbar scaleOverTime( 2, 288, 8 );
+			
+			self linkto( org );
+			
+			self.progresstime = 0;
+			while( self useButtonPressed() && ( self.progresstime < 2 ) && isAlive( self ) )
+			{
+				self.progresstime += 0.05;
+				wait 0.05;
+			}
+			
+			org delete();
+			
+			if ( self.progresstime >= 2 )
+			{			
+				// ideally we'll decrement the amount of uses this ammobox has here
+                box.ammocount--;
+                
+                // stolen from kill3r's mod
+                // this way is better suited for this version of zombies, since we're not actually giving health anymore
+                self playlocalsound( "weap_pickup" );
+
+                oldamountpri = self getWeaponSlotAmmo( "primary" );
+                oldamountprib = self getWeaponSlotAmmo( "primaryb" );
+                oldamountpistol = self getWeaponSlotAmmo( "pistol" );
+                oldamountgrenade = self getWeaponSlotAmmo( "grenade" );
+                oldamountsmokegrenade = self getWeaponSlotAmmo( "smokegrenade" );
+
+                self setWeaponSlotAmmo( "primary", ( oldamountpri + 90 ) );
+                self setWeaponSlotAmmo( "primaryb", ( oldamountprib + 90 ) );
+                self setWeaponSlotAmmo( "pistol", ( oldamountpistol + 30 ) );
+				
+				self.givenammo = true;
+				
+				self.progressbackground destroy();
+				self.progressbar destroy();
+				
+				self playSound( "weap_ammo_pickup" );
+				
+				self thread waitammo();
+				break;
+			}
+			else
+			{
+				self.progressbackground destroy();
+				self.progressbar destroy();
+			}
+		}
+		
+		wait 0.05;
+	}
+	
+	self.ammonotice destroy();
+    self.boxnotice destroy();
+	self.gettingammo = undefined;
+}
+/*
+getammo( box )
+{
+    self endon( "death" );
+    self endon( "disconnect" );
+    
+    self.gettingammo = true;
+    
+    self playlocalsound( "weap_pickup" );
+
+    oldamountpri = self getWeaponSlotAmmo( "primary" );
+    oldamountprib = self getWeaponSlotAmmo( "primaryb" );
+    oldamountpistol = self getWeaponSlotAmmo( "pistol" );
+
+    self setWeaponSlotAmmo( "primary", ( oldamountpri + 30 ) );
+    self setWeaponSlotAmmo( "primaryb", ( oldamountprib + 30 ) );
+    self setWeaponSlotAmmo( "pistol", ( oldamountpistol + 10 ) );
+    
+    wait 2;
+    
+    self.gettingammo = undefined;
+}
+*/
+waitammo()
+{
+	wait 1;
+	self.givenammo = undefined;
 }
 
 loadout()
