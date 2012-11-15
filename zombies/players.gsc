@@ -262,27 +262,21 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     
     self detachall();
 
-/*	
-	if(!isdefined(self.pers["savedmodel"]))
-		self [[ level.call ]]( "teams_model" );
-	else
-		self [[ level.call ]]( "load_model", self.pers["savedmodel"] );
-*/      
     self [[ level.call ]]( "classes_loadout" );
 	
     if ( self.pers[ "team" ] == "allies" )
     {
-        [[game["allies_model"] ]]();
-        self.voicetype = game[ "allies" ];
-        self.headicon = game["headicon_allies"];
-        self.headiconteam = "allies";
-		//self thread explodeFromGround();
-        
         if ( level.bFirstZombie ) 
         {
             self.maxhealth += 1000;
             self.health = self.maxhealth;
         }
+        
+        [[game["allies_model"] ]]();
+        self.voicetype = game[ "allies" ];
+        self.headicon = game["headicon_allies"];
+        self.headiconteam = "allies";
+		self thread explode_from_ground();
     }
     else if ( self.pers[ "team" ] == "axis" )
     {
@@ -467,4 +461,20 @@ drop_health()
 	
 	if ( level.iHealthQueueCurrent >= 16 )
 		level.iHealthQueueCurrent = 0;
+}
+
+explode_from_ground()
+{
+    playFx( level._effect[ "zombies_groundexplode" ], self getOrigin() );
+    
+    self.exp = spawn( "script_model", self getOrigin() );
+    self linkto( self.exp );
+    
+    self.exp movez( -50, 0.05 );
+    wait 0.1;
+    
+    self.exp movez( 52, 0.5 );
+    wait 0.5;
+    
+    self.exp delete();
 }
