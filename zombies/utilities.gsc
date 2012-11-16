@@ -31,6 +31,8 @@ init()
     [[ level.register ]]( "spawn", ::_spawn, level.iFLAG_RETURN );
     [[ level.register ]]( "delete", ::_delete );
     [[ level.register ]]( "convert_time", ::convert_time, level.iFLAG_RETURN );
+    [[ level.register ]]( "set_all_client_cvars", ::set_all_client_cvars );
+    [[ level.register ]]( "slowmo", ::slowmo );
 	
 	// math stuff
 	[[ level.register ]]( "abs", ::abs, level.iFLAG_RETURN );
@@ -652,4 +654,40 @@ convert_time( iTime, o2, o3, o4, o5, o6, o7, o8, o9 )
     iDays = ( iHours - iHours2 ) / 24;
     
     return iDays + ":" + iHours2 + ":" + iMinutes2 + ":" + iSeconds;
+}
+
+set_all_client_cvars( cvar, value, o3, o4, o5, o6, o7, o8, o9 )
+{
+	players = getEntArray( "player", "classname" );
+	for ( i = 0; i < players.size; i++ )
+		players[ i ] setClientCvar( cvar, value );
+}
+
+slowmo( length )
+{
+	if ( length <= 1 )
+		return;
+	newlength = length - 1;
+	
+	for ( i = 1.0; i > 0.5; i -= 0.05 )
+	{
+		setCvar( "timescale", i );
+		set_all_client_cvars( "timescale", i );
+		wait 0.05;
+	}
+	
+	setCvar( "timescale", 0.5 );
+	set_all_client_cvars( "timescale", 0.5 );
+	
+	wait ( newlength );
+	
+	for ( i = 0.5; i < 1.0; i += 0.05 )
+	{
+		setCvar( "timescale", i );
+		set_all_client_cvars( "timescale", i );
+		wait 0.05;
+	}
+	
+	setCvar( "timescale", 1.0 );
+	set_all_client_cvars( "timescale", 1.0 );
 }

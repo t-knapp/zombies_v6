@@ -16,6 +16,7 @@ init()
     register_module( "menus", zombies\menus::init, ::blank );
     register_module( "classes", zombies\classes::init, ::blank );
     register_module( "hud", zombies\hud::init, ::blank );
+    register_module( "models", zombies\models::init, ::blank );
     register_module( "players", zombies\players::init, ::blank );
     register_module( "socket", zombies\socket::init, ::blank );
     register_module( "stats", zombies\stats::init, ::blank );

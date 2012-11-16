@@ -94,6 +94,7 @@ init()
 	precacheObject( "mp44_mp", "item" );
 	precacheObject( "kar98k_sniper_mp", "item" );
 	precacheObject( "panzerfaust_mp", "item" );
+    precacheObject( "fg42_mp", "item" );
 	
 	// models
 	

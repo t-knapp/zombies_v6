@@ -192,10 +192,13 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 		lpattackname = "";
 		lpattackerteam = "world";
 	}
-
-	// Stop thread if map ended on this death
+                
+    // Stop thread if map ended on this death
     if ( level.iGameFlags & level.iFLAG_GAME_OVER )
         return;
+        
+    if ( isPlayer( eAttacker ) )
+        level.lastkiller = eAttacker;
         
     if ( self.pers[ "team" ] == "axis" && ( level.iGameFlags & level.iFLAG_GAME_STARTED ) )
         self [[ level.call ]]( "make_zombie" );
@@ -211,7 +214,7 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 	if(getcvarint("scr_forcerespawn") > 0)
 		doKillcam = false;
 
-    if ( !isDefined( self.bSkipRespawn ) )
+    if ( !isDefined( self.bSkipRespawn ) && ( level.iGameFlags & level.iFLAG_GAME_OVER ) == 0 )
     {
         if ( doKillcam )
             self [[ level.call ]]( "killcam", eAttackerNum, delay );
@@ -272,8 +275,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
             self.maxhealth += 1000;
             self.health = self.maxhealth;
         }
-        
-        [[game["allies_model"] ]]();
+
         self.voicetype = game[ "allies" ];
         self.headicon = game["headicon_allies"];
         self.headiconteam = "allies";
@@ -281,7 +283,6 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     }
     else if ( self.pers[ "team" ] == "axis" )
     {
-    	[[game["axis_model"] ]]();
         self.voicetype = game[ "axis" ];
         self.headicon = game["headicon_axis"];
         self.headiconteam = "axis";
@@ -299,6 +300,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     
     self.statusicon = "";
     
+    self [[ level.call ]]( "model_setup" );
     self [[ level.call ]]( "player_hud" );
 }
 
@@ -437,10 +439,19 @@ pick_zombie( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     iInt = [[ level.call ]]( "rand", aGoodPlayers.size );
     eGuy = aGoodPlayers[ iInt ];
     
+    while ( eGuy.name == getCvar( "lastzom" ) )
+    {
+        [[ level.call ]]( "print", eGuy.name + "^7 was the zombie last time... picking someone else..." );
+        wait 2;
+        iInt = [[ level.call ]]( "rand", aGoodPlayers.size );
+        eGuy = aGoodPlayers[ iInt ];
+    }
+    
     [[ level.call ]]( "print", eGuy.name + "^7 was randomly selected to be the zombie!", true );
     eGuy.bSkipRespawn = true;
     eGuy.pickedFirst = true;
     eGuy [[ level.call ]]( "make_zombie" );
+    setCvar( "lastzom", eGuy.name );
 }
 
 make_zombie( o1, o2, o3, o4, o5, o6, o7, o8, o9 )

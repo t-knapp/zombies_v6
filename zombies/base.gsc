@@ -115,7 +115,7 @@ main()
     
     thread game_logic();
 	
-	if ( level.timelimit > 0 )
+	if ( level.iTimeLimit > 0 )
 	{
 		level.clock = newHudElem();
 		level.clock.x = 320;
@@ -207,17 +207,36 @@ end_map( sWinner )
 	level notify( "intermission" );
     
     level.iGameFlags = level.iFLAG_GAME_OVER;
-	
-    // TODO: actual winner logic
-	if ( winner == "zombies" )
-    {
-        [[ level.call ]]( "print", "Zombies win!", true );
-    }
-    else if ( winner == "hunters" )
-    {
-        [[ level.call ]]( "print", "Hunters win!", true );
-    }
-	  
+
+    aPlayers = getentarray( "player", "classname" );
+    if ( winner == "zombies" )
+	{
+        [[ level.call ]]( "print", "^1Zombies win!", true );
+        
+        wait 2;
+        
+		for ( i = 0; i < aPlayers.size; i++ )
+		{
+			ePlayer = aPlayers[ i ];
+			ePlayer closeMenu();
+			ePlayer setClientCvar( "g_scriptMainMenu", "main" );
+			ePlayer thread [[ level.call ]]( "gamecam", level.lastKiller getEntityNumber(), 2 );
+		}
+		
+		wait 4.5;
+		
+		[[ level.call ]]( "slowmo", 3.5 );
+	}
+    
+    for ( i = 0; i < aPlayers.size; i++ )
+	{
+		aPlayers[ i ] thread [[ level.call ]]( "gamecam_remove" );
+		
+		aPlayers[ i ] [[ level.call ]]( "spawn_spectator" );
+		aPlayers[ i ].org = spawn( "script_origin", aPlayers[ i ].origin );
+		aPlayers[ i ] linkto( aPlayers[ i ].org );
+	}
+    	  
     // mapvote here
     [[ level.call ]]( "map_vote" );
     
@@ -226,7 +245,7 @@ end_map( sWinner )
     aPlayers = getentarray( "player", "classname" );
 	for ( i = 0; i < aPlayers.size; i++ )
 	{
-		ePlayer = aPlayers[ i] ;
+		ePlayer = aPlayers[ i ];
 		ePlayer closeMenu();
 		ePlayer setClientCvar( "g_scriptMainMenu", "main" );
 		ePlayer setClientCvar( "cg_objectiveText", "SILLY TEXT HERE" );
