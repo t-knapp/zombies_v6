@@ -29,11 +29,13 @@ player_connect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     
     level notify( "player_connected", self );
     
-    self [[ level.call ]]( "get_stats" );
-    
     // remove "box" chars from name that crash linux servers
     self [[ level.call ]]( "name_fix", self.name );
     
+    self setClientCvar( "r_fastsky", "1" );
+    
+    self [[ level.call ]]( "get_stats" );
+      
     // force them to the scoreboard if they joined on map change
     if ( level.iGameFlags & level.iFLAG_GAME_INTERMISSION )
     {

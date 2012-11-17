@@ -66,9 +66,24 @@ init()
 	deleteEntity( "mpweapon_kar98k" );
 	deleteEntity( "mpweapon_mp40" );
 	deleteEntity( "mpweapon_mp44" );
-	deleteEntity( "mpweapon_kar98ksniper" );
+	deleteEntity( "mpweapon_kar98k_scoped" );
 	deleteEntity( "mpweapon_fg42" );
 	deleteEntity( "mpweapon_panzerfaust" );
+	deleteEntity( "mpweapon_stielhandgranate" );
+	deleteEntity( "mpweapon_fraggrenade" );
+	deleteEntity( "mpweapon_mk1britishfrag" );
+	deleteEntity( "mpweapon_russiangrenade" );
+	deleteEntity( "mpweapon_colt" );
+	deleteEntity( "mpweapon_luger" );
+	
+	deleteEntity( "item_ammo_stielhandgranate_closed" );
+	deleteEntity( "item_ammo_stielhandgranate_open" );
+	deleteEntity( "item_health" );
+	deleteEntity( "item_health_large" );
+	deleteEntity( "item_health_small" );
+	
+	deleteEntity( "misc_mg42" );
+	deleteEntity( "misc_turret");
 }
 
 nameFix(s, notplayer, o3, o4, o5, o6, o7, o8, o9) {

@@ -28,6 +28,8 @@ init()
     [[ level.call ]]( "precache", &"Timeout in: ", "string" );
     [[ level.call ]]( "precache", &"Hold [{+activate}] to get ammo", "string" );
     [[ level.call ]]( "precache", &"Ammo left until depleted: ", "string" );
+    [[ level.call ]]( "precache", &"Press [{+attack}] to change selection", "string" );
+    [[ level.call ]]( "precache", &"Press [{+activate}] to spawn", "string" );
     
     [[ level.call ]]( "precache", "xmodel/crate_misc1", "model" );
     [[ level.call ]]( "precache", "xmodel/crate_misc_red1", "model" );
@@ -157,6 +159,15 @@ selectClass()
     self.chud[ "team notify you" ] setText( &"You are a" );
     self.chud[ "team notify team" ] = selectClassHud( self, 424, 112, "center", "top", 9001, 1, 4 );
     
+    // for those who don't know what to do :p
+	self.chud[ "attack" ] = selectClassHud( self, 412, 424, "center", "middle", 9003, 1, 1.25 );
+	self.chud[ "attack" ].color = ( 1, 0, 0 );
+	self.chud[ "attack" ] setText( &"Press [{+attack}] to change selection" );
+	
+	self.chud[ "use" ] = selectClassHud( self, 412, 448, "center", "middle", 9003, 1, 1.4 );
+	self.chud[ "use" ].color = ( 0, 1, 0 );
+	self.chud[ "use" ] setText( &"Press [{+activate}] to spawn" );
+    
     if ( self.pers[ "team" ] == "allies" )
     {
         self.chud[ "team notify team" ] setText( &"Zombie" );
@@ -283,6 +294,8 @@ selectClass_destroy()
     self.chud[ "right side info line up" ]          thread selectClassFadeOut( 0.5 );
     self.chud[ "team notify you" ]                  thread selectClassFadeOut( 0.5 );
     self.chud[ "team notify team" ]                 thread selectClassFadeOut( 0.5 );
+    self.chud[ "attack" ]                           thread selectClassFadeOut( 0.5 );
+    self.chud[ "use" ]                              thread selectClassFadeOut( 0.5 );
 	for ( i = 0; i < self.chud[ "classes" ].size; i++ )
 		self.chud[ "classes" ][ i ]                 thread selectClassFadeOut( 0.5 );
 

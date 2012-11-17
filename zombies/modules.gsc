@@ -23,9 +23,9 @@ init()
     register_module( "killcam", zombies\killcam::init, ::blank );
     register_module( "gamemodes", zombies\gamemodes::init, ::blank );
     register_module( "quickmessages", zombies\quickmessages::init, ::blank );
-    register_module( "weather", zombies\weather::init, zombies\weather::main );
     register_module( "spawnlogic", zombies\_spawnlogic::init, ::blank );
     register_module( "mapvote", zombies\mapvote::init, ::blank );
+    register_module( "weather", zombies\weather::init, zombies\weather::main );
     register_module( "base", zombies\base::init, zombies\base::main );                  // last :)
     
     init_modules();
