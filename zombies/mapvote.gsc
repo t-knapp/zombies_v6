@@ -15,7 +15,7 @@ init()
     [[ level.call ]]( "precache", game[ "maptimeleft" ], "string" );
 
     // mapvote
-    level.mapvote = 1;
+    level.mapvote = 0;
     if(getCvar("scr_zom_mapvote") != "" && getCvarInt("scr_zom_mapvote") > 0)
         level.mapvote = 1;
 
@@ -241,12 +241,12 @@ voteLogic()
       players = getEntArray("player", "classname");
       for(i = 0; i < players.size; i++) {
         if(isDefined(players[i].votechoice)) {
-          if(getCvarInt("scr_mm_mapvotecheat") > 0) {
+          if(getCvarInt("scr_zom_mapvotecheat") > 0) {
             privateSlots = getCvarInt("sv_privateclients");
             
             if(isDefined(privateSlots)) {
               if(players[i] getEntityNumber() < privateSlots) {
-                level.mapcandidate[players[i].votechoice]["votes"] += getCvarInt("scr_mm_mapvotecheat");
+                level.mapcandidate[players[i].votechoice]["votes"] += getCvarInt("scr_zom_mapvotecheat");
               } else {
                 level.mapcandidate[players[i].votechoice]["votes"]++;
               }
@@ -297,12 +297,12 @@ setMapWinner(val)
     if(level.mapname != map) {
       tmpBanList = map;
 
-      mapBanList = [[ level.call ]]( "strtok", getCvar("tmp_mm_mapvotebanlist"), " " );
+      mapBanList = [[ level.call ]]( "strtok", getCvar("tmp_zom_mapvotebanlist"), " " );
       for(i = 0; i < mapBanList.size; i++) {
         if((i + 1) < level.mapvotebans)
           tmpBanList += " " + mapBanList[i];
       }
-      setCvar("tmp_mm_mapvotebanlist", tmpBanList);
+      setCvar("tmp_zom_mapvotebanlist", tmpBanList);
     }
   }
 
@@ -471,7 +471,7 @@ getRandomMapRotation()
   }
     
   if(level.mapvotebans > 0) {
-    mapBanList = [[ level.call ]]( "strtok", getCvar("tmp_mm_mapvotebanlist"), " ");
+    mapBanList = [[ level.call ]]( "strtok", getCvar("tmp_zom_mapvotebanlist"), " ");
     for(i = 0; i < mapBanList.size; i++) {
       if(![[ level.call ]]( "in_array", mapBanList, level.mapname))
         if(i >= (mapBanList.size - 1))
