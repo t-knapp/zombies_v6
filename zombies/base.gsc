@@ -19,6 +19,7 @@ init()
     level.iHealthQueueCurrent = 0;
     level.aSpawnedObjects = [];
     level.bFirstZombie = false;
+    level.gametype = "zom";
     
     // no better place to put this :>
     setCvar( "g_TeamColor_Allies", "1 0 0" );
@@ -227,6 +228,12 @@ end_map( sWinner )
 		
 		[[ level.call ]]( "slowmo", 3.5 );
 	}
+    else if ( winner == "hunters" )
+    {
+        [[ level.call ]]( "print", "^6Hunters win!", true );
+        
+        wait 2;
+    }
     
     for ( i = 0; i < aPlayers.size; i++ )
 	{
@@ -240,6 +247,8 @@ end_map( sWinner )
     // mapvote here
     [[ level.call ]]( "map_vote" );
     
+    /*
+    
     level.iGameFlags |= level.iFLAG_GAME_INTERMISSION;
     
     aPlayers = getentarray( "player", "classname" );
@@ -250,9 +259,9 @@ end_map( sWinner )
 		ePlayer setClientCvar( "g_scriptMainMenu", "main" );
 		ePlayer setClientCvar( "cg_objectiveText", "SILLY TEXT HERE" );
 		ePlayer [[ level.call ]]( "spawn_intermission" );
-	}
+	}*/
 
-	wait 10;
+	wait 3;
 	exitLevel(false);
 }
 

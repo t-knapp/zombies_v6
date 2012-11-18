@@ -74,11 +74,17 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
         // disable friendlyfire and specnades
         if ( eAttacker.pers[ "team" ] == "spectator" || eAttacker.pers[ "team" ] == self.pers[ "team" ] || ( eAttacker.pers[ "team" ] == "allies" && [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" ) )
             return;
+            
+        // spawnprotection
+        if ( isDefined( self.spawnprotection ) )
+            return;
     }
 
 	// Don't do knockback if the damage direction was not specified
 	if(!isDefined(vDir))
 		iDFlags |= level.iDFLAGS_NO_KNOCKBACK;
+        
+    self.lasthittime = gettime();
         
     distanceModifier = 1;
     resistanceModifier = 1;
@@ -91,7 +97,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
     if ( sMeansOfDeath != "MOD_FALLING" )
     {
         // since melee damage is up close anyways, we'll do the full amount
-        if ( sMeansOfDeath != "MOD_MELEE" && sMeansOfDeath != "MOD_EXPLOSION_SPLASH" && sMeansOfDeath != "MOD_GRENADE_SPLASH" ) 
+        if ( isPlayer( eAttacker ) && sMeansOfDeath != "MOD_MELEE" && sMeansOfDeath != "MOD_EXPLOSION_SPLASH" && sMeansOfDeath != "MOD_GRENADE_SPLASH" ) 
         {
             dist = distance( eAttacker.origin, self.origin );
                 
@@ -110,11 +116,15 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
             if ( self.class == "soldier" )
             {
                 if ( sWeapon == "panzerfaust_mp" )
-                    self.health += iDamage * 1.5;
+                    self.health += iDamage * 1.3;
                 
                 if ( sMeansOfDeath == "MOD_EXPLOSION_SPLASH" || sMeansOfDeath == "MOD_GRENADE_SPLASH" )
                     resistanceModifier = 0.5;
             }
+            
+            // did i just get hit by a poison zombie?
+            if ( isPlayer( eAttacker ) && eAttacker.pers[ "team" ] == "allies" && eAttacker.class == "poison" && !isDefined( self.ispoisoned ) )
+                self [[ level.call ]]( "be_poisoned", eAttacker );
         }
     }
     
@@ -265,6 +275,8 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	self.statusicon = "";
 	self.maxhealth = 100;
 	self.health = self.maxhealth;
+    self.lasthittime = 0;
+    self.spawnprotection = true;
     
     self detachall();
 
@@ -304,6 +316,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     
     self [[ level.call ]]( "model_setup" );
     self [[ level.call ]]( "player_hud" );
+    self thread spawnprotection();
 }
 
 spawn_spectator( origin, angles, o3, o4, o5, o6, o7, o8, o9 )
@@ -492,4 +505,28 @@ explode_from_ground()
     wait 0.5;
     
     self.exp delete();
+}
+
+spawnprotection()
+{
+    self endon( "death" );
+    
+    self iPrintLn( "^3Spawn protection enabled." );
+    
+    wait 1;
+    
+    time = 0;
+    
+    while ( time < 5 )
+    {
+        if ( self attackbuttonpressed() || self meleebuttonpressed() )
+            break;
+            
+        time += 0.05;
+        wait 0.05;
+    }
+    
+    self.spawnprotection = undefined;
+    
+    self iPrintLn( "^3Spawn protection disabled." );
 }

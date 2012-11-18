@@ -20,6 +20,7 @@ init()
     [[ level.register ]]( "classes_loadout", ::loadout );
     [[ level.register ]]( "classes_hunter_default", ::hunterClass_default );
     [[ level.register ]]( "classes_hunter_default_loadout", ::hunterClass_default_loadout );
+    [[ level.register ]]( "be_poisoned", ::be_poisoned, level.iFLAG_THREAD );
     
     [[ level.call ]]( "precache", &"Select A Class", "string" );
     [[ level.call ]]( "precache", &"You are a", "string" );
@@ -453,6 +454,42 @@ zombieClass_poison()
 	self.health = 750;
 }
 
+be_poisoned( dude )
+{	
+    //self endon( "death" );
+    self endon( "disconnect" );
+    self endon( "end_respawn" );
+    
+    self.ispoisoned = true;
+    
+	self.poisonhud = newClientHudElem( self );
+	self.poisonhud.x = 0;
+	self.poisonhud.y = 0;
+	self.poisonhud setShader( "white", 640, 480 );
+	self.poisonhud.color = ( 0, 1, 0 );
+	self.poisonhud.alpha = 0.1;
+	self.poisonhud.sort = 1;
+	
+	self iPrintLnBold( "You have been ^2poisoned^7!" );
+	
+	while ( isAlive( self ) )
+	{
+		oldhealth = self.health;
+		
+		dmg = 5;
+		
+		self finishPlayerDamage( dude, dude, dmg, 0, "MOD_MELEE", "bren_mp", self.origin, ( 0, 0, 0 ), "none" );
+		
+		wait 2;
+		
+		if ( self.health > oldhealth )
+			break;
+	}
+	
+	self.poisonhud destroy();
+	self.ispoisoned = undefined;
+}
+
 zombieClass_fire() 
 {
 	self endon( "death" );
@@ -602,6 +639,22 @@ hunterClass_medic() {
     self setWeaponSlotAmmo( "grenade", 0 );
     
     self thread heal();
+    self thread regen_health();
+}
+
+regen_health()
+{
+    self endon( "death" );
+    self endon( "disconnect" );
+    
+    while ( isAlive( self ) )
+    {
+        // got hurt somehow
+        if ( self.health < self.maxhealth && self.lasthittime + 3000 < gettime() )
+            self.health++;
+            
+        wait 0.5;
+    }
 }
 
 heal()
