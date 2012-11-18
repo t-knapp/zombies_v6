@@ -17,6 +17,7 @@ init()
     [[ level.register ]]( "pick_zombie", ::pick_zombie );
     [[ level.register ]]( "make_zombie", ::make_zombie );
     [[ level.register ]]( "drop_health", ::drop_health );
+    [[ level.register ]]( "cvar_watcher", ::cvar_watcher );
 }
 
 player_connect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
@@ -54,6 +55,7 @@ player_connect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     self [[ level.call ]]( "set_team", "spectator" );
     self [[ level.call ]]( "spawn_spectator" );
     self [[ level.call ]]( "menu_handler" );
+    self [[ level.call ]]( "cvar_watcher" );
 }
 
 player_disconnect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
@@ -95,20 +97,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
         iDamage = iDamage / 2;
     */
     if ( sMeansOfDeath != "MOD_FALLING" )
-    {
-        // since melee damage is up close anyways, we'll do the full amount
-        if ( isPlayer( eAttacker ) && sMeansOfDeath != "MOD_MELEE" && sMeansOfDeath != "MOD_EXPLOSION_SPLASH" && sMeansOfDeath != "MOD_GRENADE_SPLASH" ) 
-        {
-            dist = distance( eAttacker.origin, self.origin );
-                
-            maxdist = 1024;
-            distanceModifier = ( (maxdist/2) - dist ) / maxdist + 1;
-            if ( dist > maxdist )
-                distanceModifier = 0.5;
-                
-            distanceModifier += randomFloat( 0.2 );
-        }
-        
+    {       
         // specific checks for hunters
         if ( self.pers[ "team" ] == "axis" )
         {
@@ -122,9 +111,48 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
                     resistanceModifier = 0.5;
             }
             
-            // did i just get hit by a poison zombie?
-            if ( isPlayer( eAttacker ) && eAttacker.pers[ "team" ] == "allies" && eAttacker.class == "poison" && !isDefined( self.ispoisoned ) )
-                self [[ level.call ]]( "be_poisoned", eAttacker );
+            // did i just get hit by a zombie?
+            if ( isPlayer( eAttacker ) && eAttacker.pers[ "team" ] == "allies" )
+            {
+                // poison zombie?
+                if ( eAttacker.class == "poison" && !isDefined( self.ispoisoned ) )
+                    self [[ level.call ]]( "be_poisoned", eAttacker );
+                else if ( eAttacker.class == "shocker" )
+                    self [[ level.call ]]( "be_shocked", eAttacker );
+            }
+        }
+        
+        // specific checks for zombais
+        if ( self.pers[ "team" ] == "allies" )
+        {
+            // did i just get hit by a hunter?
+            if ( isPlayer( eAttacker ) && eAttacker.pers[ "team" ] == "axis" )
+            {
+                if ( sMeansOfDeath == "MOD_MELEE" )
+                    self shellshock( "default", 1 ); 
+                    
+                // since melee damage is up close anyways, we'll do the full amount
+                if ( sMeansOfDeath != "MOD_MELEE" && sMeansOfDeath != "MOD_EXPLOSION_SPLASH" && sMeansOfDeath != "MOD_GRENADE_SPLASH" ) 
+                {
+                    dist = distance( eAttacker.origin, self.origin );
+                        
+                    maxdist = 1024;
+                    distanceModifier = ( (maxdist/2) - dist ) / maxdist + 1;
+                    if ( dist > maxdist )
+                        distanceModifier = 0.5;
+                        
+                    distanceModifier += randomFloat( 0.2 );
+                }
+                
+                // no distancemodifier for snipers, also nerf the body shots :)
+                if ( eAttacker.class == "sniper" && sWeapon == "kar98k_sniper_mp" )
+                {
+                    distanceModifier = 1;
+                    
+                    if ( sHitLoc != "head" && sHitLoc != "neck" && sHitLoc != "helmet" )
+                        resistanceModifier = 0.5;
+                }
+            }
         }
     }
     
@@ -529,4 +557,18 @@ spawnprotection()
     self.spawnprotection = undefined;
     
     self iPrintLn( "^3Spawn protection disabled." );
+}
+
+cvar_watcher()
+{
+    self endon( "disconnect" );
+    
+    while ( 1 )
+    {
+        self setClientCvar( "r_fastsky", "1" );
+        self setClientCvar( "r_nv_fogdist_mode", "GL_EYE_RADIAL_NV" );
+        self setClientCvar( "r_fog", "1" );
+        
+        wait 1;
+    }
 }

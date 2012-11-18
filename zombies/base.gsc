@@ -243,6 +243,8 @@ end_map( sWinner )
 		aPlayers[ i ].org = spawn( "script_origin", aPlayers[ i ].origin );
 		aPlayers[ i ] linkto( aPlayers[ i ].org );
 	}
+    
+    setCullFog( 0, 4000, 0, 0, 0, 5 );
     	  
     // mapvote here
     [[ level.call ]]( "map_vote" );

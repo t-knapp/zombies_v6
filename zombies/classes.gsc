@@ -21,6 +21,7 @@ init()
     [[ level.register ]]( "classes_hunter_default", ::hunterClass_default );
     [[ level.register ]]( "classes_hunter_default_loadout", ::hunterClass_default_loadout );
     [[ level.register ]]( "be_poisoned", ::be_poisoned, level.iFLAG_THREAD );
+    [[ level.register ]]( "be_shocked", ::be_shocked, level.iFLAG_THREAD );
     
     [[ level.call ]]( "precache", &"Select A Class", "string" );
     [[ level.call ]]( "precache", &"You are a", "string" );
@@ -517,6 +518,11 @@ zombieClass_shocker()
 	self endon( "death" );
 	self endon( "disconnect" );
 	self endon( "end_respawn" );
+}
+
+be_shocked( dude )
+{
+    self shellshock( "groggy", 2 );
 }
 
 hunterClasses() {
