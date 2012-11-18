@@ -472,7 +472,7 @@ be_poisoned( dude )
 	
 	self iPrintLnBold( "You have been ^2poisoned^7!" );
 	
-	while ( isAlive( self ) )
+	while ( isAlive( self ) && isDefined( self.ispoisoned ) )
 	{
 		oldhealth = self.health;
 		
@@ -699,9 +699,12 @@ dohealing( mypack )
         players = [[ level.call ]]( "get_good_players" );
         for ( i = 0; i < players.size; i++ )
         {
-            if ( players[ i ].pers[ "team" ] == "axis" && players[ i ] != self && distance( self.origin, players[ i ].origin ) < 56 )
+            if ( players[ i ].pers[ "team" ] == "axis" && distance( self.origin, players[ i ].origin ) < 56 )
             {
-                if ( players[ i ].health < players[ i ].maxhealth )
+                if ( isDefined( players[ i ].ispoisoned ) )
+                    players[ i ].ispoisoned = undefined;
+                    
+                if ( players[ i ] != self && players[ i ].health < players[ i ].maxhealth )
                     players[ i ].health++;
             }
         } 
