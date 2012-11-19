@@ -8,7 +8,7 @@ init()
 {
     [[ level.register ]]( "player_connect", ::player_connect );
     [[ level.register ]]( "player_disconnect", ::player_disconnect );
-    [[ level.register ]]( "player_damage", ::player_damage );
+    [[ level.register ]]( "player_damage", ::player_damage, level.iFLAG_THREAD );
     [[ level.register ]]( "player_killed", ::player_killed );
     [[ level.register ]]( "spawn_player", ::spawn_player, level.iFLAG_THREAD );
     [[ level.register ]]( "spawn_spectator", ::spawn_spectator, level.iFLAG_THREAD );

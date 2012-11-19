@@ -33,6 +33,7 @@ init()
     [[ level.register ]]( "convert_time", ::convert_time, level.iFLAG_RETURN );
     [[ level.register ]]( "set_all_client_cvars", ::set_all_client_cvars );
     [[ level.register ]]( "slowmo", ::slowmo );
+    [[ level.register ]]( "get_stance", ::get_stance, level.iFLAG_RETURN );
 	
 	// math stuff
 	[[ level.register ]]( "abs", ::abs, level.iFLAG_RETURN );
@@ -678,7 +679,7 @@ set_all_client_cvars( cvar, value, o3, o4, o5, o6, o7, o8, o9 )
 		players[ i ] setClientCvar( cvar, value );
 }
 
-slowmo( length )
+slowmo( length, o2, o3, o4, o5, o6, o7, o8, o9 )
 {
 	if ( length <= 1 )
 		return;
@@ -705,4 +706,25 @@ slowmo( length )
 	
 	setCvar( "timescale", 1.0 );
 	set_all_client_cvars( "timescale", 1.0 );
+}
+
+get_stance( returnValue, o2, o3, o4, o5, o6, o7, o8, o9 )
+{
+    if ( !self isOnGround() && !isDefined( returnValue ) )
+        return "in air";
+ 
+    org = spawn( "script_model", self.origin );
+    org linkto( self, "tag_helmet", ( 0, 0, 0 ), ( 0, 0, 0 ) );
+    wait 0.02;  // this is required, or else the model will not move to tag_helmet by the time it's removed
+ 
+    z = org.origin[ 2 ] - self.origin[ 2 ];
+ 
+    org delete();
+    
+    if ( isDefined( returnValue ) && returnValue )
+        return z;
+ 
+    if ( z < 20 )   return "prone";
+    if ( z < 50 )   return "crouch";
+    if ( z < 70 )   return "stand";
 }

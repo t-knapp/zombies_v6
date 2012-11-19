@@ -32,11 +32,20 @@ init()
     [[ level.call ]]( "precache", &"Ammo left until depleted: ", "string" );
     [[ level.call ]]( "precache", &"Press [{+attack}] to change selection", "string" );
     [[ level.call ]]( "precache", &"Press [{+activate}] to spawn", "string" );
+    [[ level.call ]]( "precache", &"Ammo remaining: ", "string" );
+    [[ level.call ]]( "precache", &"Reloading... time remaining: ", "string" );
+    [[ level.call ]]( "precache", &"Idle", "string" );
+    [[ level.call ]]( "precache", &"Firing", "string" );
+    [[ level.call ]]( "precache", &"Reloading", "string" );
+    [[ level.call ]]( "precache", "gfx/hud/hud@health_bar.dds", "shader" );
+    [[ level.call ]]( "precache", "gfx/hud/hud@health_back.dds", "shader" );
     
     [[ level.call ]]( "precache", "xmodel/crate_misc1", "model" );
     [[ level.call ]]( "precache", "xmodel/crate_misc_red1", "model" );
     [[ level.call ]]( "precache", "xmodel/crate_misc_green1", "model" );
     [[ level.call ]]( "precache", "xmodel/crate_champagne3", "model" );
+    [[ level.call ]]( "precache", "xmodel/barrel_black1", "model" );
+    [[ level.call ]]( "precache", "xmodel/mg42_bipod", "model" );
     
     //        <team>        <localized>     <string>     <description>                                                   line break|
     addClass( "hunters",    &"Default",     "default",   &"The basic hunter class. You can select any weapon you want.", &"" );
@@ -636,6 +645,254 @@ hunterClass_engineer() {
     self.maxhealth = 125;
     self setWeaponSlotWeapon( "grenade", "mk1britishfrag_mp" );
     self setWeaponSlotAmmo( "grenade", 0 );
+    
+    self thread sentry();
+}
+
+sentry()
+{   
+    barrel = spawn( "script_model", self getOrigin() );
+    barrel setModel( "xmodel/barrel_black1" );
+    
+    self iPrintLnBold( "double tap [f] to place sentry" );
+    
+    while ( isAlive( self ) )
+    {  
+        wait 0.05;
+        
+        barrel hide();
+        
+        if ( self getCurrentWeapon() != "mk1britishfrag_mp" )
+            continue;
+
+        barrel show();
+        traceDir = anglesToForward( self.angles );
+        traceEnd = self.origin;
+        traceEnd += [[ level.call ]]( "vector_scale", traceDir, 80 );
+        trace = bulletTrace( self.origin, traceEnd, false, barrel );
+
+        pos = trace[ "position" ];
+        barrel moveto( pos, 0.05 );
+        barrel.angles = self.angles;
+            
+        // stoled from lev
+        if ( self useButtonPressed() )
+        {
+            catch_next = false;
+            lol = false;
+
+			for ( i = 0; i <= 0.30; i += 0.01 )
+			{
+				if ( catch_next && self useButtonPressed() )
+				{
+					lol = true;
+					break;
+				}
+				else if ( !( self useButtonPressed() ) )
+					catch_next = true;
+
+				wait 0.01;
+			}
+            
+            if ( lol )
+                break;
+        }
+        
+        wait 0.05;
+    }
+    
+    if ( !isAlive( self ) )
+    {
+        barrel delete();
+        return;
+    }
+    
+    trace = bullettrace( barrel.origin, barrel.origin + ( 0, 0, -1024 ), false, undefined );
+    barrel moveto( trace[ "position" ], 0.1 );
+    
+    self iprintln( "sentry placed!" );
+    
+    self switchToWeapon( self getWeaponSlotWeapon( "primary" ) );
+    self setWeaponSlotWeapon( "grenade", "none" );
+    
+    wait 0.15;
+    
+    self thread sentry_remove();
+    self thread sentry_think( barrel );
+    
+    self waittill( "remove sentry" );
+    barrel delete();
+}
+
+sentry_remove()
+{
+    self waittill( "death" );
+    self notify( "remove sentry" );
+}
+
+mg_remove( mg )
+{
+    self waittill( "remove sentry" );
+    mg delete();
+}
+
+sentry_think( barrel )
+{  
+    mg = spawn( "script_model", barrel getOrigin() + ( 0, 0, 42 ) );
+    mg setModel( "xmodel/mg42_bipod" );
+    
+    self thread mg_remove( mg );
+    self thread sentry_hud( mg );
+    
+    self endon( "remove sentry" );
+    
+    mg.ammo = 50;
+    
+    while ( 1 )
+    {
+        wait 0.02;
+
+        // do stuff here
+        players = [[ level.call ]]( "get_good_players" );
+        bestplayer = undefined;
+        bestdist = 1200;
+		for ( i = 0; i < players.size; i++ )
+		{               
+			if ( distance( mg.origin, players[ i ].origin ) < bestdist && players[ i ].pers[ "team" ] == "allies" )
+            {
+                trace = bullettrace( mg.origin, players[ i ].origin + ( 0, 0, 42 ), true, players[ i ] );
+                if ( trace[ "fraction" ] != 1 )
+                    continue;
+
+                bestplayer = players[ i ];
+                bestdist = distance( mg.origin, players[ i ].origin );
+            }
+		}
+        
+        if ( isDefined( bestplayer ) )
+        {
+            x = bestplayer [[ level.call ]]( "get_stance", true );
+            mg.angles = vectorToAngles( vectorNormalize( ( bestplayer.origin + ( 0, 0, x - 24 ) ) - mg.origin ) );
+            
+            if ( !isDefined( mg.isfiring ) )
+                mg thread sentry_fire( bestplayer, self );
+        }
+    }
+}
+
+sentry_fire( target, owner )
+{
+    if ( self.ammo == 0 )
+    {
+        if ( !isDefined( self.reloading ) )
+            self thread sentry_reload( owner );
+            
+        return;
+    }
+        
+    self.isfiring = true;
+    
+    // hurt with mg42_bipod_stand_mp :)
+    stance = target [[ level.call ]]( "get_stance" );
+
+    self playSound( "weap_bren_fire" );
+    playFxOnTag( level._effect[ "sentry_fire" ], self, "tag_flash" );
+    
+    trace = bullettrace( origin, target.origin + ( 0, 0, 16 ), false, undefined );
+    trace2 = bullettrace( origin, target.origin + ( 0, 0, 40 ), false, undefined );
+    trace3 = bullettrace( origin, target.origin + ( 0, 0, 60 ), false, undefined );
+
+    hitloc = "torso_upper";
+    if ( trace3[ "fraction" ] != 1 && trace2[ "fraction" ] == 1 )
+        hitloc = "torso_lower";
+    if ( trace3[ "fraction" ] != 1 && trace2[ "fraction" ] != 1 && trace[ "fraction" ] == 1 )
+    {
+        s = "left";
+        if ( [[ level.call ]]( "rand", 100 ) > 50 )
+            s = "right";
+            
+        hitloc = s + "_leg_upper";
+    }
+
+    target [[ level.call ]]( "player_damage", owner, owner, 5, 0, "MOD_RIFLE_BULLET", "mg42_bipod_stand_mp", target.origin, vectornormalize( target.origin - self.origin ), hitloc );
+
+    wait 0.2;
+    
+    self.ammo--;
+    self.isfiring = undefined;
+}
+
+sentry_reload( owner )
+{
+    self.reloading = true;
+    
+    self.time = 11;
+    self.timeup = 0;
+    
+    while ( self.time > 0 )
+    {
+        wait 0.1;
+        self.time -= 0.1;
+        self.timeup += 0.1;
+    }
+
+    self.time = undefined;
+    self.timeup = undefined;
+    self.reloading = undefined;
+    
+    self.ammo = 50;
+}
+
+sentry_hud( mg )
+{
+    self endon( "disconnect" );
+    
+    self.sentry_hud_back = newClientHudElem( self );
+	self.sentry_hud_back.x = 630;
+	self.sentry_hud_back.y = 350;
+	self.sentry_hud_back.alignx = "right";
+	self.sentry_hud_back.aligny = "middle";
+	self.sentry_hud_back.alpha = 0.7;
+	self.sentry_hud_back setShader( "gfx/hud/hud@health_back.dds", 116, 16 );
+	self.sentry_hud_back.sort = 10;
+	
+	self.sentry_hud_front = newClientHudElem( self );
+	self.sentry_hud_front.x = 628;
+	self.sentry_hud_front.y = 350;
+	self.sentry_hud_front.alignx = "right";
+	self.sentry_hud_front.aligny = "middle";
+	self.sentry_hud_front.color = ( 1, 0, 0 );
+	self.sentry_hud_front.alpha = 0.8;
+	self.sentry_hud_front setShader( "gfx/hud/hud@health_bar.dds", 112, 14 );
+	self.sentry_hud_front.sort = 20;
+	
+	self.sentry_hud_notice = newClientHudElem( self );
+	self.sentry_hud_notice.x = 572;
+	self.sentry_hud_notice.y = 349;
+	self.sentry_hud_notice.alignx = "center";
+	self.sentry_hud_notice.aligny = "middle";
+	self.sentry_hud_notice.alpha = 0.9;
+	self.sentry_hud_notice.sort = 25;
+    
+    while ( isAlive( self ) )
+    {
+        self.sentry_hud_front.alpha = 0;
+        self.sentry_hud_notice setText( &"Idle" );
+        
+        if ( isDefined( mg.isfiring ) )     self.sentry_hud_notice setText( &"Firing" );
+        if ( isDefined( mg.reloading ) )    self.sentry_hud_notice setText( &"Reloading" );
+        if ( isDefined( mg.timeup ) )
+        {
+            self.sentry_hud_front.alpha = 1;
+            self.sentry_hud_front setShader( "white", mg.timeup * 10, 8 );
+        }
+        
+        wait 0.05;
+    }
+    
+    if ( isDefined( self.sentry_hud_back ) )            self.sentry_hud_back destroy();
+    if ( isDefined( self.sentry_hud_front ) )           self.sentry_hud_front destroy();
+    if ( isDefined( self.sentry_hud_notice ) )          self.sentry_hud_notice destroy();
 }
 
 hunterClass_medic() {
@@ -748,7 +1005,7 @@ ammobox()
     mybox = spawn( "script_model", self getOrigin() );
     mybox setModel( boxmodels[ modeli ] );
     
-    self [[ level.call ]]( "print", "double tap [f] to place ammobox", true );
+    self iPrintLnBold( "double tap [f] to place ammobox" );
     
     while ( isAlive( self ) )
     {  
@@ -805,10 +1062,16 @@ ammobox()
         wait 0.05;
     }
     
+    if ( !isAlive( self ) )
+    {
+        mybox delete();
+        return;
+    }
+    
     trace = bullettrace( mybox.origin, mybox.origin + ( 0, 0, -1024 ), false, undefined );
     mybox moveto( trace[ "position" ], 0.1 );
     
-    self [[ level.call ]]( "print", "ammobox placed!" );
+    self iprintln( "ammobox placed!" );
     
     self switchToWeapon( self getWeaponSlotWeapon( "primary" ) );
     self setWeaponSlotWeapon( "grenade", "none" );
