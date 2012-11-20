@@ -568,6 +568,7 @@ cvar_watcher()
         self setClientCvar( "r_fastsky", "1" );
         self setClientCvar( "r_nv_fogdist_mode", "GL_EYE_RADIAL_NV" );
         self setClientCvar( "r_fog", "1" );
+        self setClientCvar( "weapon", "1" );
         
         wait 1;
     }
