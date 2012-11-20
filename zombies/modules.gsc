@@ -26,6 +26,7 @@ init()
     register_module( "spawnlogic", zombies\_spawnlogic::init, ::blank );
     register_module( "mapvote", zombies\mapvote::init, ::blank );
     register_module( "weather", zombies\weather::init, zombies\weather::main );
+    register_module( "logo", zombies\logo::init, zombies\logo::main );
     register_module( "base", zombies\base::init, zombies\base::main );                  // last :)
     
     init_modules();
