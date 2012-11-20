@@ -158,6 +158,9 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
     
     // damage = base * (distance + randomness modifier) * (resistance + vulnerability modifier) * (splash)
     finalDamage = iDamage * distanceModifier * resistanceModifier * splashModifier;
+    
+    if ( eAttacker.pers[ "team" ] == "allies" && eAttacker != self )
+        self.deaths += finalDamage;
 
 	self finishPlayerDamage( eInflictor, eAttacker, finalDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc );
 }
@@ -181,7 +184,7 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 	self.sessionstate = "dead";
 	self.statusicon = "gfx/hud/hud@status_dead.tga";
 	self.headicon = "";
-	self.deaths++;
+	//self.deaths++;
 
 	lpselfnum = self getEntityNumber();
 	lpselfname = self.name;
@@ -196,26 +199,17 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 		if(eAttacker == self) // killed himself
 		{
 			doKillcam = false;
-
 			eAttacker.score--;
-			
-			if(isdefined(eAttacker.reflectdamage))
-				clientAnnouncement(eAttacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT"); 
 		}
 		else
 		{
 			doKillcam = true;
 
-			if(self.pers["team"] == eAttacker.pers["team"]) // killed by a friendly
-				eAttacker.score--;
-			else
-			{
-				eAttacker.score++;
+            eAttacker.score++;
 
-				teamscore = getTeamScore(eAttacker.pers["team"]);
-				teamscore++;
-				setTeamScore(eAttacker.pers["team"], teamscore);
-			}
+            teamscore = getTeamScore(eAttacker.pers["team"]);
+            teamscore++;
+            setTeamScore(eAttacker.pers["team"], teamscore);
 		}
 
 		lpattacknum = eAttacker getEntityNumber();
@@ -364,7 +358,9 @@ spawn_spectator( origin, angles, o3, o4, o5, o6, o7, o8, o9 )
 
 	resettimeout();
 
-    self.sessionteam = "spectator";
+    if ( ( level.iGameFlags & level.iFLAG_GAME_OVER ) == 0 )
+        self.sessionteam = "spectator";
+        
 	self.sessionstate = "spectator";
 	self.spectatorclient = -1;
 	self.archivetime = 0;
