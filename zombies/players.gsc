@@ -321,14 +321,14 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
             self.health = self.maxhealth;
         }
 
-        self.voicetype = game[ "allies" ];
+        self.nationality = "british";
         self.headicon = game["headicon_allies"];
         self.headiconteam = "allies";
 		self thread explode_from_ground();
     }
     else if ( self.pers[ "team" ] == "axis" )
     {
-        self.voicetype = game[ "axis" ];
+        self.nationality = "german";
         self.headicon = game["headicon_axis"];
         self.headiconteam = "axis";
         
