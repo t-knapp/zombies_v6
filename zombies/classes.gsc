@@ -325,8 +325,9 @@ selectClass_destroy()
     self.chud[ "team notify team" ]                 thread selectClassFadeOut( 0.5 );
     self.chud[ "attack" ]                           thread selectClassFadeOut( 0.5 );
     self.chud[ "use" ]                              thread selectClassFadeOut( 0.5 );
-	for ( i = 0; i < self.chud[ "classes" ].size; i++ )
-		self.chud[ "classes" ][ i ]                 thread selectClassFadeOut( 0.5 );
+    
+	for ( i = 0; i < self.chud[ "classes" ].size; i++ )         
+        self.chud[ "classes" ][ i ] thread selectClassFadeOut( 0.5 );
 
 	self.chud[ "selector" ]                         thread selectClassFadeOut( 0.5 );
     self.chud[ "desc" ]                             thread selectClassFadeOut( 0.5 );

@@ -105,7 +105,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
             if ( self.class == "soldier" )
             {
                 if ( sWeapon == "panzerfaust_mp" )
-                    self.health += iDamage * 1.3;
+                    self.health += iDamage / 1.3;
                 
                 if ( sMeansOfDeath == "MOD_EXPLOSION_SPLASH" || sMeansOfDeath == "MOD_GRENADE_SPLASH" )
                     resistanceModifier = 0.5;
