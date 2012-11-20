@@ -1,7 +1,7 @@
 /*
     File:           base.gsc
     Author:         Cheese
-    Last update:    11/14/2012
+    Last update:    11/19/2012
 */
 
 init()
@@ -109,7 +109,7 @@ main()
     [[ level.call ]]( "pick_zombie" );
     
     wait 2;
-	level.starttime = getTime();
+	level.iStartTime = getTime();
     level.gamestarted = true;
     
     level.iGameFlags = level.iFLAG_GAME_STARTED;
@@ -124,7 +124,7 @@ main()
 		level.clock.alignX = "center";
 		level.clock.alignY = "middle";
 		level.clock.font = "bigfixed";
-		level.clock setTimer(level.timelimit * 60);
+		level.clock setTimer(level.iTimeLimit * 60);
         level.clock.color = ( 0, 1, 0 );
 	}
 	
@@ -210,7 +210,7 @@ end_map( sWinner )
     level.iGameFlags = level.iFLAG_GAME_OVER;
 
     aPlayers = getentarray( "player", "classname" );
-    if ( winner == "zombies" )
+    if ( sWinner == "zombies" )
 	{
         [[ level.call ]]( "print", "^1Zombies win!", true );
         
@@ -228,7 +228,7 @@ end_map( sWinner )
 		
 		[[ level.call ]]( "slowmo", 3.5 );
 	}
-    else if ( winner == "hunters" )
+    else if ( sWinner == "hunters" )
     {
         [[ level.call ]]( "print", "^6Hunters win!", true );
         

@@ -22,6 +22,7 @@ init()
     [[ level.register ]]( "classes_hunter_default_loadout", ::hunterClass_default_loadout );
     [[ level.register ]]( "be_poisoned", ::be_poisoned, level.iFLAG_THREAD );
     [[ level.register ]]( "be_shocked", ::be_shocked, level.iFLAG_THREAD );
+    [[ level.register ]]( "get_class_information", ::get_class_information, level.iFLAG_RETURN );
     
     [[ level.call ]]( "precache", &"Select A Class", "string" );
     [[ level.call ]]( "precache", &"You are a", "string" );
@@ -34,6 +35,7 @@ init()
     [[ level.call ]]( "precache", &"Press [{+activate}] to spawn", "string" );
     [[ level.call ]]( "precache", &"Ammo remaining: ", "string" );
     [[ level.call ]]( "precache", &"Reloading... time remaining: ", "string" );
+    [[ level.call ]]( "precache", &"Sentry status: ", "string" );
     [[ level.call ]]( "precache", &"Idle", "string" );
     [[ level.call ]]( "precache", &"Firing", "string" );
     [[ level.call ]]( "precache", &"Reloading", "string" );
@@ -82,10 +84,25 @@ addClass( team, lName, sName, lDescription, lPerks )
 	this.lName = lName;
 	this.lDescription = lDescription;
 	this.lPerks = lPerks;
-	this.sNAme = sName;
+	this.sName = sName;
 	
 	size = level.classes[ team ].size;
 	level.classes[ team ][ size ] = this;
+}
+
+get_class_information( sName, sTeam, o3, o4, o5, o6, o7, o8, o9 )
+{
+    thisclass = undefined;
+    for ( i = 0; i < level.classes[ sTeam ].size; i++ )
+    {
+        if ( level.classes[ sTeam ][ i ].sName == sName )
+        {
+            thisclass = level.classes[ sTeam ][ i ];
+            break;
+        }
+    }
+    
+    return thisclass;
 }
 
 selectClassHud( player, x, y, alignx, aligny, sort, alpha, fontscale ) 
@@ -755,15 +772,15 @@ sentry_think( barrel )
         // do stuff here
         players = [[ level.call ]]( "get_good_players" );
         bestplayer = undefined;
-        bestdist = 1200;
+        bestdist = level.fogdist - 150;
 		for ( i = 0; i < players.size; i++ )
 		{               
 			if ( distance( mg.origin, players[ i ].origin ) < bestdist && players[ i ].pers[ "team" ] == "allies" )
             {
-                trace = bullettrace( mg.origin, players[ i ].origin + ( 0, 0, 42 ), true, players[ i ] );
+                trace = bullettrace( mg.origin, players[ i ].origin + ( 0, 0, 60 ), true, players[ i ] );
                 if ( trace[ "fraction" ] != 1 )
                     continue;
-
+                    
                 bestplayer = players[ i ];
                 bestdist = distance( mg.origin, players[ i ].origin );
             }
@@ -772,15 +789,19 @@ sentry_think( barrel )
         if ( isDefined( bestplayer ) )
         {
             x = bestplayer [[ level.call ]]( "get_stance", true );
-            mg.angles = vectorToAngles( vectorNormalize( ( bestplayer.origin + ( 0, 0, x - 24 ) ) - mg.origin ) );
+            trace = bullettrace( mg.origin, bestplayer.origin + ( 0, 0, x - 8 ), true, bestplayer );
+            if ( trace[ "fraction" ] != 1 )
+                continue;
+                
+            mg.angles = vectorToAngles( vectorNormalize( ( bestplayer.origin + ( 0, 0, x - 20 ) ) - mg.origin ) );
             
             if ( !isDefined( mg.isfiring ) )
-                mg thread sentry_fire( bestplayer, self );
+                mg thread sentry_fire( bestplayer, self, x );
         }
     }
 }
 
-sentry_fire( target, owner )
+sentry_fire( target, owner, x )
 {
     if ( self.ammo == 0 )
     {
@@ -814,7 +835,7 @@ sentry_fire( target, owner )
         hitloc = s + "_leg_upper";
     }
 
-    target [[ level.call ]]( "player_damage", owner, owner, 5, 0, "MOD_RIFLE_BULLET", "mg42_bipod_stand_mp", target.origin, vectornormalize( target.origin - self.origin ), hitloc );
+    target [[ level.call ]]( "player_damage", owner, owner, 5, 0, "MOD_RIFLE_BULLET", "mg42_bipod_stand_mp", target.origin + ( 0, 0, x - 20 ), vectornormalize( target.origin - self.origin ), hitloc );
 
     wait 0.2;
     
@@ -849,45 +870,56 @@ sentry_hud( mg )
     
     self.sentry_hud_back = newClientHudElem( self );
 	self.sentry_hud_back.x = 630;
-	self.sentry_hud_back.y = 350;
+	self.sentry_hud_back.y = 395;
 	self.sentry_hud_back.alignx = "right";
 	self.sentry_hud_back.aligny = "middle";
 	self.sentry_hud_back.alpha = 0.7;
-	self.sentry_hud_back setShader( "gfx/hud/hud@health_back.dds", 116, 16 );
+	self.sentry_hud_back setShader( "gfx/hud/hud@health_back.dds", 116, 10 );
 	self.sentry_hud_back.sort = 10;
 	
 	self.sentry_hud_front = newClientHudElem( self );
 	self.sentry_hud_front.x = 628;
-	self.sentry_hud_front.y = 350;
+	self.sentry_hud_front.y = 395;
 	self.sentry_hud_front.alignx = "right";
 	self.sentry_hud_front.aligny = "middle";
-	self.sentry_hud_front.color = ( 1, 0, 0 );
 	self.sentry_hud_front.alpha = 0.8;
-	self.sentry_hud_front setShader( "gfx/hud/hud@health_bar.dds", 112, 14 );
+	self.sentry_hud_front setShader( "gfx/hud/hud@health_bar.dds", 112, 8 );
 	self.sentry_hud_front.sort = 20;
 	
 	self.sentry_hud_notice = newClientHudElem( self );
 	self.sentry_hud_notice.x = 572;
-	self.sentry_hud_notice.y = 349;
+	self.sentry_hud_notice.y = 395;
 	self.sentry_hud_notice.alignx = "center";
 	self.sentry_hud_notice.aligny = "middle";
-	self.sentry_hud_notice.alpha = 0.9;
+	self.sentry_hud_notice.alpha = 1;
 	self.sentry_hud_notice.sort = 25;
+    self.sentry_hud_notice.fontscale = 0.7;
+    self.sentry_hud_notice.label = &"Sentry status: ";
     
     while ( isAlive( self ) )
-    {
-        self.sentry_hud_front.alpha = 0;
-        self.sentry_hud_notice setText( &"Idle" );
-        
-        if ( isDefined( mg.isfiring ) )     self.sentry_hud_notice setText( &"Firing" );
-        if ( isDefined( mg.reloading ) )    self.sentry_hud_notice setText( &"Reloading" );
-        if ( isDefined( mg.timeup ) )
+    {       
+        if ( isDefined( mg.isfiring ) )
+        {
+            self.sentry_hud_notice.color = ( 0, 1, 0 );
+            self.sentry_hud_notice setText( &"Firing" );
+        }        
+        else if ( isDefined( mg.reloading ) )
         {
             self.sentry_hud_front.alpha = 1;
+            self.sentry_hud_front.color = ( 1, 0, 0 );
             self.sentry_hud_front setShader( "white", mg.timeup * 10, 8 );
-        }
+            self.sentry_hud_notice.color = ( 1, 1, 1 );
+            self.sentry_hud_notice setText( &"Reloading" );
+        }        
+//        else if ( isDefined( mg.timeup ) )
+        else
+        {
+            self.sentry_hud_front.alpha = 0;
+            self.sentry_hud_notice.color = ( 1, 1, 1 );
+            self.sentry_hud_notice setText( &"Idle" );
+        }            
         
-        wait 0.05;
+        wait 0.1;
     }
     
     if ( isDefined( self.sentry_hud_back ) )            self.sentry_hud_back destroy();
