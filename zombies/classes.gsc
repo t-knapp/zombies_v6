@@ -942,6 +942,11 @@ sentry_fire( target, owner, x )
     wait 0.2;
     
     self.ammo--;
+    
+    // every 10th shot has a chance of lowering the health by 1-3 points
+    if ( self.ammo % 10 == 0 && [[ level.call ]]( "rand", 100 ) > 50 )
+        self.health -= [[ level.call ]]( "rand_range", 1, 5 );
+        
     self.isfiring = undefined;
 }
 
@@ -1031,6 +1036,7 @@ sentry_hud( mg )
     {       
         if ( isDefined( mg.isfiring ) )
         {
+            self.sentry_hud_front.alpha = 0;
             self.sentry_hud_notice.color = ( 0, 1, 0 );
             self.sentry_hud_notice setText( &"Firing" );
         }        
@@ -1038,7 +1044,7 @@ sentry_hud( mg )
         {
             self.sentry_hud_front.alpha = 1;
             self.sentry_hud_front.color = ( 1, 0, 0 );
-            self.sentry_hud_front setShader( "white", mg.timeup * 10, 8 );
+            self.sentry_hud_front setShader( "white", mg.timeup * 11.2, 8 );
             self.sentry_hud_notice.color = ( 1, 1, 1 );
             self.sentry_hud_notice setText( &"Reloading" );
         }        
