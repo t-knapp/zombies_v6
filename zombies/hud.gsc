@@ -19,7 +19,7 @@ player_hud()
     self.hud = [];
     
     self addTextHud( "health", 567, 465, "center", "middle", 1, 0.8, 10, &"" );
-    self addTextHud( "class", 630, 410, "right", "middle", 1, 1, 10, &"Class: " );
+    self addTextHud( "class", 630, 415, "right", "middle", 1, 1, 10, &"Class: " );
     
     self thread run_hud();
 }

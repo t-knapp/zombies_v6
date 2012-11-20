@@ -132,7 +132,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
                     self shellshock( "default", 1 ); 
                     
                 // since melee damage is up close anyways, we'll do the full amount
-                if ( sMeansOfDeath != "MOD_MELEE" && sMeansOfDeath != "MOD_EXPLOSION_SPLASH" && sMeansOfDeath != "MOD_GRENADE_SPLASH" ) 
+                if ( sMeansOfDeath != "MOD_MELEE" && sMeansOfDeath != "MOD_EXPLOSION_SPLASH" && sMeansOfDeath != "MOD_GRENADE_SPLASH" && sWeapon != "mg42_bipod_stand_mp" ) 
                 {
                     dist = distance( eAttacker.origin, self.origin );
                         
@@ -335,6 +335,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
             self giveWeapon( self.pers[ "weapon" ] );
             self setSpawnWeapon( self.pers[ "weapon" ] );
             self giveMaxAmmo( self.pers[ "weapon" ] );
+            self setWeaponSlotClipAmmo( "primary", 0 );
             
             self [[ level.call ]]( "classes_hunter_default_loadout" );
         }

@@ -36,6 +36,7 @@ init()
     [[ level.call ]]( "precache", &"Ammo remaining: ", "string" );
     [[ level.call ]]( "precache", &"Reloading... time remaining: ", "string" );
     [[ level.call ]]( "precache", &"Sentry status: ", "string" );
+    [[ level.call ]]( "precache", &"Sentry health: ", "string" );
     [[ level.call ]]( "precache", &"Idle", "string" );
     [[ level.call ]]( "precache", &"Firing", "string" );
     [[ level.call ]]( "precache", &"Reloading", "string" );
@@ -583,6 +584,9 @@ hunterClasses() {
 	self giveWeapon( weapon );
 	self giveMaxAmmo( weapon );
 	self setSpawnWeapon( weapon );
+    
+    if ( self.class != "soldier" )
+        self setWeaponSlotClipAmmo( "primary", 0 );
 	
 	self hunterClass_updateAmmo();	
 	
@@ -671,8 +675,6 @@ sentry()
     barrel = spawn( "script_model", self getOrigin() );
     barrel setModel( "xmodel/barrel_black1" );
     
-    self iPrintLnBold( "double tap [f] to place sentry" );
-    
     while ( isAlive( self ) )
     {  
         wait 0.05;
@@ -750,55 +752,104 @@ sentry_remove()
 mg_remove( mg )
 {
     self waittill( "remove sentry" );
-    mg delete();
+    self.mg delete();
+    self.mg = undefined;
 }
 
 sentry_think( barrel )
-{  
-    mg = spawn( "script_model", barrel getOrigin() + ( 0, 0, 42 ) );
-    mg setModel( "xmodel/mg42_bipod" );
+{     
+    self.mg = spawn( "script_model", barrel getOrigin() + ( 0, 0, 42 ) );
+    self.mg setModel( "xmodel/mg42_bipod" );
     
-    self thread mg_remove( mg );
-    self thread sentry_hud( mg );
+    self thread mg_remove( self.mg );
+    self thread sentry_hud( self.mg );
+       
+    self.mg.ammo = 50;
+    self.mg.health = 100;
     
-    self endon( "remove sentry" );
-    
-    mg.ammo = 50;
-    
-    while ( 1 )
+    while ( isAlive( self ) && isDefined( self.mg ) )
     {
         wait 0.02;
-
-        // do stuff here
-        players = [[ level.call ]]( "get_good_players" );
-        bestplayer = undefined;
-        bestdist = level.fogdist - 150;
-		for ( i = 0; i < players.size; i++ )
-		{               
-			if ( distance( mg.origin, players[ i ].origin ) < bestdist && players[ i ].pers[ "team" ] == "allies" )
-            {
-                trace = bullettrace( mg.origin, players[ i ].origin + ( 0, 0, 60 ), true, players[ i ] );
-                if ( trace[ "fraction" ] != 1 )
-                    continue;
-                    
-                bestplayer = players[ i ];
-                bestdist = distance( mg.origin, players[ i ].origin );
-            }
-		}
         
-        if ( isDefined( bestplayer ) )
+        self sentry_aim();
+        self sentry_damage_detect();
+    }
+}
+
+sentry_aim()
+{
+    // do stuff here
+    players = [[ level.call ]]( "get_good_players" );
+    bestplayer = undefined;
+    bestdist = level.fogdist - 250;
+    for ( i = 0; i < players.size; i++ )
+    {               
+        if ( distance( self.mg.origin, players[ i ].origin ) < bestdist && players[ i ].pers[ "team" ] == "allies" )
         {
-            x = bestplayer [[ level.call ]]( "get_stance", true );
-            trace = bullettrace( mg.origin, bestplayer.origin + ( 0, 0, x - 8 ), true, bestplayer );
+            trace = bullettrace( self.mg.origin, players[ i ].origin + ( 0, 0, 60 ), true, players[ i ] );
             if ( trace[ "fraction" ] != 1 )
                 continue;
                 
-            mg.angles = vectorToAngles( vectorNormalize( ( bestplayer.origin + ( 0, 0, x - 20 ) ) - mg.origin ) );
-            
-            if ( !isDefined( mg.isfiring ) )
-                mg thread sentry_fire( bestplayer, self, x );
+            bestplayer = players[ i ];
+            bestdist = distance( self.mg.origin, players[ i ].origin );
         }
     }
+    
+    if ( isDefined( bestplayer ) )
+    {
+        x = bestplayer [[ level.call ]]( "get_stance", true );
+        trace = bullettrace( self.mg.origin, bestplayer.origin + ( 0, 0, x - 8 ), true, bestplayer );
+        if ( trace[ "fraction" ] != 1 )
+            return;
+            
+        self.mg.angles = vectorToAngles( vectorNormalize( ( bestplayer.origin + ( 0, 0, x - 20 ) ) - self.mg.origin ) );
+        
+        if ( !isDefined( self.mg.isfiring ) )
+            self.mg thread sentry_fire( bestplayer, self, x );
+    }
+}
+
+sentry_damage_detect()
+{
+    doHit = false;
+    players = [[ level.call ]]( "get_good_players" );
+    for ( i = 0; i < players.size; i++ )
+    {
+        if ( distance( self.mg.origin, players[ i ].origin ) < 52 )
+        {
+            if ( players[ i ].pers[ "team" ] == "axis" && players[ i ].class == "shocker" && players[ i ] meleeButtonPressed() )
+            {
+                players[ i ] playSound( "melee_hit" );
+                doHit = true;
+                break;
+            }
+            
+            if ( players[ i ] == self )
+            {
+                self.mg.health += 1;
+                if ( self.mg.health > 100 )
+                    self.mg.health = 100;
+            }
+        }
+    }
+    
+    if ( doHit )
+    {
+        self.mg.health -= [[ level.call ]]( "rand_range", 15, 45 );
+        if ( self.mg.health <= 0 )
+            self sentry_explode();
+            
+        // melee time from lee enfield
+        wait 0.8;
+    }
+}
+
+sentry_explode()
+{
+    playFx( level._effect[ "sentry_explode" ], self.mg.origin );
+    wait 0.05;
+    
+    self notify( "remove sentry" );
 }
 
 sentry_fire( target, owner, x )
@@ -834,8 +885,14 @@ sentry_fire( target, owner, x )
             
         hitloc = s + "_leg_upper";
     }
+    
+    dist = distance( target.origin, self.origin );
+    maxdist = 1024;
+    distanceModifier = ( (maxdist/2) - dist ) / maxdist + 1;
+    if ( dist > maxdist )
+        distanceModifier = 0.5;
 
-    target [[ level.call ]]( "player_damage", owner, owner, 5, 0, "MOD_RIFLE_BULLET", "mg42_bipod_stand_mp", target.origin + ( 0, 0, x - 20 ), vectornormalize( target.origin - self.origin ), hitloc );
+    target [[ level.call ]]( "player_damage", owner, owner, 5 * distanceModifier, 0, "MOD_RIFLE_BULLET", "mg42_bipod_stand_mp", target.origin + ( 0, 0, x - 20 ), vectornormalize( target.origin - self.origin ), hitloc );
 
     wait 0.2;
     
@@ -870,7 +927,7 @@ sentry_hud( mg )
     
     self.sentry_hud_back = newClientHudElem( self );
 	self.sentry_hud_back.x = 630;
-	self.sentry_hud_back.y = 395;
+	self.sentry_hud_back.y = 400;
 	self.sentry_hud_back.alignx = "right";
 	self.sentry_hud_back.aligny = "middle";
 	self.sentry_hud_back.alpha = 0.7;
@@ -879,7 +936,7 @@ sentry_hud( mg )
 	
 	self.sentry_hud_front = newClientHudElem( self );
 	self.sentry_hud_front.x = 628;
-	self.sentry_hud_front.y = 395;
+	self.sentry_hud_front.y = 400;
 	self.sentry_hud_front.alignx = "right";
 	self.sentry_hud_front.aligny = "middle";
 	self.sentry_hud_front.alpha = 0.8;
@@ -888,7 +945,7 @@ sentry_hud( mg )
 	
 	self.sentry_hud_notice = newClientHudElem( self );
 	self.sentry_hud_notice.x = 572;
-	self.sentry_hud_notice.y = 395;
+	self.sentry_hud_notice.y = 400;
 	self.sentry_hud_notice.alignx = "center";
 	self.sentry_hud_notice.aligny = "middle";
 	self.sentry_hud_notice.alpha = 1;
@@ -896,7 +953,36 @@ sentry_hud( mg )
     self.sentry_hud_notice.fontscale = 0.7;
     self.sentry_hud_notice.label = &"Sentry status: ";
     
-    while ( isAlive( self ) )
+    self.sentry_hud_health_back = newClientHudElem( self );
+	self.sentry_hud_health_back.x = 630;
+	self.sentry_hud_health_back.y = 388;
+	self.sentry_hud_health_back.alignx = "right";
+	self.sentry_hud_health_back.aligny = "middle";
+	self.sentry_hud_health_back.alpha = 0.7;
+	self.sentry_hud_health_back setShader( "gfx/hud/hud@health_back.dds", 116, 10 );
+	self.sentry_hud_health_back.sort = 10;
+	
+	self.sentry_hud_health_front = newClientHudElem( self );
+	self.sentry_hud_health_front.x = 628;
+	self.sentry_hud_health_front.y = 388;
+	self.sentry_hud_health_front.alignx = "right";
+	self.sentry_hud_health_front.aligny = "middle";
+	self.sentry_hud_health_front.alpha = 0.8;
+    self.sentry_hud_health_front.color = ( 0, 0, 1 );
+	self.sentry_hud_health_front setShader( "gfx/hud/hud@health_bar.dds", 112, 8 );
+	self.sentry_hud_health_front.sort = 20;
+    
+    self.sentry_hud_health = newClientHudElem( self );
+	self.sentry_hud_health.x = 572;
+	self.sentry_hud_health.y = 388;
+	self.sentry_hud_health.alignx = "center";
+	self.sentry_hud_health.aligny = "middle";
+	self.sentry_hud_health.alpha = 1;
+	self.sentry_hud_health.sort = 25;
+    self.sentry_hud_health.fontscale = 0.7;
+    self.sentry_hud_health.label = &"Sentry health: ";
+    
+    while ( isAlive( self ) && isDefined( self.mg ) )
     {       
         if ( isDefined( mg.isfiring ) )
         {
@@ -919,12 +1005,17 @@ sentry_hud( mg )
             self.sentry_hud_notice setText( &"Idle" );
         }            
         
+        self.sentry_hud_health setValue( self.mg.health );
+        self.sentry_hud_health_front setShader( "white", self.mg.health * 1.12, 8 );
         wait 0.1;
     }
     
     if ( isDefined( self.sentry_hud_back ) )            self.sentry_hud_back destroy();
     if ( isDefined( self.sentry_hud_front ) )           self.sentry_hud_front destroy();
     if ( isDefined( self.sentry_hud_notice ) )          self.sentry_hud_notice destroy();
+    if ( isDefined( self.sentry_hud_health_back ) )     self.sentry_hud_health_back destroy();
+    if ( isDefined( self.sentry_hud_health_front ) )    self.sentry_hud_health_front destroy();
+    if ( isDefined( self.sentry_hud_health ) )          self.sentry_hud_health destroy();
 }
 
 hunterClass_medic() {
@@ -1089,6 +1180,8 @@ ammobox()
                 modeli = 0;
                 
             mybox setModel( boxmodels[ modeli ] );
+            
+            wait 0.5;
         }
         
         wait 0.05;
