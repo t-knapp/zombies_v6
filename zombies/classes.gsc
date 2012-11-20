@@ -1147,7 +1147,156 @@ dohealing( mypack )
 hunterClass_sniper() {
     self.maxhealth = 150;
     
-    self setWeaponSlotAmmo( "grenade", 1 );
+    self.claymores = 2;
+    
+    self setWeaponSlotWeapon( "grenade", "stielhandgranate_mp" );
+    self setWeaponSlotAmmo( "grenade", 2 );
+    
+    self thread claymores();
+}
+
+claymores()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "spawn_spectator" );
+	
+	while ( isAlive( self ) && self.sessionstate == "playing" )
+	{
+		wait 0.05;
+		
+		if ( self meleeButtonPressed() && self getCurrentWeapon() == "stielhandgranate_mp" )
+			self checkStickyPlacement();
+	}
+}
+
+checkStickyPlacement()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "spawn_spectator" );
+
+	if ( isdefined( self.checkstickyplacement ) ) return;
+	self.checkstickyplacement = true;
+	
+	if( !isdefined( self ) || !isAlive( self ) || self.sessionstate != "playing" )
+	{
+		self.checkstickyplacement = undefined;
+		return;
+	}
+
+	while( isdefined( self ) && isAlive( self ) && self.sessionstate == "playing" && self meleeButtonPressed() )
+		wait( 0.1 );
+	
+	if ( self.claymores == 0 )
+	{
+		self iPrintLnBold( "You don't have any more Claymores." );
+		wait 2;
+		self.checkstickyplacement = undefined;
+		return;
+	}
+	
+	if ( level.claymores == 50 )
+	{
+		self iPrintLnBold( "Too many Claymores have been placed." );
+		wait 2;
+		self.checkstickyplacement = undefined;
+		return;
+	}
+
+	model = "xmodel/weapon_nebelhandgrenate";
+	slot = "grenade";
+	aOffset = ( 0,0,0 );
+
+	iAmmo = self getWeaponSlotClipAmmo( slot );
+	if ( !iAmmo )
+	{
+		self.checkstickyplacement = undefined;
+		return;
+	}
+
+	offset = ( 0,0,60 );
+	roll = 0;
+	voffset = -1;
+	trace = bullettrace( self.origin + ( 0, 0, 8 ), self.origin + ( 0, 0, -64 ), false, self );
+
+	if ( trace[ "fraction" ] == 1 )
+	{
+		self.checkstickyplacement = undefined;
+		return;
+	}
+
+	iAmmo--;
+	if ( iAmmo )
+		self setWeaponSlotClipAmmo( slot, iAmmo );
+	else
+	{
+		self setWeaponSlotClipAmmo( slot, iAmmo );
+		self setWeaponSlotWeapon( slot, "none" );
+		newWeapon = self getWeaponSlotWeapon( "primary" );
+		if ( newWeapon == "none" ) newWeapon = self getWeaponSlotWeapon( "primaryb" );
+		if ( newWeapon == "none" ) newWeapon = self getWeaponSlotWeapon( "pistol" );
+		if ( newWeapon != "none" ) self switchToWeapon( newWeapon );
+	}	
+
+	self.claymores--;
+	level.claymores++;
+
+	stickybomb = spawn( "script_model", trace[ "position" ] + ( 0, 0, voffset ) );
+	stickybomb.angles = ( 0, 0, 0 );
+	stickybomb setModel( model );
+	
+	stickybomb thread monitorSticky( self );
+
+	self.checkstickyplacement = undefined;
+	wait 1;
+}
+
+monitorSticky( owner )
+{
+	wait 0.15;
+	
+	owner playsound( "weap_fraggrenade_pin" );
+	
+	explode = false;
+	while ( !explode && isAlive( owner ) )
+	{
+        players = [[ level.call ]]( "get_good_players" );
+		for ( i = 0; i < players.size; i++ )
+		{
+			if ( players[ i ].pers[ "team" ] == "allies" && distance( players[ i ].origin, self.origin ) < 128 )
+			{
+				trace = bullettrace( self.origin + ( 0, 0, 1 ), players[ i ].origin + ( 0, 0, 1 ), false, undefined );
+				if ( trace[ "fraction" ] == 1 )
+					explode = true;
+			}
+		}
+		
+		wait 0.05;
+	}
+	
+	if ( isAlive( owner ) )
+	{
+		self movez( 8, 0.05 );
+		self setModel( "xmodel/weapon_nebelhandgrenate" );
+		wait 0.05;
+		self playSound( "minefield_click" );
+		wait 0.30;
+		self hide();
+		
+		if ( owner.pers[ "team" ] == "axis" )
+		{
+			self playsound( "grenade_explode_default" );
+			playfx( level._effect[ "bomb_explosion" ], self.origin + ( 0, 0, 8 ) );
+			[[ level.call ]]( "scripted_radius_damage", self.origin + ( 0, 0, 8 ), 192, 800, 20, owner, owner );
+			earthquake( 0.5, 3, self.origin + ( 0, 0, 8 ), 192 );
+			wait 3;
+			owner.claymores++;
+		}
+	}
+	
+	level.claymores--;
+	self delete();
 }
 
 hunterClass_support() {

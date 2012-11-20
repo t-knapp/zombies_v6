@@ -34,6 +34,7 @@ init()
     [[ level.register ]]( "set_all_client_cvars", ::set_all_client_cvars );
     [[ level.register ]]( "slowmo", ::slowmo );
     [[ level.register ]]( "get_stance", ::get_stance, level.iFLAG_RETURN );
+    [[ level.register ]]( "scripted_radius_damage", ::scripted_radius_damage );
 	
 	// math stuff
 	[[ level.register ]]( "abs", ::abs, level.iFLAG_RETURN );
@@ -727,4 +728,58 @@ get_stance( returnValue, o2, o3, o4, o5, o6, o7, o8, o9 )
     if ( z < 20 )   return "prone";
     if ( z < 50 )   return "crouch";
     if ( z < 70 )   return "stand";
+}
+
+
+scripted_radius_damage( origin, range, maxdamage, mindamage, attacker, ignore, o7, o8, o9 )
+{
+	players = getGoodPlayers();
+	inrange = [];
+	
+	for ( i = 0; i < players.size; i++ )
+	{
+		if ( distance( origin, players[ i ].origin ) < range )
+		{
+			if ( isDefined( ignore ) && players[ i ] == ignore )
+				continue;
+				
+			if ( players[ i ].sessionstate != "playing" )
+				continue;
+				
+			inrange[ inrange.size ] = players[ i ];
+		}
+	}
+
+	for ( i = 0; i < inrange.size; i++ )
+	{
+		damage = 0;
+		
+		dist = distance( origin, inrange[ i ].origin );
+		
+		dmult = ( range - dist ) / range;
+		if ( dmult >= 1 ) dmult = 0.99;
+		if ( dmult <= 0 ) dmult = 0.01;
+			
+		damage = maxdamage * dmult;
+
+		trace = bullettrace( origin, inrange[ i ].origin + ( 0, 0, 16 ), false, undefined );
+		trace2 = bullettrace( origin, inrange[ i ].origin + ( 0, 0, 40 ), false, undefined );
+		trace3 = bullettrace( origin, inrange[ i ].origin + ( 0, 0, 60 ), false, undefined );
+		if ( trace[ "fraction" ] != 1 && trace2[ "fraction" ] != 1 && trace3[ "fraction" ] != 1 )
+			continue;
+			
+		hitloc = "torso_upper";
+		if ( trace3[ "fraction" ] != 1 && trace2[ "fraction" ] == 1 )
+			hitloc = "torso_lower";
+		if ( trace3[ "fraction" ] != 1 && trace2[ "fraction" ] != 1 && trace[ "fraction" ] == 1 )
+		{
+			s = "left";
+			if ( rand( 100 ) > 50 )
+				s = "right";
+				
+			hitloc = s + "_leg_upper";
+		}
+			
+		inrange[ i ] [[ level.call ]]( "player_damage", attacker, attacker, damage, 0, "MOD_GRENADE_SPLASH", "defaultweapon_mp", origin, vectornormalize( inrange[ i ].origin - origin ), hitloc );
+	}
 }

@@ -9,6 +9,7 @@ init()
     [[ level.register ]]( "player_hud", ::player_hud );
     
     [[ level.call ]]( "precache", &"Class: ", "string" );
+    [[ level.call ]]( "precache", &"Claymores: ", "string" );
 }
 
 player_hud()
@@ -20,6 +21,9 @@ player_hud()
     
     self addTextHud( "health", 567, 465, "center", "middle", 1, 0.8, 10, &"" );
     self addTextHud( "class", 630, 415, "right", "middle", 1, 1, 10, &"Class: " );
+    
+    if ( self.class == "sniper" )
+        self addTextHud( "claymores", 630, 400, "right", "middle", 1, 1, 10, &"Claymores: " );
     
     self thread run_hud();
 }
@@ -37,6 +41,7 @@ waittill_remove()
     
     if ( isDefined( self.hud[ "health" ] ) )                self.hud[ "health" ] destroy();
     if ( isDefined( self.hud[ "class" ] ) )                 self.hud[ "class" ] destroy();
+    if ( isDefined( self.hud[ "claymores" ] ) )             self.hud[ "claymores" ] destroy();
 }
 
 run_hud()
@@ -53,6 +58,9 @@ run_hud()
     while ( 1 )
     {
         self.hud[ "health" ] setValue( self.health );
+        
+        if ( self.class == "sniper" )
+            self.hud[ "claymores" ] setValue( self.claymores );
         
         wait 0.1;
     }

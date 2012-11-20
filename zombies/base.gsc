@@ -19,6 +19,7 @@ init()
     level.iHealthQueueCurrent = 0;
     level.aSpawnedObjects = [];
     level.bFirstZombie = false;
+    level.claymores = 0;
     level.gametype = "zom";
     
     // no better place to put this :>
