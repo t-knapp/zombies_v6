@@ -730,7 +730,6 @@ get_stance( returnValue, o2, o3, o4, o5, o6, o7, o8, o9 )
     if ( z < 70 )   return "stand";
 }
 
-
 scripted_radius_damage( origin, range, maxdamage, mindamage, attacker, ignore, o7, o8, o9 )
 {
 	players = getGoodPlayers();

@@ -241,7 +241,14 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
         level.lastkiller = eAttacker;
         
     if ( self.pers[ "team" ] == "axis" && ( level.iGameFlags & level.iFLAG_GAME_STARTED ) )
+    {
         self [[ level.call ]]( "make_zombie" );
+        
+        if ( eAttacker == self )
+            [[ level.call ]]( "print", self.name + "^7 killed themselves and is now a ^1zombie^7!" );
+        else
+            [[ level.call ]]( "print", self.name + "^7 had their brains eaten by " + eAttacker.name + "^7!" );
+    }
         
 	// Make the player drop health
 	//self [[ level.call ]]( "drop_health" );
