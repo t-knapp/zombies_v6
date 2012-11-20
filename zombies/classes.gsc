@@ -523,11 +523,55 @@ zombieClass_fire()
 	self endon( "death" );
 	self endon( "disconnect" );
 	self endon( "end_respawn" );
+    
+    self thread firemonitor( self );
+}
+
+firemonitor( dude )
+{	
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "end_respawn" );
+	self endon( "stopfire" );
 	
-	while ( 1 ) {
-		playfx( level._effect[ "zombies_fire" ], self.origin + ( 0, 0, 24 ) );
-		wait 0.2;
+	self.onfire = true;
+	
+	if ( self.pers[ "team" ] == "axis" )
+		self thread firedeath( dude );
+	
+	while ( 1 )
+	{
+		playFx( level._effect[ "zombies_fire" ], self.origin + ( 0, 0, 32 ) );
+		
+		players = [[ level.call ]]( "get_good_players" );
+		for ( i = 0; i < players.size; i++ )
+		{
+			if ( players[ i ] != self && ( distance( self.origin, players[ i ].origin ) < 36 && !isDefined( players[ i ].onfire ) ) )
+				players[ i ] thread firemonitor( dude );
+		}
+		
+		wait 0.1;
 	}
+}
+
+firedeath( dude )
+{
+	self iPrintLnBold( "You are on ^1fire^7!" );
+	
+	while ( isAlive( self ) && isDefined( self.onfire ) )
+	{
+		oldhealth = self.health;
+		
+		self finishPlayerDamage( dude, dude, 3, 0, "MOD_MELEE", "enfield_mp", self.origin, ( 0, 0, 0 ), "none" );
+		
+		wait 0.75;
+		
+		if ( self.health > oldhealth )
+			break;
+	}
+	
+	self notify( "stopfire" );
+	self.onfire = undefined;
 }
 
 zombieClass_fast() 
@@ -1089,6 +1133,8 @@ dohealing( mypack )
             {
                 if ( isDefined( players[ i ].ispoisoned ) )
                     players[ i ].ispoisoned = undefined;
+                if ( isDefined( players[ i ].onfire ) )
+                    players[ i ].onfire = undefined;
                     
                 if ( players[ i ] != self && players[ i ].health < players[ i ].maxhealth )
                     players[ i ].health++;
