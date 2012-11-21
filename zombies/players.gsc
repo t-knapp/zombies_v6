@@ -190,6 +190,8 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 	lpselfname = self.name;
 	lpselfteam = self.pers["team"];
 	lpattackerteam = "";
+    
+    [[ level.call ]]( "update_stats", self, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc );
 
 	eAttackerNum = -1;
 	if(isPlayer(eAttacker))
