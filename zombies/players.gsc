@@ -76,11 +76,11 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
         // disable friendlyfire and specnades
         if ( eAttacker.pers[ "team" ] == "spectator" || eAttacker.pers[ "team" ] == self.pers[ "team" ] || ( eAttacker.pers[ "team" ] == "allies" && [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" ) )
             return;
-            
-        // spawnprotection
-        if ( isDefined( self.spawnprotection ) )
-            return;
     }
+    
+    // spawnprotection
+    if ( isDefined( self.spawnprotection ) )
+        return;
 
 	// Don't do knockback if the damage direction was not specified
 	if(!isDefined(vDir))
@@ -128,7 +128,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
             // did i just get hit by a hunter?
             if ( isPlayer( eAttacker ) && eAttacker.pers[ "team" ] == "axis" )
             {
-                if ( sMeansOfDeath == "MOD_MELEE" )
+                if ( sMeansOfDeath == "MOD_MELEE" && self.class != "shocker" )
                     self shellshock( "default", 1 ); 
                     
                 // since melee damage is up close anyways, we'll do the full amount
@@ -159,7 +159,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
     // damage = base * (distance + randomness modifier) * (resistance + vulnerability modifier) * (splash)
     finalDamage = iDamage * distanceModifier * resistanceModifier * splashModifier;
     
-    if ( eAttacker.pers[ "team" ] == "allies" && eAttacker != self )
+    if ( eAttacker.pers[ "team" ] == "allies" && isPlayer( eAttacker ) && eAttacker != self )
         self.deaths += finalDamage;
 
 	self finishPlayerDamage( eInflictor, eAttacker, finalDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc );
@@ -239,9 +239,9 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
         self [[ level.call ]]( "make_zombie" );
         
         if ( eAttacker == self )
-            [[ level.call ]]( "print", self.name + "^7 killed themselves and is now a ^1zombie^7!" );
+            [[ level.call ]]( "print", self.name + "^7 killed themselves and is now a ^1zombie^7!", true );
         else
-            [[ level.call ]]( "print", self.name + "^7 had their brains eaten by " + eAttacker.name + "^7!" );
+            [[ level.call ]]( "print", self.name + "^7 had their brains eaten by " + eAttacker.name + "^7!", true );
     }
         
 	// Make the player drop health
@@ -294,6 +294,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     self.onfire = undefined;
     self.claymores = undefined;
 	self.sessionstate = "playing";
+    self.spawnprotection = true;
 		
 	spawnpointname = "mp_teamdeathmatch_spawn";
 	spawnpoint = [[ level.call ]]( "get_spawnpoint_nearteam", getentarray( spawnpointname, "classname" ) );
@@ -307,7 +308,6 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	self.maxhealth = 100;
 	self.health = self.maxhealth;
     self.lasthittime = 0;
-    self.spawnprotection = true;
     
     self detachall();
 

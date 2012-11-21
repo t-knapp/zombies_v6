@@ -862,7 +862,7 @@ sentry_damage_detect()
     {
         if ( distance( self.mg.origin, players[ i ].origin ) < 52 )
         {
-            if ( players[ i ].pers[ "team" ] == "axis" && players[ i ].class == "shocker" && players[ i ] meleeButtonPressed() )
+            if ( players[ i ].pers[ "team" ] == "allies" && players[ i ].class == "shocker" && players[ i ] meleeButtonPressed() )
             {
                 players[ i ] playSound( "melee_hit" );
                 doHit = true;
