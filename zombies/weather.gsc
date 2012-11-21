@@ -23,6 +23,7 @@ main()
 setFog( close, far, r, g, b, time )
 {
     amount = far / ( time / 5 );
+    iprintln( amount );
     
     while ( time > 0 && ( level.iGameFlags & level.iFLAG_GAME_OVER ) == 0 )
     {

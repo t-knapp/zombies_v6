@@ -109,12 +109,11 @@ main()
     
     [[ level.call ]]( "pick_zombie" );
     
-    level.iGameFlags = level.iFLAG_GAME_STARTED;
-    
     wait 2;
-    
 	level.iStartTime = getTime();
     level.gamestarted = true;
+    
+    level.iGameFlags = level.iFLAG_GAME_STARTED;
     
     thread game_logic();
 	
