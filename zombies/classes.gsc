@@ -37,9 +37,11 @@ init()
     [[ level.call ]]( "precache", &"Reloading... time remaining: ", "string" );
     [[ level.call ]]( "precache", &"Sentry status: ", "string" );
     [[ level.call ]]( "precache", &"Sentry health: ", "string" );
+    [[ level.call ]]( "precache", &"Sentry kills: ", "string" );
     [[ level.call ]]( "precache", &"Idle", "string" );
     [[ level.call ]]( "precache", &"Firing", "string" );
     [[ level.call ]]( "precache", &"Reloading", "string" );
+    [[ level.call ]]( "precache", &"Disabled", "string" );
     [[ level.call ]]( "precache", "gfx/hud/hud@health_bar.dds", "shader" );
     [[ level.call ]]( "precache", "gfx/hud/hud@health_back.dds", "shader" );
     
@@ -719,6 +721,7 @@ sentry()
 {   
     barrel = spawn( "script_model", self getOrigin() );
     barrel setModel( "xmodel/barrel_black1" );
+    barrel setContents( 1 );
     
     while ( isAlive( self ) )
     {  
@@ -797,6 +800,7 @@ sentry_remove()
 mg_remove( mg )
 {
     self waittill( "remove sentry" );
+    wait 0.05;
     self.mg delete();
     self.mg = undefined;
 }
@@ -805,9 +809,11 @@ sentry_think( barrel )
 {     
     self.mg = spawn( "script_model", barrel getOrigin() + ( 0, 0, 42 ) );
     self.mg setModel( "xmodel/mg42_bipod" );
+    self.mg setContents( 1 );
     
     self thread mg_remove( self.mg );
     self thread sentry_hud( self.mg );
+    self thread sentry_explode();
        
     self.mg.ammo = 50;
     self.mg.health = 100;
@@ -823,6 +829,9 @@ sentry_think( barrel )
 
 sentry_aim()
 {
+    if ( isDefined( self.mg.disabled ) )
+        return;
+        
     // do stuff here
     players = [[ level.call ]]( "get_good_players" );
     bestplayer = undefined;
@@ -862,7 +871,7 @@ sentry_damage_detect()
     {
         if ( distance( self.mg.origin, players[ i ].origin ) < 52 )
         {
-            if ( players[ i ].pers[ "team" ] == "axis" && players[ i ].class == "shocker" && players[ i ] meleeButtonPressed() )
+            if ( players[ i ].pers[ "team" ] == "allies" && players[ i ].class == "shocker" && players[ i ] meleeButtonPressed() )
             {
                 players[ i ] playSound( "melee_hit" );
                 doHit = true;
@@ -881,20 +890,38 @@ sentry_damage_detect()
     if ( doHit )
     {
         self.mg.health -= [[ level.call ]]( "rand_range", 15, 45 );
-        if ( self.mg.health <= 0 )
-            self sentry_explode();
+        if ( self.mg.health < 0 )
+            self.mg.health = 0;
+            
+        if ( self.mg.health == 0 )
+            self thread sentry_disable();
             
         // melee time from lee enfield
         wait 0.8;
     }
 }
 
+sentry_disable()
+{
+    if ( isDefined( self.mg.disabled ) )
+        return;
+        
+    self.mg.disabled = true;
+    
+    while ( self.mg.health <= 0 )
+    {
+        playFx( level._effect[ "sentry_onfire" ], self.mg.origin + ( 0, 0, -8 ) );
+        wait 0.3;
+    }
+    
+    self.mg.disabled = undefined;
+}
+
 sentry_explode()
 {
-    playFx( level._effect[ "sentry_explode" ], self.mg.origin );
-    wait 0.05;
+    self waittill( "remove sentry" );
     
-    self notify( "remove sentry" );
+    playFx( level._effect[ "sentry_explode" ], self.mg.origin );
 }
 
 sentry_fire( target, owner, x )
@@ -1032,6 +1059,16 @@ sentry_hud( mg )
     self.sentry_hud_health.fontscale = 0.7;
     self.sentry_hud_health.label = &"Sentry health: ";
     
+    self.sentry_hud_kills = newClientHudElem( self );
+	self.sentry_hud_kills.x = 572;
+	self.sentry_hud_kills.y = 376;
+	self.sentry_hud_kills.alignx = "center";
+	self.sentry_hud_kills.aligny = "middle";
+	self.sentry_hud_kills.alpha = 1;
+	self.sentry_hud_kills.sort = 25;
+    self.sentry_hud_kills.fontscale = 0.7;
+    self.sentry_hud_kills.label = &"Sentry kills: ";
+    
     while ( isAlive( self ) && isDefined( self.mg ) )
     {       
         if ( isDefined( mg.isfiring ) )
@@ -1048,7 +1085,12 @@ sentry_hud( mg )
             self.sentry_hud_notice.color = ( 1, 1, 1 );
             self.sentry_hud_notice setText( &"Reloading" );
         }        
-//        else if ( isDefined( mg.timeup ) )
+        else if ( isDefined( mg.disabled ) )
+        {
+            self.sentry_hud_front.alpha = 0;
+            self.sentry_hud_notice.color = ( 1, 0, 0 );
+            self.sentry_hud_notice setText( &"Disabled" );
+        }
         else
         {
             self.sentry_hud_front.alpha = 0;
@@ -1058,6 +1100,7 @@ sentry_hud( mg )
         
         self.sentry_hud_health setValue( self.mg.health );
         self.sentry_hud_health_front setShader( "white", self.mg.health * 1.12, 8 );
+        self.sentry_hud_kills setValue( self.stats[ "sentryKills" ] );
         wait 0.1;
     }
     
@@ -1067,6 +1110,7 @@ sentry_hud( mg )
     if ( isDefined( self.sentry_hud_health_back ) )     self.sentry_hud_health_back destroy();
     if ( isDefined( self.sentry_hud_health_front ) )    self.sentry_hud_health_front destroy();
     if ( isDefined( self.sentry_hud_health ) )          self.sentry_hud_health destroy();
+    if ( isDefined( self.sentry_hud_kills ) )           self.sentry_hud_kills destroy();
 }
 
 hunterClass_medic() {
@@ -1139,12 +1183,21 @@ dohealing( mypack )
             if ( players[ i ].pers[ "team" ] == "axis" && distance( self.origin, players[ i ].origin ) < 56 )
             {
                 if ( isDefined( players[ i ].ispoisoned ) )
+                {
                     players[ i ].ispoisoned = undefined;
+                    self.stats[ "infectionsHealed" ]++;
+                }
                 if ( isDefined( players[ i ].onfire ) )
+                {
                     players[ i ].onfire = undefined;
+                    self.stats[ "firesPutOut" ]++;
+                }
                     
                 if ( players[ i ] != self && players[ i ].health < players[ i ].maxhealth )
+                {
                     players[ i ].health++;
+                    self.stats[ "healPoints" ]++;
+                }
             }
         } 
     }

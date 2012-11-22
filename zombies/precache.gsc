@@ -116,8 +116,12 @@ init()
 	level._effect[ "zombies_fire" ] = loadfx( "fx/fire/tinybon.efx" );
     level._effect[ "zombies_groundexplode" ] = loadfx( "fx/smoke/aftermath1.efx" );
     level._effect[ "sentry_fire" ] = loadfx( "fx/muzzleflashes/mg42flash.efx" );
+    level._effect[ "sentry_onfire" ] = loadfx( "fx/fire/barrelfire.efx" );
     level._effect[ "sentry_explode" ] = loadfx( "fx/explosions/pathfinder_explosion.efx" );
     level._effect[ "bomb_explosion" ] = loadfx( "fx/explosions/grenade3.efx" );
+    
+    // cool effect for misty fireish haze
+    // fx/fire/distancefire.efx
 }
 
 precacheObject( oObject, sType ) 

@@ -10,6 +10,9 @@ init()
     
     [[ level.call ]]( "precache", &"Class: ", "string" );
     [[ level.call ]]( "precache", &"Claymores: ", "string" );
+    [[ level.call ]]( "precache", &"Heal points: ", "string" );
+    [[ level.call ]]( "precache", &"Infections healed: ", "string" );
+    [[ level.call ]]( "precache", &"Fires put out: ", "string" );
 }
 
 player_hud()
@@ -24,6 +27,12 @@ player_hud()
     
     if ( self.class == "sniper" )
         self addTextHud( "claymores", 630, 400, "right", "middle", 1, 1, 10, &"Claymores: " );
+    else if ( self.class == "medic" )
+    {
+        self addTextHud( "healpoints", 630, 400, "right", "middle", 1, 1, 10, &"Heal points: " );
+        self addTextHud( "infections", 630, 385, "right", "middle", 1, 1, 10, &"Infections healed: " );
+        self addTextHud( "fires", 630, 370, "right", "middle", 1, 1, 10, &"Fires put out: " );
+    }
     
     self thread run_hud();
 }
@@ -42,6 +51,9 @@ waittill_remove()
     if ( isDefined( self.hud[ "health" ] ) )                self.hud[ "health" ] destroy();
     if ( isDefined( self.hud[ "class" ] ) )                 self.hud[ "class" ] destroy();
     if ( isDefined( self.hud[ "claymores" ] ) )             self.hud[ "claymores" ] destroy();
+    if ( isDefined( self.hud[ "healpoints" ] ) )            self.hud[ "healpoints" ] destroy();
+    if ( isDefined( self.hud[ "infections" ] ) )            self.hud[ "infections" ] destroy();
+    if ( isDefined( self.hud[ "fires" ] ) )                 self.hud[ "fires" ] destroy();
 }
 
 run_hud()
@@ -61,6 +73,12 @@ run_hud()
         
         if ( self.class == "sniper" )
             self.hud[ "claymores" ] setValue( self.claymores );
+        else if ( self.class == "medic" )
+        {
+            self.hud[ "healpoints" ] setValue( self.stats[ "healPoints" ] );
+            self.hud[ "infections" ] setValue( self.stats[ "infectionsHealed" ] );
+            self.hud[ "fires" ] setValue( self.stats[ "firesPutOut" ] );
+        }
         
         wait 0.1;
     }
