@@ -160,7 +160,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
     finalDamage = iDamage * distanceModifier * resistanceModifier * splashModifier;
     
     if ( eAttacker.pers[ "team" ] == "allies" && eAttacker != self )
-        self.deaths += finalDamage;
+        eAttacker.deaths += finalDamage;
 
 	self finishPlayerDamage( eInflictor, eAttacker, finalDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc );
 }

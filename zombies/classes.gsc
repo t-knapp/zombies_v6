@@ -721,7 +721,6 @@ sentry()
 {   
     barrel = spawn( "script_model", self getOrigin() );
     barrel setModel( "xmodel/barrel_black1" );
-    barrel setContents( 1 );
     
     while ( isAlive( self ) )
     {  
@@ -1350,7 +1349,6 @@ monitorSticky( owner )
 			[[ level.call ]]( "scripted_radius_damage", self.origin + ( 0, 0, 8 ), 192, 800, 20, owner, owner );
 			earthquake( 0.5, 3, self.origin + ( 0, 0, 8 ), 192 );
 			wait 3;
-			owner.claymores++;
 		}
 	}
 	
@@ -1579,9 +1577,7 @@ getammo( box )
                 oldamountpri = self getWeaponSlotAmmo( "primary" );
                 oldamountprib = self getWeaponSlotAmmo( "primaryb" );
                 oldamountpistol = self getWeaponSlotAmmo( "pistol" );
-                oldamountgrenade = self getWeaponSlotAmmo( "grenade" );
-                oldamountsmokegrenade = self getWeaponSlotAmmo( "smokegrenade" );
-
+    
                 self setWeaponSlotAmmo( "primary", ( oldamountpri + 90 ) );
                 self setWeaponSlotAmmo( "primaryb", ( oldamountprib + 90 ) );
                 self setWeaponSlotAmmo( "pistol", ( oldamountpistol + 30 ) );
