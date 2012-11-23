@@ -70,7 +70,10 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
         if ( eAttacker.pers[ "team" ] == "axis" && self.pers[ "team" ] == "axis" && eAttacker.class == "medic" && sMeansOfDeath == "MOD_MELEE" && [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" )
         {
             if ( self.health < self.maxhealth - 10 )
+            {
                 self.health += 10;
+                eAttacker.stats[ "healPoints" ] += 10;
+            }
         }
         
         // disable friendlyfire and specnades
@@ -128,7 +131,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
             // did i just get hit by a hunter?
             if ( isPlayer( eAttacker ) && eAttacker.pers[ "team" ] == "axis" )
             {
-                if ( sMeansOfDeath == "MOD_MELEE" )
+                if ( sMeansOfDeath == "MOD_MELEE" && self.class != "shocker" )
                     self shellshock( "default", 1 ); 
                     
                 // since melee damage is up close anyways, we'll do the full amount
@@ -296,6 +299,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     self.onfire = undefined;
     self.claymores = undefined;
 	self.sessionstate = "playing";
+    self.spawnprotection = true;
 		
 	spawnpointname = "mp_teamdeathmatch_spawn";
 	spawnpoint = [[ level.call ]]( "get_spawnpoint_nearteam", getentarray( spawnpointname, "classname" ) );
@@ -309,7 +313,6 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	self.maxhealth = 100;
 	self.health = self.maxhealth;
     self.lasthittime = 0;
-    self.spawnprotection = true;
     
     self detachall();
 

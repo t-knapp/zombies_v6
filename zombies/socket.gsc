@@ -65,7 +65,7 @@ receive()
 receive_timeout() 
 {
 	time = 0;
-	while ( time < 3 && !self.received ) 
+	while ( time < 5 && !self.received ) 
     {
 		time += 0.05;
 		wait 0.05;
