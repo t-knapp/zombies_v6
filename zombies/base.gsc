@@ -108,12 +108,12 @@ main()
     hWarmUp destroy();
     
     [[ level.call ]]( "pick_zombie" );
-    
-    wait 2;
-	level.iStartTime = getTime();
     level.gamestarted = true;
     
     level.iGameFlags = level.iFLAG_GAME_STARTED;
+    
+    wait 2;
+	level.iStartTime = getTime();
     
     thread game_logic();
 	

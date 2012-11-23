@@ -8,6 +8,7 @@ init()
 {
     [[ level.register ]]( "get_stats", ::get_stats );
     [[ level.register ]]( "update_stats", ::update_stats, level.iFLAG_THREAD );
+    [[ level.register ]]( "save_stats", ::save_stats );
     
     [[ level.call ]]( "precache", &"^3Retrieving stats...", "string" );
 }
@@ -190,4 +191,8 @@ update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vD
         if ( player.pers[ "team" ] == "axis" )
             eAttacker.stats[ "huntersKilled" ]++;
     }
+}
+
+save_stats()
+{
 }
