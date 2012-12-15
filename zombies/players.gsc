@@ -79,11 +79,11 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
         // disable friendlyfire and specnades
         if ( eAttacker.pers[ "team" ] == "spectator" || eAttacker.pers[ "team" ] == self.pers[ "team" ] || ( eAttacker.pers[ "team" ] == "allies" && [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" ) )
             return;
-            
-        // spawnprotection
-        if ( isDefined( self.spawnprotection ) )
-            return;
     }
+  
+    // spawnprotection
+    if ( isDefined( self.spawnprotection ) )
+        return;
 
 	// Don't do knockback if the damage direction was not specified
 	if(!isDefined(vDir))
@@ -175,7 +175,7 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 	if(self.sessionteam == "spectator")
 		return;
 
-	// If the player was killed by a head shot, let players know it was a head shot kill
+        // If the player was killed by a head shot, let players know it was a head shot kill
 	if(sHitLoc == "head" && sMeansOfDeath != "MOD_MELEE")
 		sMeansOfDeath = "MOD_HEAD_SHOT";
 		

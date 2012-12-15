@@ -783,22 +783,16 @@ sentry()
     
     wait 0.15;
     
-    self thread sentry_remove();
     self thread sentry_think( barrel );
     
-    self waittill( "remove sentry" );
-    barrel delete();
-}
-
-sentry_remove()
-{
-    self waittill( "death" );
+    self [[ level.call ]]( "waittill_any", "death", "disconnect" );
     self notify( "remove sentry" );
+    barrel delete();
 }
 
 mg_remove( mg )
 {
-    self waittill( "remove sentry" );
+    self [[ level.call ]]( "waittill_any", "death", "disconnect" );
     wait 0.05;
     self.mg delete();
     self.mg = undefined;

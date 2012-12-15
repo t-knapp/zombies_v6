@@ -35,6 +35,7 @@ init()
     [[ level.register ]]( "slowmo", ::slowmo );
     [[ level.register ]]( "get_stance", ::get_stance, level.iFLAG_RETURN );
     [[ level.register ]]( "scripted_radius_damage", ::scripted_radius_damage );
+    [[ level.register ]]( "waittill_any", ::waittill_any );
 	
 	// math stuff
 	[[ level.register ]]( "abs", ::abs, level.iFLAG_RETURN );
@@ -781,4 +782,30 @@ scripted_radius_damage( origin, range, maxdamage, mindamage, attacker, ignore, o
 			
 		inrange[ i ] [[ level.call ]]( "player_damage", attacker, attacker, damage, 0, "MOD_GRENADE_SPLASH", "defaultweapon_mp", origin, vectornormalize( inrange[ i ].origin - origin ), hitloc );
 	}
+}
+
+// from singleplayer :p
+waittill_any( string1, string2, string3, string4, string5 )
+{
+    level endon( "intermission" );
+    
+	ent = spawnstruct();
+
+	if ( isdefined ( string1 ) )    self thread waittill_string( string1, ent );
+	if ( isdefined ( string2 ) )    self thread waittill_string( string2, ent );
+	if ( isdefined ( string3 ) )    self thread waittill_string( string3, ent );
+	if ( isdefined ( string4 ) )    self thread waittill_string( string4, ent );
+	if ( isdefined ( string5 ) )    self thread waittill_string( string5, ent );
+
+	ent waittill( "returned" );
+	ent notify( "die" );
+}
+
+
+waittill_string (msg, ent)
+{
+	level endon( "intermission" );
+	ent endon( "die" );
+	self waittill( msg );
+	ent notify( "returned" );
 }
