@@ -700,6 +700,8 @@ hunterClass_soldier() {
     
     self setWeaponSlotWeapon( "primaryb", "mp40_mp" );
     self giveMaxAmmo( "mp40_mp" );
+    self giveWeapon( "stielhandgranate_mp" );   
+    self setWeaponSlotAmmo( "grenade", 2 );
 }
 
 hunterClass_heavy() {
@@ -747,7 +749,7 @@ sentry()
             catch_next = false;
             lol = false;
 
-			for ( i = 0; i <= 0.30; i += 0.01 )
+			for ( i = 0; i <= 0.30; i += 0.02 )
 			{
 				if ( catch_next && self useButtonPressed() )
 				{
@@ -757,7 +759,7 @@ sentry()
 				else if ( !( self useButtonPressed() ) )
 					catch_next = true;
 
-				wait 0.01;
+				wait 0.02;
 			}
             
             if ( lol )
@@ -1402,7 +1404,7 @@ ammobox()
             catch_next = false;
             lol = false;
 
-			for ( i = 0; i <= 0.30; i += 0.01 )
+			for ( i = 0; i <= 0.30; i += 0.02 )
 			{
 				if ( catch_next && self useButtonPressed() )
 				{
@@ -1412,7 +1414,7 @@ ammobox()
 				else if ( !( self useButtonPressed() ) )
 					catch_next = true;
 
-				wait 0.01;
+				wait 0.02;
 			}
             
             if ( lol )

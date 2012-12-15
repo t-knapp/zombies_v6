@@ -1,6 +1,6 @@
 init()
 {
-    [[ level.call ]]( "precache", &"^1zomb^7ies ^2alpha", "string" );
+    [[ level.call ]]( "precache", &"^1zomb^7ies ^2beta", "string" );
     [[ level.call ]]( "precache", &"mod by ^3cheese", "string" );
     [[ level.call ]]( "precache", &"xfire^2:^7 thecheeseman999", "string" );
 }
@@ -18,7 +18,7 @@ main()
 	while ( 1 )
 	{
 		level.logo.alpha = 0;
-		level.logo setText( &"^1zomb^7ies ^2alpha" );
+		level.logo setText( &"^1zomb^7ies ^2beta" );
 		level.logo fadeOverTime( 2 );
 		level.logo.alpha = 1;
 		

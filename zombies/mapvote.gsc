@@ -393,7 +393,7 @@ playerVote()
 	hasVoted = false;
 	
 	for(;;) {
-    wait 0.01;
+    wait 0.02;
 	
     if(self attackButtonPressed()) {
       if(!hasVoted) {
@@ -417,7 +417,7 @@ playerVote()
     }
     
     while(self attackButtonPressed())
-      wait 0.01;
+      wait 0.02;
       
 		self.sessionstate = "spectator";
 		self.spectatorclient = -1;
