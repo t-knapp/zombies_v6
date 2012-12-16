@@ -236,7 +236,7 @@ end_map( sWinner )
         for ( i = 0; i < aPlayers.size; i++ )
         {
             ePlayer = aPlayers[ i ];
-            ePlayer.stats[ "timesSurvived" ]+;
+            ePlayer.stats[ "timesSurvived" ]++;
         }
         
         wait 2;

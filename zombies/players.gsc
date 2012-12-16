@@ -60,6 +60,7 @@ player_connect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 
 player_disconnect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 {  
+    [[ level.call ]]( "print", self.name + " disconnected." );
 }
 
 player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc )
@@ -162,8 +163,16 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
     // damage = base * (distance + randomness modifier) * (resistance + vulnerability modifier) * (splash)
     finalDamage = iDamage * distanceModifier * resistanceModifier * splashModifier;
     
-    if ( eAttacker.pers[ "team" ] == "allies" && eAttacker != self )
-        eAttacker.deaths += finalDamage;
+    if ( isPlayer( eAttacker ) && eAttacker != self )
+    {
+        if ( eAttacker.pers[ "team" ] == "allies" )
+        {
+            eAttacker.deaths += finalDamage;
+            eAttacker.stats[ "zombieDamageDealt" ] += finalDamage;
+        }
+        else if ( eAttacker.pers[ "team" ] == "axis" )
+            eAttacker.stats[ "hunterDamageDealt" ] += finalDamage;
+    }
 
 	self finishPlayerDamage( eInflictor, eAttacker, finalDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc );
 }
