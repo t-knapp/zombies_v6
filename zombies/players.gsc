@@ -118,9 +118,9 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
             if ( isPlayer( eAttacker ) && eAttacker.pers[ "team" ] == "allies" )
             {
                 // poison zombie?
-                if ( eAttacker.class == "poison" && !isDefined( self.ispoisoned ) )
+                if ( isDefined( eAttacker.class ) && eAttacker.class == "poison" && !isDefined( self.ispoisoned ) )
                     self [[ level.call ]]( "be_poisoned", eAttacker );
-                else if ( eAttacker.class == "shocker" )
+                else if ( isDefined( eAttacker.class ) && eAttacker.class == "shocker" )
                     self [[ level.call ]]( "be_shocked", eAttacker );
             }
         }
@@ -580,6 +580,7 @@ cvar_watcher()
         self setClientCvar( "r_nv_fogdist_mode", "GL_EYE_RADIAL_NV" );
         self setClientCvar( "r_fog", "1" );
         self setClientCvar( "weapon", "1" );
+        self setClientCvar( "r_drawsun", "0" );
         
         wait 1;
     }

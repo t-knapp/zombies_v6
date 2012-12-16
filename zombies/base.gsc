@@ -233,6 +233,12 @@ end_map( sWinner )
     {
         [[ level.call ]]( "print", "^6Hunters win!", true );
         
+        for ( i = 0; i < aPlayers.size; i++ )
+        {
+            ePlayer = aPlayers[ i ];
+            ePlayer.stats[ "timesSurvived" ]+;
+        }
+        
         wait 2;
     }
     

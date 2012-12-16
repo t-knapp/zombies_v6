@@ -195,6 +195,8 @@ update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vD
 
 save_stats()
 {
+    self iprintln( "saving stats..." );
+    
     infostring = "saveinfo " + self getEntityNumber();
     
     // add up our totals
@@ -212,7 +214,7 @@ save_stats()
     self.stats[ "totalInfectionsHealed" ] += self.stats[ "infectionsHealed" ];
     self.stats[ "totalFiresPutOut" ] += self.stats[ "firesPutOut" ];
     
-    infostring += "|zombiesKilled|" + self.stats[ "totalZombiesKilled" ];
+    infostring += ":zombiesKilled|" + self.stats[ "totalZombiesKilled" ];
     infostring += "|huntersKilled|" + self.stats[ "totalHuntersKilled" ];
     infostring += "|timesSurvived|" + self.stats[ "totalTimesSurvived" ];
     infostring += "|zombieDamageDealt|" + self.stats[ "totalZombieDamageDealt" ];
@@ -243,6 +245,8 @@ save_stats()
 	if ( response[ 1 ] == "broked" || response[ 1 ] == "timeout" || response[ 1 ] == "failed" ) {
         // notify
         self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
-        self iprintln( infostring );
+        //self iprintln( infostring );
 	}
+    
+    self iprintln( "stats saved!" );
 }
