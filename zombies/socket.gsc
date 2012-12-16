@@ -113,9 +113,10 @@ getHandler( request )
 	sock = socket();
 	sock send( request );
 	sock receive();
+    timedout = sock.timeout;
 	close( sock );
 	
-	if ( !sock.timeout ) 
+	if ( !timedout ) 
 		return sock.recvData;
 	else
 		return request + "|timeout";

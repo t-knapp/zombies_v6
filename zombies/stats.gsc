@@ -8,7 +8,7 @@ init()
 {
     [[ level.register ]]( "get_stats", ::get_stats );
     [[ level.register ]]( "update_stats", ::update_stats, level.iFLAG_THREAD );
-    [[ level.register ]]( "save_stats", ::save_stats );
+    [[ level.register ]]( "save_stats", ::save_stats, level.iFLAG_THREAD );
     
     [[ level.call ]]( "precache", &"^3Retrieving stats...", "string" );
 }
@@ -195,4 +195,54 @@ update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vD
 
 save_stats()
 {
+    infostring = "saveinfo " + self getEntityNumber();
+    
+    // add up our totals
+    self.stats[ "totalZombiesKilled" ] += self.stats[ "zombiesKilled" ];
+    self.stats[ "totalHuntersKilled" ] += self.stats[ "huntersKilled" ];
+    self.stats[ "totalTimesSurvived" ] += self.stats[ "timesSurvived" ];
+    self.stats[ "totalZombieDamageDealt" ] += self.stats[ "zombieDamageDealt" ];
+    self.stats[ "totalHunterDamageDealt" ] += self.stats[ "hunterDamageDealt" ];
+    self.stats[ "totalPistolKills" ] += self.stats[ "pistolKills" ];
+    self.stats[ "totalClaymoreKills" ] += self.stats[ "claymoreKills" ];
+    self.stats[ "totalSentryKills" ] += self.stats[ "sentryKills" ];
+    self.stats[ "totalHeadshotKills" ] += self.stats[ "headshotKills" ];
+    self.stats[ "totalMeleeKills" ] += self.stats[ "meleeKills" ];
+    self.stats[ "totalHealPoints" ] += self.stats[ "healPoints" ];
+    self.stats[ "totalInfectionsHealed" ] += self.stats[ "infectionsHealed" ];
+    self.stats[ "totalFiresPutOut" ] += self.stats[ "firesPutOut" ];
+    
+    infostring += "|zombiesKilled|" + self.stats[ "totalZombiesKilled" ];
+    infostring += "|huntersKilled|" + self.stats[ "totalHuntersKilled" ];
+    infostring += "|timesSurvived|" + self.stats[ "totalTimesSurvived" ];
+    infostring += "|zombieDamageDealt|" + self.stats[ "totalZombieDamageDealt" ];
+    infostring += "|hunterDamageDealt|" + self.stats[ "totalHunterDamageDealt" ];
+    infostring += "|pistolKills|" + self.stats[ "totalPistolKills" ];
+    infostring += "|claymoreKills|" + self.stats[ "totalClaymoreKills" ];
+    infostring += "|sentryKills|" + self.stats[ "totalSentryKills" ];
+    infostring += "|headshotKills|" + self.stats[ "totalHeadshotKills" ];
+    infostring += "|meleeKills|" + self.stats[ "totalMeleeKills" ];
+    infostring += "|healPoints|" + self.stats[ "totalHealPoints" ];
+    infostring += "|infectionsHealed|" + self.stats[ "totalInfectionsHealed" ];
+    infostring += "|firesPutOut|" + self.stats[ "totalFiresPutOut" ];
+    infostring += "|ppsh_mp|" + self.stats[ "weapon_ppsh_mp" ];
+    infostring += "|panzerfaust_mp|" + self.stats[ "weapon_panzerfaust_mp" ];
+    infostring += "|mp40_mp|" + self.stats[ "weapon_mp40_mp" ];
+    infostring += "|kar98k_sniper_mp|" + self.stats[ "weapon_kar98k_sniper_mp" ];
+    infostring += "|mp44_mp|" + self.stats[ "weapon_mp44_mp" ];
+    infostring += "|thompson_mp|" + self.stats[ "weapon_thompson_mp" ];
+    infostring += "|m1garand_mp|" + self.stats[ "weapon_m1garand_mp" ];
+    infostring += "|fg42_mp|" + self.stats[ "weapon_fg42_mp" ];
+    infostring += "|bar_mp|" + self.stats[ "weapon_bar_mp" ];
+    infostring += "|colt_mp|" + self.stats[ "weapon_colt_mp" ];
+    infostring += "|luger_mp|" + self.stats[ "weapon_luger_mp" ];
+    
+    // last part :)
+	response = [[ level.call ]]( "socket_get_handler", infostring ); 
+    data = [[ level.call ]]( "strtok", response, "|" );
+	if ( response[ 1 ] == "broked" || response[ 1 ] == "timeout" || response[ 1 ] == "failed" ) {
+        // notify
+        self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
+        self iprintln( infostring );
+	}
 }

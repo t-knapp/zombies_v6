@@ -243,6 +243,7 @@ end_map( sWinner )
 		aPlayers[ i ] [[ level.call ]]( "spawn_spectator" );
 		aPlayers[ i ].org = spawn( "script_origin", aPlayers[ i ].origin );
 		aPlayers[ i ] linkto( aPlayers[ i ].org );
+        aPlayers[ i ] [[ level.call ]]( "save_stats" );
 	}
     
     setCullFog( 0, 4000, 0, 0, 0, 5 );
