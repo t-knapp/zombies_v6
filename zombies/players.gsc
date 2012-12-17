@@ -166,10 +166,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
       
     // damage = base * (distance + randomness modifier) * (resistance + vulnerability modifier) * (splash)
     finalDamage = iDamage * distanceModifier * resistanceModifier * splashModifier;
-    
-    iprintln( "dist: " + distance( eAttacker, self ) );
-    iprintln( "dmg: " + finalDamage );
-    
+
     if ( isPlayer( eAttacker ) && eAttacker != self )
     {
         if ( eAttacker.pers[ "team" ] == "allies" )

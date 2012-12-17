@@ -273,7 +273,7 @@ quickstatements( response, o2, o3, o4, o5, o6, o7, o8, o9 )
 
             case "7":
                 soundalias = "american_need_reinforcements";
-                saytext = "Need reinforcements!";
+                saytext = "MEDIC!";
                 break;
 
             case "8":
@@ -363,7 +363,7 @@ quickstatements( response, o2, o3, o4, o5, o6, o7, o8, o9 )
 
             case "7":
                 soundalias = "russian_need_reinforcements";
-                saytext = "Need reinforcements!";
+                saytext = "MEDIC!";
                 break;
 
             case "8":
@@ -408,7 +408,7 @@ quickstatements( response, o2, o3, o4, o5, o6, o7, o8, o9 )
 
             case "7":
                 soundalias = "german_need_reinforcements";
-                saytext = "Need reinforcements!";
+                saytext = "MEDIC!";
                 break;
 
             case "8":

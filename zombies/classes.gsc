@@ -29,8 +29,8 @@ init()
     [[ level.call ]]( "precache", &"Hunter", "string" );
     [[ level.call ]]( "precache", &"Zombie", "string" );
     [[ level.call ]]( "precache", &"Timeout in: ", "string" );
-    [[ level.call ]]( "precache", &"Hold [{+activate}] to get ammo", "string" );
-    [[ level.call ]]( "precache", &"Ammo left until depleted: ", "string" );
+    //[[ level.call ]]( "precache", &"Hold [{+activate}] to get ammo", "string" );
+    //[[ level.call ]]( "precache", &"Ammo left until depleted: ", "string" );
     [[ level.call ]]( "precache", &"Press [{+attack}] to change selection", "string" );
     [[ level.call ]]( "precache", &"Press [{+activate}] to spawn", "string" );
     [[ level.call ]]( "precache", &"Ammo remaining: ", "string" );
@@ -44,10 +44,15 @@ init()
     [[ level.call ]]( "precache", &"Disabled", "string" );
     [[ level.call ]]( "precache", "gfx/hud/hud@health_bar.dds", "shader" );
     [[ level.call ]]( "precache", "gfx/hud/hud@health_back.dds", "shader" );
-    [[ level.call ]]( "precache", "gfx/hud/hud@health_cross", "statusicon" );
-    [[ level.call ]]( "precache", "gfx/hud/hud@health_cross", "headicon" );
+    [[ level.call ]]( "precache", "gfx/hud/hud@health_cross.tga", "statusicon" );
+    [[ level.call ]]( "precache", "gfx/hud/hud@health_cross.tga", "headicon" );
     [[ level.call ]]( "precache", "gfx/hud/hud@weaponmode_full.tga", "statusicon" );
     [[ level.call ]]( "precache", "gfx/hud/hud@weaponmode_full.tga", "headicon" );
+    //[[ level.call ]]( "precache", "gfx/hud/death_headshot.tga", "statusicon" );
+    //[[ level.call ]]( "precache", "gfx/hud/hud@death_mg42.tga", "statusicon" );
+    //[[ level.call ]]( "precache", "gfx/hud/hud@death_ppsh.tga", "statusicon" );
+    //[[ level.call ]]( "precache", "gfx/hud/hud@death_fg42.tga", "statusicon" );
+    //[[ level.call ]]( "precache", "gfx/hud/hud@death_panzerfaust.tga", "statusicon" );
     
     [[ level.call ]]( "precache", "xmodel/crate_misc1", "model" );
     [[ level.call ]]( "precache", "xmodel/crate_misc_red1", "model" );
@@ -696,11 +701,15 @@ hunterClass_default() {
 hunterClass_scout() {
     self.maxhealth = 125;
     
+    self.statusicon = "gfx/hud/hud@death_ppsh.tga";
+    
     self giveWeapon( "colt_mp" );
 }
 
 hunterClass_soldier() {
     self.maxhealth = 200;
+    
+    self.statusicon = "gfx/hud/hud@death_panzerfaust.tga";
     
     self setWeaponSlotWeapon( "primaryb", "mp40_mp" );
     self giveMaxAmmo( "mp40_mp" );
@@ -711,12 +720,17 @@ hunterClass_soldier() {
 hunterClass_heavy() {
 	self.maxhealth = 300;
     
+    self.statusicon = "gfx/hud/hud@death_fg42.tga";
+    
     self setWeaponSlotWeapon( "primaryb", "bar_mp" );
     self giveMaxAmmo( "bar_mp" );
 }
 
 hunterClass_engineer() {
     self.maxhealth = 125;
+    
+    self.statusicon = "gfx/hud/hud@death_mg42.tga";
+    
     self setWeaponSlotWeapon( "grenade", "mk1britishfrag_mp" );
     self setWeaponSlotAmmo( "grenade", 0 );
     
@@ -1182,7 +1196,7 @@ dohealing( mypack )
         players = [[ level.call ]]( "get_good_players" );
         for ( i = 0; i < players.size; i++ )
         {
-            if ( players[ i ].pers[ "team" ] == "axis" && distance( self.origin, mypack.origin ) < 56 )
+            if ( players[ i ].pers[ "team" ] == "axis" && distance( mypack.origin, players[ i ].origin ) < 56 )
             {
                 if ( isDefined( players[ i ].ispoisoned ) )
                 {
@@ -1217,6 +1231,8 @@ hunterClass_sniper() {
     self.maxhealth = 150;
     
     self.claymores = 2;
+    
+    self.statusicon = "gfx/hud/death_headshot.tga";
     
     self setWeaponSlotWeapon( "grenade", "stielhandgranate_mp" );
     self setWeaponSlotAmmo( "grenade", 2 );
@@ -1446,7 +1462,7 @@ ammobox_think( box )
 		players = [[ level.call ]]( "get_good_players" );
 		for ( i = 0; i < players.size; i++ )
 		{
-			if ( distance( box.origin, players[ i ].origin ) < 56 && players[ i ].pers[ "team" ] == "axis" )
+			if ( distance( box.origin, players[ i ].origin ) < 64 && players[ i ].pers[ "team" ] == "axis" )
             {
                 // stolen from kill3r's mod
                 // this way is better suited for this version of zombies, since we're not actually giving health anymore
@@ -1456,7 +1472,10 @@ ammobox_think( box )
                 oldamountprib = players[ i ] getWeaponSlotAmmo( "primaryb" );
                 oldamountpistol = players[ i ] getWeaponSlotAmmo( "pistol" );
     
-                players[ i ] setWeaponSlotAmmo( "primary", ( oldamountpri + 5 ) );
+                if ( players[ i ] getWeaponSlotWeapon( "primary" ) != "panzerfaust" )
+                    players[ i ] setWeaponSlotAmmo( "primary", ( oldamountpri + 5 ) );
+                else
+                    players[ i ] setWeaponSlotAmmo( "primary", ( oldamountpri + 1 ) );
                 players[ i ] setWeaponSlotAmmo( "primaryb", ( oldamountprib + 5 ) );
                 players[ i ] setWeaponSlotAmmo( "pistol", ( oldamountpistol + 5 ) );
             }
