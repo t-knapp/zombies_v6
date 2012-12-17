@@ -44,6 +44,10 @@ init()
     [[ level.call ]]( "precache", &"Disabled", "string" );
     [[ level.call ]]( "precache", "gfx/hud/hud@health_bar.dds", "shader" );
     [[ level.call ]]( "precache", "gfx/hud/hud@health_back.dds", "shader" );
+    [[ level.call ]]( "precache", "gfx/hud/hud@health_cross", "statusicon" );
+    [[ level.call ]]( "precache", "gfx/hud/hud@health_cross", "headicon" );
+    [[ level.call ]]( "precache", "gfx/hud/hud@weaponmode_full.tga", "statusicon" );
+    [[ level.call ]]( "precache", "gfx/hud/hud@weaponmode_full.tga", "headicon" );
     
     [[ level.call ]]( "precache", "xmodel/crate_misc1", "model" );
     [[ level.call ]]( "precache", "xmodel/crate_misc_red1", "model" );
@@ -53,7 +57,7 @@ init()
     [[ level.call ]]( "precache", "xmodel/mg42_bipod", "model" );
     
     //        <team>        <localized>     <string>                <description>                                                   line break|                                                              line break|                                                              line break|
-    addClass( "hunters",    &"Default",     "default",              &"The basic hunter class. You can select any weapon you want.", &"" );
+    addClass( "hunters",    &"Default",     "default",              &"To access more classes, visit http://1.1zombies.com and register! It's free!", &"" );
     addClass( "hunters",    &"Recon",       "scout",                &"The recon is a fast hunter with the ability to double jump and a shotgun\nthat does massive damage at close range.", &"Health: 125\nMove Speed: 1.3x" );
     addClass( "hunters",    &"Explosives Expert",     "soldier",    &"The Explosives Expert is an explosives specialist with a panzerfaust and\nan MP40. He can destroy entire groups of zombies with splash damage from\nhis panzerfaust and grenades and then switch to his mp40 for personal\ndefence.", &"Health: 200\nMove Speed: 1x" );
     addClass( "hunters",    &"Sharpshooter",      "sniper",         &"The Sharpshooter is a fast moving, long range assassin. Able to take out\nmany zombies in 1 hit with his sniper, he also does massive damage with a\nheadshot. He also has the ability to place claymore mines in key positions\nto prevent zombies from rushing in.", &"" );
@@ -64,7 +68,7 @@ init()
     addClass( "hunters",    &"Random",      "random",               &"Let the game decide a class for you.", &"Will be determined once spawned." );
     
     //        <team>        <localized>     <string>    <description>                                                   line break|                                                              line break|                                                              line break|
-    addClass( "zombies",    &"Default",     "default",  &"The basic zombie class. No perks, just pure death.", &"" );
+    addClass( "zombies",    &"Default",     "default",  &"To access more classes, visit http://1.1zombies.com and register! It's free!", &"" );
 	addClass( "zombies",    &"Fast",        "fast",     &"The fast zombie is the fastest zombie in the game. Able to quickly get in and\nout of a crowd of hunters, this zombie is very good for hit and run tactics. But\nwatch out! This class also has the lowest health of any zombie in the game.", &"Health: 150\nMove Speed: 1.5x" );
 	addClass( "zombies",    &"Inferno",     "inferno",  &"FIRE! This zombie really turns up the heat with its intense flames. It can\neven turn it up more by hitting hunters with its Springfield and finishing\nthem off by setting them on fire.", &"Health: 200\nMove Speed: 1.0x" );
 	addClass( "zombies",    &"Jumper",      "jumper",   &"Lurking on all the high places, this zombie brings a new meaning to the\nterm \"airstrike\". Able to jump high into the air it can land in a group of\nhunters and do a lot of damage.", &"Health: 200\nMove Speed: 1.0x" );
@@ -388,7 +392,7 @@ selectClass_timeout()
 	
 	self notify( "select class notify stop" );
     
-    self [[ level.call ]]( "print", "Moved to spectator for AFK", true );
+    self iPrintLnBold( "Moved to spectator for AFK" );
     self [[ level.call ]]( "spawn_spectator" );
 }
 
@@ -549,7 +553,7 @@ firemonitor( dude )
 		players = [[ level.call ]]( "get_good_players" );
 		for ( i = 0; i < players.size; i++ )
 		{
-			if ( players[ i ] != self && ( distance( self.origin, players[ i ].origin ) < 36 && !isDefined( players[ i ].onfire ) ) )
+			if ( players[ i ] != self && ( distance( self.origin, players[ i ].origin ) < 36 && !isDefined( players[ i ].onfire ) && !isDefined( players[ i ].firetimeout ) ) && players[ i ].pers[ "team" ] == "axis" )
 				players[ i ] thread firemonitor( dude );
 		}
 		
@@ -1076,7 +1080,7 @@ sentry_hud( mg )
         {
             self.sentry_hud_front.alpha = 1;
             self.sentry_hud_front.color = ( 1, 0, 0 );
-            self.sentry_hud_front setShader( "white", mg.timeup * 11.2, 8 );
+            self.sentry_hud_front setShader( "white", mg.timeup * 10.2, 8 );
             self.sentry_hud_notice.color = ( 1, 1, 1 );
             self.sentry_hud_notice setText( &"Reloading" );
         }        
@@ -1095,7 +1099,7 @@ sentry_hud( mg )
         
         self.sentry_hud_health setValue( self.mg.health );
         self.sentry_hud_health_front setShader( "white", self.mg.health * 1.12, 8 );
-        self.sentry_hud_kills setValue( self.stats[ "sentryKills" ] );
+        self.sentry_hud_kills setValue( self.stats[ "totalSentryKills" ] + self.stats[ "sentryKills" ] );
         wait 0.1;
     }
     
@@ -1110,6 +1114,9 @@ sentry_hud( mg )
 
 hunterClass_medic() {
     self.maxhealth = 150;
+    
+    self.headicon = "gfx/hud/hud@health_cross.tga";
+    self.statusicon = "gfx/hud/hud@health_cross.tga";
     
     self setWeaponSlotWeapon( "grenade", "mk1britishfrag_mp" );
     self setWeaponSlotAmmo( "grenade", 0 );
@@ -1175,7 +1182,7 @@ dohealing( mypack )
         players = [[ level.call ]]( "get_good_players" );
         for ( i = 0; i < players.size; i++ )
         {
-            if ( players[ i ].pers[ "team" ] == "axis" && distance( self.origin, players[ i ].origin ) < 56 )
+            if ( players[ i ].pers[ "team" ] == "axis" && distance( self.origin, mypack.origin ) < 56 )
             {
                 if ( isDefined( players[ i ].ispoisoned ) )
                 {
@@ -1185,6 +1192,7 @@ dohealing( mypack )
                 if ( isDefined( players[ i ].onfire ) )
                 {
                     players[ i ].onfire = undefined;
+                    players[ i ] thread medic_fire_timeout();
                     self.stats[ "firesPutOut" ]++;
                 }
                     
@@ -1196,6 +1204,13 @@ dohealing( mypack )
             }
         } 
     }
+}
+
+medic_fire_timeout()
+{
+    self.firetimeout = true;
+    wait 0.15;
+    self.firetimeout = undefined;
 }
 
 hunterClass_sniper() {
@@ -1355,9 +1370,12 @@ monitorSticky( owner )
 hunterClass_support() {
 	self.maxhealth = 175;
     
+    self.headicon = "gfx/hud/hud@weaponmode_full.tga";
+    self.statusicon = "gfx/hud/hud@weaponmode_full.tga";
+    
     self setWeaponSlotWeapon( "grenade", "mk1britishfrag_mp" );
     self setWeaponSlotAmmo( "grenade", 0 );
-    
+
     self thread ammobox();
 }
 
@@ -1368,16 +1386,16 @@ hunterClass_updateAmmo() {
 ammobox()
 {  
     boxmodels = [];
-    boxmodels[ 0 ] = "xmodel/crate_misc1";
-    boxmodels[ 1 ] = "xmodel/crate_misc_red1";
-    boxmodels[ 2 ] = "xmodel/crate_misc_green1";
-    boxmodels[ 3 ] = "xmodel/crate_champagne3";
+    //boxmodels[ 0 ] = "xmodel/crate_misc1";
+    //boxmodels[ 1 ] = "xmodel/crate_misc_red1";
+    //boxmodels[ 2 ] = "xmodel/crate_misc_green1";
+    boxmodels[ 0 ] = "xmodel/crate_champagne3";
     modeli = 0;
     
     mybox = spawn( "script_model", self getOrigin() );
     mybox setModel( boxmodels[ modeli ] );
     
-    self iPrintLnBold( "double tap [f] to place ammobox" );
+    self thread ammobox_think( mybox );
     
     while ( isAlive( self ) )
     {  
@@ -1390,37 +1408,14 @@ ammobox()
 
         mybox show();
         traceDir = anglesToForward( self.angles );
-        traceEnd = self.origin;
-        traceEnd += [[ level.call ]]( "vector_scale", traceDir, 80 );
-        trace = bulletTrace( self.origin, traceEnd, false, mybox );
+        traceEnd = self.origin + ( 0, 0, 36 );
+        traceEnd += [[ level.call ]]( "vector_scale", traceDir, 48 );
+        trace = bulletTrace( self.origin + ( 0, 0, 36 ), traceEnd, false, mybox );
 
         pos = trace[ "position" ];
         mybox moveto( pos, 0.05 );
         mybox.angles = self.angles;
-            
-        // stoled from lev
-        if ( self useButtonPressed() )
-        {
-            catch_next = false;
-            lol = false;
-
-			for ( i = 0; i <= 0.30; i += 0.02 )
-			{
-				if ( catch_next && self useButtonPressed() )
-				{
-					lol = true;
-					break;
-				}
-				else if ( !( self useButtonPressed() ) )
-					catch_next = true;
-
-				wait 0.02;
-			}
-            
-            if ( lol )
-                break;
-        }
-        
+/*
         if ( self meleeButtonPressed() )
         {
             modeli++;
@@ -1430,67 +1425,42 @@ ammobox()
                 
             mybox setModel( boxmodels[ modeli ] );
             
-            wait 0.5;
-        }
-        
-        wait 0.05;
+            wait 0.25;
+        }*/
     }
     
-    if ( !isAlive( self ) )
-    {
-        mybox delete();
-        return;
-    }
-    
-    trace = bullettrace( mybox.origin, mybox.origin + ( 0, 0, -1024 ), false, undefined );
-    mybox moveto( trace[ "position" ], 0.1 );
-    
-    self iprintln( "ammobox placed!" );
-    
-    self switchToWeapon( self getWeaponSlotWeapon( "primary" ) );
-    self setWeaponSlotWeapon( "grenade", "none" );
-    
-    self thread ammobox_remove();
-    self thread ammobox_remove_count( mybox );
-    self thread ammobox_think( mybox );
-    
-    self waittill( "remove ammobox" );
     mybox delete();
-}
-
-ammobox_remove()
-{
-    self waittill( "death" );
-    self notify( "remove ammobox" );
-}
-
-// removes ammobox after it's depleted
-ammobox_remove_count( box )
-{
-    self endon( "remove ammobox" );
-   
-    box.ammocount = randomInt( 20 ) + 10;
-    
-    while ( box.ammocount > 0 )
-        wait 1;
-        
-    self notify( "remove ammobox" );
 }
 
 ammobox_think( box )
 {
     self endon( "remove ammobox" );
     
-	while ( 1 )
+	while ( isAlive( self ) )
 	{
+        wait 0.5;
+        
+        if ( self getCurrentWeapon() != "mk1britishfrag_mp" )
+            continue;
+            
 		players = [[ level.call ]]( "get_good_players" );
 		for ( i = 0; i < players.size; i++ )
 		{
-			if ( distance( box.origin, players[ i ].origin ) < 32 && players[ i ].pers[ "team" ] == "axis" && !isDefined( players[ i ].gettingammo ) )
-				players[ i ] thread getammo( box );
+			if ( distance( box.origin, players[ i ].origin ) < 56 && players[ i ].pers[ "team" ] == "axis" )
+            {
+                // stolen from kill3r's mod
+                // this way is better suited for this version of zombies, since we're not actually giving health anymore
+                players[ i ] playlocalsound( "weap_pickup" );
+
+                oldamountpri = players[ i ] getWeaponSlotAmmo( "primary" );
+                oldamountprib = players[ i ] getWeaponSlotAmmo( "primaryb" );
+                oldamountpistol = players[ i ] getWeaponSlotAmmo( "pistol" );
+    
+                players[ i ] setWeaponSlotAmmo( "primary", ( oldamountpri + 5 ) );
+                players[ i ] setWeaponSlotAmmo( "primaryb", ( oldamountprib + 5 ) );
+                players[ i ] setWeaponSlotAmmo( "pistol", ( oldamountpistol + 5 ) );
+            }
 		}
-		
-		wait 0.1;
 	}
 }
 

@@ -208,6 +208,8 @@ end_map( sWinner )
     // stops the menu_handler() thread on clients
 	level notify( "intermission" );
     
+    level.clock destroy();
+    
     level.iGameFlags = level.iFLAG_GAME_OVER;
 
     aPlayers = getentarray( "player", "classname" );

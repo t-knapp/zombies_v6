@@ -11,6 +11,7 @@ init()
     [[ level.register ]]( "save_stats", ::save_stats, level.iFLAG_THREAD );
     
     [[ level.call ]]( "precache", &"^3Retrieving stats...", "string" );
+    [[ level.call ]]( "precache", &"^3This is taking longer than usual...", "string" );
 }
 
 get_stats()
@@ -81,16 +82,34 @@ get_stats()
 	self.statshud.fontscale = 1.5;
 	self.statshud.sort = 9021;
     
+    self.statshud2 = newClientHudElem( self );
+	self.statshud2.x = 320;
+	self.statshud2.y = 260;
+	self.statshud2.alignx = "center";
+	self.statshud2.aligny = "middle";
+	self.statshud2 setText( &"^3This is taking longer than usual..." );
+	self.statshud2.fontscale = 1.5;
+    self.statshud2.alpha = 0;
+	self.statshud2.sort = 9021;
+    
     self.isRegistered = false;
 	
 	infostring = "getinfo " + self getEntityNumber();
     achievementstring = "getachievements " + self getEntityNumber();
 	mystats = [[ level.call ]]( "socket_get_handler", infostring ); 
+    
+    data = [[ level.call ]]( "strtok", mystats, "|" );
+	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" || data[ 1 ] == "timeout" ) {
+        // try again
+        self.statshud2.alpha = 1;
+        mystats = [[ level.call ]]( "socket_get_handler", infostring ); 
+	}
 	
 	data = [[ level.call ]]( "strtok", mystats, "|" );
 	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" || data[ 1 ] == "timeout" ) {
 		// not registered, stop here
 		self.statshud destroy();
+        self.statshud2 destroy();
 		self.black destroy();
 		return;
 	}
@@ -151,10 +170,9 @@ Zombies.stats = [
 	}
 		
 	self.isRegistered = true;
-    
-    //myachievements = [[ level.socket.getHandler ]]( achievementstring );
 	
 	self.statshud destroy();
+    self.statshud2 destroy();
 	self.black destroy();
 }
 

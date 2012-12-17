@@ -141,6 +141,10 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
                     dist = distance( eAttacker.origin, self.origin );
                         
                     maxdist = 1024;
+                    
+                    if ( isDefined( eAttacker.class ) && eAttacker.class == "scout" )
+                        maxdist = 512;
+                        
                     distanceModifier = ( (maxdist/2) - dist ) / maxdist + 1;
                     if ( dist > maxdist )
                         distanceModifier = 0.5;
@@ -159,9 +163,12 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
             }
         }
     }
-    
+      
     // damage = base * (distance + randomness modifier) * (resistance + vulnerability modifier) * (splash)
     finalDamage = iDamage * distanceModifier * resistanceModifier * splashModifier;
+    
+    iprintln( "dist: " + distance( eAttacker, self ) );
+    iprintln( "dmg: " + finalDamage );
     
     if ( isPlayer( eAttacker ) && eAttacker != self )
     {
@@ -213,7 +220,7 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 		if(eAttacker == self) // killed himself
 		{
 			doKillcam = false;
-			eAttacker.score--;
+			//eAttacker.score--;
 		}
 		else
 		{
@@ -234,7 +241,7 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 	{
 		doKillcam = false;
 		
-		self.score--;
+		//self.score--;
 
 		lpattacknum = -1;
 		lpattackname = "";
@@ -343,7 +350,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     else if ( self.pers[ "team" ] == "axis" )
     {
         self.nationality = "german";
-        self.headicon = game["headicon_axis"];
+        //self.headicon = game["headicon_axis"];
         self.headiconteam = "axis";
         
         // default nubs :>
@@ -357,8 +364,6 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
             self [[ level.call ]]( "classes_hunter_default_loadout" );
         }
     }
-    
-    self.statusicon = "";
     
     self [[ level.call ]]( "model_setup" );
     self [[ level.call ]]( "player_hud" );
