@@ -27,39 +27,26 @@ init()
     [[ level.register ]]( "selectClass_destroy", ::selectClass_destroy, level.iFLAG_THREAD );
     
     // class-specific calls
-    [[ level.register ]]( "zombieClass_jumper", ::zombieClass_jumper, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "zombieClass_fire", ::zombieClass_fire, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "zombieClass_shocker", ::zombieClass_shocker, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "zombieClass_poison", ::zombieClass_poison, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "zombieClass_fast", ::zombieClass_fast, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "blockjump", ::blockjump, level.iFLAG_THREAD );
+    [[ level.register ]]( "zombieClass_jumper", ::zombieClass_jumper, level.iFLAG_THREAD );
+    [[ level.register ]]( "zombieClass_fire", ::zombieClass_fire, level.iFLAG_THREAD );
+    [[ level.register ]]( "zombieClass_shocker", ::zombieClass_shocker, level.iFLAG_THREAD );
+    [[ level.register ]]( "zombieClass_poison", ::zombieClass_poison, level.iFLAG_THREAD );
+    [[ level.register ]]( "zombieClass_fast", ::zombieClass_fast, level.iFLAG_THREAD );
     [[ level.register ]]( "firemonitor", ::firemonitor, level.iFLAG_THREAD );
     [[ level.register ]]( "firedeath", ::firedeath, level.iFLAG_THREAD );
     [[ level.register ]]( "be_poisoned", ::be_poisoned, level.iFLAG_THREAD );
     [[ level.register ]]( "be_shocked", ::be_shocked, level.iFLAG_THREAD );
-    [[ level.register ]]( "hunterClass_scout", ::hunterClass_scout, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "hunterClass_soldier", ::hunterClass_soldier, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "hunterClass_sniper", ::hunterClass_sniper, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "hunterClass_support", ::hunterClass_support, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "hunterClass_medic", ::hunterClass_medic, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "hunterClass_engineer", ::hunterClass_engineer, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
-    [[ level.register ]]( "hunterClass_heavy", ::hunterClass_heavy, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
+    [[ level.register ]]( "hunterClass_scout", ::hunterClass_scout, level.iFLAG_THREAD );
+    [[ level.register ]]( "hunterClass_soldier", ::hunterClass_soldier, level.iFLAG_THREAD );
+    [[ level.register ]]( "hunterClass_sniper", ::hunterClass_sniper, level.iFLAG_THREAD );
+    [[ level.register ]]( "hunterClass_support", ::hunterClass_support, level.iFLAG_THREAD );
+    [[ level.register ]]( "hunterClass_medic", ::hunterClass_medic, level.iFLAG_THREAD );
+    [[ level.register ]]( "hunterClass_engineer", ::hunterClass_engineer, level.iFLAG_THREAD );
+    [[ level.register ]]( "hunterClass_heavy", ::hunterClass_heavy, level.iFLAG_THREAD );
     [[ level.register ]]( "sentry", ::sentry, level.iFLAG_THREAD );
-    [[ level.register ]]( "sentry_think", ::sentry_think, level.iFLAG_THREAD );
-    [[ level.register ]]( "sentry_hud", ::sentry_hud, level.iFLAG_THREAD );
-    [[ level.register ]]( "sentry_reload", ::sentry_reload, level.iFLAG_THREAD );
-    [[ level.register ]]( "sentry_explode", ::sentry_explode, level.iFLAG_THREAD );
-    [[ level.register ]]( "sentry_fire", ::sentry_fire, level.iFLAG_THREAD );
-    [[ level.register ]]( "sentry_disable", ::sentry_disable, level.iFLAG_THREAD );
-    [[ level.register ]]( "mg_remove", ::mg_remove, level.iFLAG_THREAD );
     [[ level.register ]]( "heal", ::heal, level.iFLAG_THREAD );
-    [[ level.register ]]( "regen_health", ::regen_health, level.iFLAG_THREAD );
-    [[ level.register ]]( "dohealing", ::dohealing, level.iFLAG_THREAD );
-    [[ level.register ]]( "medic_fire_timeout", ::medic_fire_timeout, level.iFLAG_THREAD );
-    [[ level.register ]]( "claymores", ::claymores, level.iFLAG_THREAD );
     [[ level.register ]]( "monitorSticky", ::monitorSticky, level.iFLAG_THREAD );
     [[ level.register ]]( "ammobox", ::ammobox, level.iFLAG_THREAD );
-    [[ level.register ]]( "ammobox_think", ::ammobox_think, level.iFLAG_THREAD );
     [[ level.register ]]( "get_class_information", ::get_class_information, level.iFLAG_RETURN );
     
     [[ level.call ]]( "precache", &"Select A Class", "string" );
@@ -292,9 +279,9 @@ selectClass()
 	//self.chud[ "perks" ] = selectClassHud( self, 236, 160, undefined, "middle", 9003, 1, 1.3 );
 	//self.chud[ "perks" ].label = &"Perks:\n";
     
-    self [[ level.call ]]( "selectClass_menuStopper" );
-    self [[ level.call ]]( "selectClass_notifyStop" );
-    self [[ level.call ]]( "selectClass_timeout" );
+    self thread selectClass_menuStopper();
+    self thread selectClass_notifyStop();
+    self thread selectClass_timeout();
     
     index = 0;
     self.chudselectedclass = myclasses[ index ];
@@ -499,7 +486,7 @@ zombieClass_jumper()
                 
             if ( airjumps == 2 ) {
                 airjumps = 0;
-                self [[ level.call ]]( "blockjump" );
+                self thread blockjump();
             }
 
 			for ( i = 0; i < 2; i++ ) 
@@ -525,10 +512,6 @@ blockjump()
 
 zombieClass_poison() 
 {
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "end_respawn" );
-	
 	self.maxhealth = 750;
 	self.health = 750;
 }
@@ -571,33 +554,27 @@ be_poisoned( dude )
 
 zombieClass_fire() 
 {
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "end_respawn" );
+    self.maxhealth = 600;
+    self.health = 600;
     
     self [[ level.call ]]( "firemonitor", self );
 }
 
 firemonitor( dude )
 {	
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "end_respawn" );
-	self endon( "stopfire" );
-	
 	self.onfire = true;
 	
 	if ( self.pers[ "team" ] == "axis" )
 		self [[ level.call ]]( "firedeath", dude );
 	
-	while ( 1 )
+	while ( isAlive( self ) )
 	{
 		playFx( level._effect[ "zombies_fire" ], self.origin + ( 0, 0, 32 ) );
 		
 		players = [[ level.call ]]( "get_good_players" );
 		for ( i = 0; i < players.size; i++ )
 		{
-			if ( players[ i ] != self && ( distance( self.origin, players[ i ].origin ) < 36 && !isDefined( players[ i ].onfire ) && !isDefined( players[ i ].firetimeout ) ) && players[ i ].pers[ "team" ] == "axis" )
+			if ( players[ i ] != self && ( distance( self.origin + ( 0, 0, 32 ), players[ i ].origin + ( 0, 0, 32 ) ) < 48 && !isDefined( players[ i ].onfire ) && !isDefined( players[ i ].firetimeout ) ) && players[ i ].pers[ "team" ] == "axis" )
 				players[ i ] [[ level.call ]]( "firemonitor", dude );
 		}
 		
@@ -627,19 +604,12 @@ firedeath( dude )
 
 zombieClass_fast() 
 {
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "end_respawn" );
-	
 	self.maxhealth = 250;
 	self.health = 250;
 }
 
 zombieClass_shocker() 
 {
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "end_respawn" );
 }
 
 be_shocked( dude )
@@ -684,8 +654,6 @@ hunterClasses() {
         self setWeaponSlotClipAmmo( "primary", 0 );
 	
 	self hunterClass_updateAmmo();	
-	
-	self.health = self.maxhealth;
 }
 
 hunterClass_default_loadout()
@@ -739,6 +707,7 @@ hunterClass_default() {
 
 hunterClass_scout() {
     self.maxhealth = 125;
+    self.health = 125;
     
     self.statusicon = "gfx/hud/hud@death_ppsh.tga";
     
@@ -747,6 +716,7 @@ hunterClass_scout() {
 
 hunterClass_soldier() {
     self.maxhealth = 200;
+    self.health = 200;
     
     self.statusicon = "gfx/hud/hud@death_panzerfaust.tga";
     
@@ -758,6 +728,7 @@ hunterClass_soldier() {
 
 hunterClass_heavy() {
 	self.maxhealth = 300;
+    self.health = 300;
     
     self.statusicon = "gfx/hud/hud@death_fg42.tga";
     
@@ -767,6 +738,7 @@ hunterClass_heavy() {
 
 hunterClass_engineer() {
     self.maxhealth = 125;
+    self.health = 125;
     
     self.statusicon = "gfx/hud/hud@death_mg42.tga";
     
@@ -842,16 +814,16 @@ sentry()
     
     wait 0.15;
     
-    self [[ level.call ]]( "sentry_think", barrel );
+    self thread sentry_think( barrel );
     
-    self [[ level.call ]]( "waittill_any", "death", "disconnect" );
+    self waittill( "death" );
     self notify( "remove sentry" );
     barrel delete();
 }
 
 mg_remove( mg )
 {
-    self [[ level.call ]]( "waittill_any", "death", "disconnect" );
+    self waittill( "death" );
     wait 0.05;
     mg delete();
     mg = undefined;
@@ -863,9 +835,9 @@ sentry_think( barrel )
     self.mg setModel( "xmodel/mg42_bipod" );
     self.mg setContents( 1 );
     
-    self [[ level.call ]]( "mg_remove", self.mg );
-    self [[ level.call ]]( "sentry_hud", self.mg );
-    self [[ level.call ]]( "sentry_explode" );
+    self thread mg_remove( self.mg );
+    self thread sentry_hud( self.mg );
+    self thread sentry_explode();
        
     self.mg.ammo = 50;
     self.mg.health = 100;
@@ -911,7 +883,7 @@ sentry_aim()
         self.mg.angles = vectorToAngles( vectorNormalize( ( bestplayer.origin + ( 0, 0, x - 20 ) ) - self.mg.origin ) );
         
         if ( !isDefined( self.mg.isfiring ) )
-            self.mg [[ level.call ]]( "sentry_fire", bestplayer, self, x );
+            self.mg thread sentry_fire( bestplayer, self, x );
     }
 }
 
@@ -946,7 +918,7 @@ sentry_damage_detect()
             self.mg.health = 0;
             
         if ( self.mg.health == 0 )
-            self [[ level.call ]]( "sentry_disable" );
+            self thread sentry_disable();
             
         // melee time from lee enfield
         wait 0.8;
@@ -1167,6 +1139,7 @@ sentry_hud( mg )
 
 hunterClass_medic() {
     self.maxhealth = 150;
+    self.health = 150;
     
     self.headicon = "gfx/hud/hud@health_cross.tga";
     self.statusicon = "gfx/hud/hud@health_cross.tga";
@@ -1175,14 +1148,11 @@ hunterClass_medic() {
     self setWeaponSlotAmmo( "grenade", 0 );
     
     self [[ level.call ]]( "heal" );
-    self [[ level.call ]]( "regen_health" );
+    self thread regen_health();
 }
 
 regen_health()
-{
-    self endon( "death" );
-    self endon( "disconnect" );
-    
+{   
     while ( isAlive( self ) )
     {
         // got hurt somehow
@@ -1198,7 +1168,7 @@ heal()
     mypack = spawn( "script_model", self getOrigin() );
     mypack setModel( "xmodel/health_large" );
     
-    self [[ level.call ]]( "dohealing", mypack );
+    self thread dohealing( mypack );
     
     while ( isAlive( self ) )
     {  
@@ -1245,7 +1215,7 @@ dohealing( mypack )
                 if ( isDefined( players[ i ].onfire ) )
                 {
                     players[ i ].onfire = undefined;
-                    players[ i ] [[ level.call ]]( "medic_fire_timeout" );
+                    players[ i ] thread medic_fire_timeout();
                     self.stats[ "firesPutOut" ]++;
                 }
                     
@@ -1268,6 +1238,7 @@ medic_fire_timeout()
 
 hunterClass_sniper() {
     self.maxhealth = 150;
+    self.health = 150;
     
     self.claymores = 2;
     
@@ -1276,15 +1247,11 @@ hunterClass_sniper() {
     self setWeaponSlotWeapon( "grenade", "stielhandgranate_mp" );
     self setWeaponSlotAmmo( "grenade", 2 );
     
-    self [[ level.call ]]( "claymores" );
+    self thread claymores();
 }
 
 claymores()
 {
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "spawn_spectator" );
-	
 	while ( isAlive( self ) && self.sessionstate == "playing" )
 	{
 		wait 0.05;
@@ -1424,6 +1391,7 @@ monitorSticky( owner )
 
 hunterClass_support() {
 	self.maxhealth = 175;
+    self.health = 175;
     
     self.headicon = "gfx/hud/hud@weaponmode_full.tga";
     self.statusicon = "gfx/hud/hud@weaponmode_full.tga";
@@ -1450,7 +1418,7 @@ ammobox()
     mybox = spawn( "script_model", self getOrigin() );
     mybox setModel( boxmodels[ modeli ] );
     
-    self [[ level.call ]]( "ammobox_think", mybox );
+    self thread ammobox_think( mybox );
     
     while ( isAlive( self ) )
     {  

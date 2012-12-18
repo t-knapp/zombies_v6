@@ -8,7 +8,7 @@ init()
 {
     [[ level.register ]]( "get_stats", ::get_stats );
     [[ level.register ]]( "update_stats", ::update_stats, level.iFLAG_THREAD );
-    [[ level.register ]]( "save_stats", ::save_stats, level.iFLAG_THREAD );
+    [[ level.register ]]( "save_stats", ::save_stats, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
     
     [[ level.call ]]( "precache", &"^3Retrieving stats...", "string" );
     [[ level.call ]]( "precache", &"^3This is taking longer than usual...", "string" );

@@ -7,8 +7,7 @@
 init()
 {
     [[ level.register ]]( "player_hud", ::player_hud );
-    [[ level.register ]]( "waittill_death", ::waittill_death, level.iFLAG_THREAD );
-    [[ level.register ]]( "waittill_remove", ::waittill_remove, level.iFLAG_THREAD );
+    [[ level.register ]]( "hud_remove", ::hud_remove, level.iFLAG_THREAD );
     [[ level.register ]]( "run_hud", ::run_hud, level.iFLAG_THREAD );
     
     [[ level.call ]]( "precache", &"^1Zombies Killed^7: ", "string" );
@@ -27,10 +26,7 @@ init()
 }
 
 player_hud()
-{
-    self [[ level.call ]]( "waittill_death" );
-    self [[ level.call ]]( "waittill_remove" );
-    
+{   
     self.hud = [];
     
     self addTextHud( "zombieskilled", 630, 25, "right", "middle", 1, 0.8, 10, &"^1Zombies Killed^7: " );
@@ -57,17 +53,8 @@ player_hud()
     self [[ level.call ]]( "run_hud" );
 }
 
-waittill_death()
-{
-    self waittill( "death" );
-    
-    self notify( "remove_hud_stuff" );
-}
-
-waittill_remove()
-{
-    self waittill( "remove_hud_stuff" );
-    
+hud_remove()
+{   
     if ( isDefined( self.hud[ "zombieskilled" ] ) )         self.hud[ "zombieskilled" ] destroy();
     if ( isDefined( self.hud[ "hunterskilled" ] ) )         self.hud[ "hunterskilled" ] destroy();
     if ( isDefined( self.hud[ "zombiedamage" ] ) )          self.hud[ "zombiedamage" ] destroy();
@@ -86,9 +73,7 @@ waittill_remove()
 }
 
 run_hud()
-{
-    self endon( "remove_hud_stuff" );
-    
+{   
     if ( self.pers[ "team" ] == "axis" )
         class = [[ level.call ]]( "get_class_information", self.class, "hunters" );
     else
@@ -96,7 +81,7 @@ run_hud()
         
     self.hud[ "class" ] setText( class.lName );
     
-    while ( 1 )
+    while ( isAlive( self ) )
     {
         self.hud[ "zombieskilled" ] setValue( self.stats[ "totalZombiesKilled" ] + self.stats[ "zombiesKilled" ] );
         self.hud[ "hunterskilled" ] setValue( self.stats[ "totalHuntersKilled" ] + self.stats[ "huntersKilled" ] );
@@ -118,6 +103,8 @@ run_hud()
         
         wait 0.1;
     }
+    
+    self [[ level.call ]]( "hud_remove" );
 }
 
 addTextHud( name, x, y, alignX, alignY, alpha, fontScale, sort, label )

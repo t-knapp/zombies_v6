@@ -13,17 +13,13 @@ init()
     [[ level.register ]]( "spawn_player", ::spawn_player, level.iFLAG_THREAD );
     [[ level.register ]]( "spawn_spectator", ::spawn_spectator, level.iFLAG_THREAD );
     [[ level.register ]]( "spawn_intermission", ::spawn_intermission, level.iFLAG_THREAD );
-    [[ level.register ]]( "respawn", ::respawn, level.iFLAG_THREAD );
+    [[ level.register ]]( "respawn", ::respawn, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
     [[ level.register ]]( "pick_zombie", ::pick_zombie );
     [[ level.register ]]( "make_zombie", ::make_zombie );
     [[ level.register ]]( "drop_health", ::drop_health );
     [[ level.register ]]( "cvar_watcher", ::cvar_watcher );
     [[ level.register ]]( "explode_from_ground", ::explode_from_ground, level.iFLAG_THREAD );
     [[ level.register ]]( "spawnprotection", ::spawnprotection, level.iFLAG_THREAD );
-    [[ level.register ]]( "waitForceRespawnTime", ::waitForceRespawnTime, level.iFLAG_THREAD );
-    [[ level.register ]]( "waitRespawnButton", ::waitRespawnButton, level.iFLAG_THREAD );
-    [[ level.register ]]( "removeRespawnText", ::removeRespawnText, level.iFLAG_THREAD );
-    [[ level.register ]]( "waitRemoveRespawnText", ::waitRemoveRespawnText, level.iFLAG_THREAD );
 }
 
 player_connect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
@@ -310,7 +306,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
         
     if ( self.pers[ "team" ] == "axis" && self.class == "default" )
         self [[ level.call ]]( "classes_hunter_default" );
-        
+    
     self notify("spawned");
 	self notify("end_respawn");
 	self notify( "player_spawned" );
@@ -441,13 +437,13 @@ respawn( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	
 	if(getcvarint("scr_forcerespawn") > 0)
 	{
-		self [[ level.call ]]( "waitForceRespawnTime" );
-		self [[ level.call ]]( "waitRespawnButton" );
+		self thread waitForceRespawnTime();
+		self thread waitRespawnButton();
 		self waittill("respawn");
 	}
 	else
 	{
-		self [[ level.call ]]( "waitRespawnButton" );
+		self thread waitRespawnButton();
 		self waittill("respawn");
 	}
 	
@@ -478,9 +474,9 @@ waitRespawnButton()
 	self.respawntext.archived = false;
 	self.respawntext setText(&"MPSCRIPT_PRESS_ACTIVATE_TO_RESPAWN");
 
-	[[ level.call ]]( "removeRespawnText" );
-	[[ level.call ]]( "waitRemoveRespawnText", "end_respawn");
-	[[ level.call ]]( "waitRemoveRespawnText", "respawn");
+	self thread removeRespawnText();
+	self thread waitRemoveRespawnText( "end_respawn" );
+	self thread waitRemoveRespawnText( "respawn" );
 
 	while(self useButtonPressed() != true)
 		wait .05;
@@ -566,16 +562,14 @@ explode_from_ground()
 }
 
 spawnprotection()
-{
-    self endon( "death" );
-    
+{   
     self iPrintLn( "^3Spawn protection enabled." );
     
     wait 1;
     
     time = 0;
     
-    while ( time < 5 )
+    while ( isAlive( self ) && time < 5 )
     {
         if ( self attackbuttonpressed() || self meleebuttonpressed() )
             break;

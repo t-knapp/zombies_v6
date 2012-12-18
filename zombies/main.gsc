@@ -135,6 +135,8 @@ run_thread( oFunc, o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     //iprintln( gettime() + "/fnc:" + oFunc.sName + "/start/" + isPlayer( self ) + "/" + isDefined( self ) );
     
     self [[ oFunc.pFunction ]]( o1, o2, o3, o4, o5, o6, o7, o8, o9 );
+    
+    wait 0;
 
     //iprintln( gettime() + "/fnc:" + oFunc.sName + "/stop/" + isPlayer( self ) + "/" + isDefined( self ) );
     level.threadcount--;

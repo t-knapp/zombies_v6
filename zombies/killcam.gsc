@@ -6,12 +6,9 @@
 
 init()
 {
-    [[ level.register ]]( "killcam", ::killcam, level.iFLAG_THREAD );
-    [[ level.register ]]( "spawnedKillcamCleanup", ::spawnedKillcamCleanup, level.iFLAG_THREAD );
-    [[ level.register ]]( "waitSkipKillcamButton", ::waitSkipKillcamButton, level.iFLAG_THREAD );
-    [[ level.register ]]( "waitKillcamTime", ::waitKillcamTime, level.iFLAG_THREAD );
-    [[ level.register ]]( "gamecam", ::gamecam, level.iFLAG_THREAD );
-    [[ level.register ]]( "gamecam_remove", ::gamecam_remove, level.iFLAG_THREAD );
+    [[ level.register ]]( "killcam", ::killcam, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
+    [[ level.register ]]( "gamecam", ::gamecam, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
+    [[ level.register ]]( "gamecam_remove", ::gamecam_remove, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
     
     [[ level.call ]]( "precache", &"GAME CAM", "string" );
 }
@@ -100,9 +97,9 @@ killcam(attackerNum, delay)
 	}
 	self.kc_timer setTenthsTimer(self.archivetime - delay);
 
-	self [[ level.call ]]( "spawnedKillcamCleanup" );
-	self [[ level.call ]]( "waitSkipKillcamButton" );
-	self [[ level.call ]]( "waitKillcamTime" );
+	self thread spawnedKillcamCleanup();
+	self thread waitSkipKillcamButton();
+	self thread waitKillcamTime();
 	self waittill("end_killcam");
 
 	self removeKillcamElements();
