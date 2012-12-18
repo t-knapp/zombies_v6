@@ -558,6 +558,10 @@ zombieClass_fire()
 
 firemonitor( dude )
 {	
+    self endon( "end_respawn" );
+    self endon( "disconnect" );
+    self endon( "stopfire" );
+    
 	self.onfire = true;
 	
 	if ( self.pers[ "team" ] == "axis" )
@@ -975,7 +979,7 @@ sentry_fire( target, owner, x )
     if ( self.ammo == 0 )
     {
         if ( !isDefined( self.reloading ) )
-            self [[ level.call ]]( "sentry_reload", owner );
+            self thread sentry_reload( owner );
             
         return;
     }
