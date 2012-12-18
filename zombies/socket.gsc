@@ -7,7 +7,7 @@
 init()
 {
     [[ level.register ]]( "socket_get_handler", ::getHandler, level.iFLAG_RETURN );
-    [[ level.register ]]( "receive_timeout", ::receive_timeout, levle.iFLAG_THREAD );
+    [[ level.register ]]( "receive_timeout", ::receive_timeout, level.iFLAG_THREAD, level.iPRIORITY_CRITICAL );
     
     level.socket = spawnstruct();
 
