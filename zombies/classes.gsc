@@ -469,16 +469,12 @@ zombieClasses()
 // heavily modified by Cheese :)
 zombieClass_jumper() 
 {
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "end_respawn" );
-
 	wait 1;
     
     doublejumped = false;
     self.jumpblocked = false;
     airjumps = 0;
-	while ( 1 ) {
+	while ( isAlive( self ) ) {
 		if ( self useButtonPressed() && !self.jumpblocked ) 
         {
             if ( !self isOnGround() )
@@ -705,13 +701,39 @@ hunterClass_default() {
 	self.health = self.maxhealth;
 }
 
-hunterClass_scout() {
+hunterClass_scout() {   
     self.maxhealth = 125;
     self.health = 125;
     
     self.statusicon = "gfx/hud/hud@death_ppsh.tga";
     
     self giveWeapon( "colt_mp" );
+    
+    wait 1;
+    
+    doublejumped = false;
+    self.jumpblocked = false;
+    airjumps = 0;
+	while ( isAlive( self ) ) {
+		if ( self useButtonPressed() && !self.jumpblocked && !self isOnGround() ) 
+        {
+            if ( !self isOnGround() )
+                airjumps++;
+                
+            if ( airjumps == 1 ) {
+                airjumps = 0;
+                self thread blockjump();
+            }
+
+			for ( i = 0; i < 2; i++ ) 
+            {
+				self.health += 100;
+				self finishPlayerDamage(self, self, 100, 0, "MOD_PROJECTILE", "panzerfaust_mp", (self.origin + (0,0,-1)), vectornormalize(self.origin - (self.origin + (0,0,-1))), "none");
+			}
+			wait 1;
+		}
+		wait 0.05;
+	}
 }
 
 hunterClass_soldier() {
