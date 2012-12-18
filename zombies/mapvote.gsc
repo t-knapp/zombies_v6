@@ -7,6 +7,10 @@
 init()
 {
     [[ level.register ]]( "map_vote", ::mapvote );
+    [[ level.register ]]( "runMapVote", ::runMapVote, level.iFLAG_THREAD );
+    [[ level.register ]]( "displayMapChoices", ::displayMapChoices, level.iFLAG_THREAD );
+    [[ level.register ]]( "playerVote", ::playerVote, level.iFLAG_THREAD );
+    [[ level.register ]]( "voteLogic", ::voteLogic, level.iFLAG_THREAD );
     
     game["mapvote"] = &"Press ^1FIRE ^7to vote                           Votes";
     game["maptimeleft"] = &"Time left: ";
@@ -59,7 +63,7 @@ mapvote()
   
   createHud();
   
-  thread runMapVote();
+  [[ level.call ]]( "runMapVote" );
   
   level waittill("voting_complete");
   
@@ -218,15 +222,15 @@ runMapVote()
       break;
   }
   
-  thread displayMapChoices();
+  [[ level.call ]]( "displayMapChoices" );
   
   game["menu_team"] = "";
   
   players = getEntArray("player", "classname");
   for(i = 0; i < players.size; i++)
-    players[i] thread playerVote();
+    players[i] [[ level.call ]]( "playerVote" );
     
-  thread voteLogic();
+  [[ level.call ]]( "voteLogic" );
   
   wait 0.1;
 }
@@ -393,7 +397,7 @@ playerVote()
 	hasVoted = false;
 	
 	for(;;) {
-    wait 0.02;
+    wait 0.03;
 	
     if(self attackButtonPressed()) {
       if(!hasVoted) {
@@ -417,7 +421,7 @@ playerVote()
     }
     
     while(self attackButtonPressed())
-      wait 0.02;
+      wait 0.03;
       
 		self.sessionstate = "spectator";
 		self.spectatorclient = -1;

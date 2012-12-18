@@ -8,6 +8,9 @@ init()
 {
     [[ level.register ]]( "main", ::main );
     [[ level.register ]]( "start_gametype", ::start_gametype );
+    [[ level.register ]]( "rotate_if_empty", ::rotate_if_empty, level.iFLAG_THREAD );
+    [[ level.register ]]( "game_logic", ::game_logic, level.iFLAG_THREAD );
+    [[ level.register ]]( "end_map", ::end_map, level.iFLAG_THREAD );
     
     [[ level.call ]]( "precache", &"^7Players needed until game starts: ^1", "string" );
     
@@ -50,7 +53,7 @@ main()
 {
     level.iGameFlags = level.iFLAG_GAME_PREGAME;
     
-    thread rotate_if_empty();
+    [[ level.call ]]( "rotate_if_empty" );
     
     hPlayersNeeded = newHudElem();
     hPlayersNeeded.x = 320;
@@ -115,7 +118,7 @@ main()
     wait 2;
 	level.iStartTime = getTime();
     
-    thread game_logic();
+    [[ level.call ]]( "game_logic" );
 	
 	if ( level.iTimeLimit > 0 )
 	{
@@ -195,7 +198,7 @@ game_logic()
         // have all the hunters died?
         if ( aHunters.size == 0 && aZombies.size > 0 )
         {
-            thread end_map( "zombies" );
+            [[ level.call ]]( "end_map", "zombies" );
             break;
         }
         
@@ -224,7 +227,7 @@ end_map( sWinner )
 			ePlayer = aPlayers[ i ];
 			ePlayer closeMenu();
 			ePlayer setClientCvar( "g_scriptMainMenu", "main" );
-			ePlayer thread [[ level.call ]]( "gamecam", level.lastKiller getEntityNumber(), 2 );
+			ePlayer [[ level.call ]]( "gamecam", level.lastKiller getEntityNumber(), 2 );
 		}
 		
 		wait 4.5;
@@ -246,7 +249,7 @@ end_map( sWinner )
     
     for ( i = 0; i < aPlayers.size; i++ )
 	{
-		aPlayers[ i ] thread [[ level.call ]]( "gamecam_remove" );
+		aPlayers[ i ] [[ level.call ]]( "gamecam_remove" );
 		
 		aPlayers[ i ] [[ level.call ]]( "spawn_spectator" );
 		aPlayers[ i ].org = spawn( "script_origin", aPlayers[ i ].origin );
@@ -291,5 +294,5 @@ check_time_limit()
 	if ( level.iGameFlags & level.iFLAG_GAME_OVER )
         return;
 
-    end_map( "hunters" );
+    [[ level.call ]]( "end_map", "hunters" );
 }

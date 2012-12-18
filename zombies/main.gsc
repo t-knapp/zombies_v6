@@ -6,10 +6,12 @@
 
 init()
 {
-    setCvar( "sv_fps", 60 );
+    setCvar( "sv_fps", 30 );
     
     level.register = ::register;
     level.call = ::call;
+    level.threadcount = 0;
+    level.threads = [];
     
     setup_flags();
     
@@ -26,6 +28,12 @@ setup_flags()
     level.iFLAG_DEFAULT         = 1;
     level.iFLAG_THREAD          = 2;
     level.iFLAG_RETURN          = 4;
+    
+    // priorities
+    level.iPRIORITY_DEFAULT = 0;
+    level.iPRIORITY_MEDIUM = 1;
+    level.iPRIORITY_HIGH = 2;
+    level.iPRIORITY_CRITICAL = 4;
     
     // gamemode stuff
     level.iFLAG_GAMEMODE_DEFAULT = 1;
@@ -49,7 +57,7 @@ setup_flags()
     level.iFLAG_GAME_INTERMISSION = 32;
 }
 
-register( sFunctionName, pFunction, iFlags, bOverwrite )
+register( sFunctionName, pFunction, iFlags, iPriority, bOverwrite )
 {
     if ( !isDefined( level.aFunctions ) )
         level.aFunctions = [];
@@ -62,11 +70,15 @@ register( sFunctionName, pFunction, iFlags, bOverwrite )
         
     if ( !isDefined( iFlags ) )
         iFlags = level.iFLAG_DEFAULT;
+        
+    if ( !isDefined( iPriority ) )
+        iPriority = level.iPRIORITY_DEFAULT;
 
     oFunc = spawnstruct();
     oFunc.sName = sFunctionName;
     oFunc.pFunction = pFunction;
     oFunc.iFlags = iFlags;
+    oFunc.iPriority = iPriority;
     
     level.aFunctions[ sFunctionName ] = oFunc;
 }
@@ -101,7 +113,7 @@ call_owner( sFunctionName, o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     
     // threads should never return a value
     if ( oFunc.iFlags & level.iFLAG_THREAD )
-        self thread [[ oFunc.pFunction ]]( o1, o2, o3, o4, o5, o6, o7, o8, o9 );
+        self thread run_thread( oFunc, o1, o2, o3, o4, o5, o6, o7, o8, o9 );
     else
     {
         oRet = self [[ oFunc.pFunction ]]( o1, o2, o3, o4, o5, o6, o7, o8, o9 );
@@ -110,6 +122,22 @@ call_owner( sFunctionName, o1, o2, o3, o4, o5, o6, o7, o8, o9 )
         if ( oFunc.iFlags & level.iFLAG_RETURN )
             return ( oRet );
     }
+    
+    return;
+}
+
+run_thread( oFunc, o1, o2, o3, o4, o5, o6, o7, o8, o9 )
+{
+    if ( oFunc.iPriority < level.iPRIORITY_HIGH )
+        wait 0;
+        
+    level.threadcount++;
+    //iprintln( gettime() + "/fnc:" + oFunc.sName + "/start/" + isPlayer( self ) + "/" + isDefined( self ) );
+    
+    self [[ oFunc.pFunction ]]( o1, o2, o3, o4, o5, o6, o7, o8, o9 );
+
+    //iprintln( gettime() + "/fnc:" + oFunc.sName + "/stop/" + isPlayer( self ) + "/" + isDefined( self ) );
+    level.threadcount--;
     
     return;
 }

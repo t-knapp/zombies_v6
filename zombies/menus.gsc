@@ -13,7 +13,7 @@ menu_handler()
 {
     level endon( "intermission" );
     
-    for(;;)
+    while( isDefined( self ) )
 	{
 		self waittill("menuresponse", menu, response);
 		
@@ -45,7 +45,8 @@ menu_handler()
                 // let zombies rechoose a class
 				if ( response == "allies" && self.pers[ "team" ] == "allies" && isDefined( self.class ) ) 
                 {
-					self suicide();
+                    if ( isAlive( self ) )
+                        self suicide();
                     self.skiprespawn = true;
 					self.class = undefined;
 				}
@@ -53,7 +54,8 @@ menu_handler()
                 // let hunters rechoose a class ONLY during the pregame :D
                 if ( response == "axis" && self.pers[ "team" ] == "axis" && isDefined( self.class ) && !level.gamestarted )
                 {
-                    self suicide();
+                    if ( isAlive( self ) )
+                        self suicide();
                     self.skiprespawn = true;
                     self.class = undefined;
                 }
@@ -63,7 +65,8 @@ menu_handler()
 
 				if( response != self.pers[ "team" ] && self.sessionstate == "playing" )
                 {
-					self suicide();
+                    if ( isAlive( self ) )
+                        self suicide();
                     self.class = undefined;
                 }
 				
@@ -197,4 +200,6 @@ menu_handler()
 		else if(menu == game["menu_quickresponses"])
 			self [[ level.call ]]( "quickmessage_responses", response );
 	}
+    
+    return;
 }

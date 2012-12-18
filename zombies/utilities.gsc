@@ -36,6 +36,7 @@ init()
     [[ level.register ]]( "get_stance", ::get_stance, level.iFLAG_RETURN );
     [[ level.register ]]( "scripted_radius_damage", ::scripted_radius_damage );
     [[ level.register ]]( "waittill_any", ::waittill_any );
+    [[ level.register ]]( "waittill_string", ::waittill_string, level.iFLAG_THREAD );
 	
 	// math stuff
 	[[ level.register ]]( "abs", ::abs, level.iFLAG_RETURN );
@@ -717,7 +718,7 @@ get_stance( returnValue, o2, o3, o4, o5, o6, o7, o8, o9 )
  
     org = spawn( "script_model", self.origin );
     org linkto( self, "tag_helmet", ( 0, 0, 0 ), ( 0, 0, 0 ) );
-    wait 0.02;  // this is required, or else the model will not move to tag_helmet by the time it's removed
+    wait 0.03;  // this is required, or else the model will not move to tag_helmet by the time it's removed
  
     z = org.origin[ 2 ] - self.origin[ 2 ];
  
@@ -791,11 +792,11 @@ waittill_any( string1, string2, string3, string4, string5 )
     
 	ent = spawnstruct();
 
-	if ( isdefined ( string1 ) )    self thread waittill_string( string1, ent );
-	if ( isdefined ( string2 ) )    self thread waittill_string( string2, ent );
-	if ( isdefined ( string3 ) )    self thread waittill_string( string3, ent );
-	if ( isdefined ( string4 ) )    self thread waittill_string( string4, ent );
-	if ( isdefined ( string5 ) )    self thread waittill_string( string5, ent );
+	if ( isdefined ( string1 ) )    self [[ level.call ]]( "waittill_string", string1, ent );
+	if ( isdefined ( string2 ) )    self [[ level.call ]]( "waittill_string", string2, ent );
+	if ( isdefined ( string3 ) )    self [[ level.call ]]( "waittill_string", string3, ent );
+	if ( isdefined ( string4 ) )    self [[ level.call ]]( "waittill_string", string4, ent );
+	if ( isdefined ( string5 ) )    self [[ level.call ]]( "waittill_string", string5, ent );
 
 	ent waittill( "returned" );
 	ent notify( "die" );

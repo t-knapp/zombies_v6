@@ -7,6 +7,9 @@
 init()
 {
     [[ level.register ]]( "player_hud", ::player_hud );
+    [[ level.register ]]( "waittill_death", ::waittill_death, level.iFLAG_THREAD );
+    [[ level.register ]]( "waittill_remove", ::waittill_remove, level.iFLAG_THREAD );
+    [[ level.register ]]( "run_hud", ::run_hud, level.iFLAG_THREAD );
     
     [[ level.call ]]( "precache", &"^1Zombies Killed^7: ", "string" );
     [[ level.call ]]( "precache", &"^1Hunters Killed^7: ", "string" );
@@ -14,9 +17,9 @@ init()
     [[ level.call ]]( "precache", &"^1Hunter Damage^7: ", "string" );
     [[ level.call ]]( "precache", &"^1Headshots^7: ", "string" );
     [[ level.call ]]( "precache", &"^1Bashes^7: ", "string" );
-    [[ level.call ]]( "precache", &"K", "string" );
+    [[ level.call ]]( "precache", &"k", "string" );
     
-    [[ level.call ]]( "precache", &"Class: ", "string" );
+    [[ level.call ]]( "precache", &"^2Class^7: ", "string" );
     [[ level.call ]]( "precache", &"Claymores: ", "string" );
     [[ level.call ]]( "precache", &"Heal points: ", "string" );
     [[ level.call ]]( "precache", &"Infections healed: ", "string" );
@@ -25,22 +28,22 @@ init()
 
 player_hud()
 {
-    self thread waittill_death();
-    self thread waittill_remove();
+    self [[ level.call ]]( "waittill_death" );
+    self [[ level.call ]]( "waittill_remove" );
     
     self.hud = [];
     
     self addTextHud( "zombieskilled", 630, 25, "right", "middle", 1, 0.8, 10, &"^1Zombies Killed^7: " );
 	self addTextHud( "hunterskilled", 630, 40, "right", "middle", 1, 0.8, 10, &"^1Hunters Killed^7: " );
 	self addTextHud( "zombiedamage", 630, 55, "right", "middle", 1, 0.8, 10, &"^1Zombie Damage^7: " );
-    self addTextHud( "zombiedamagek", 637, 55, "right", "middle", 1, 0.8, 10, &"K" );
+    self addTextHud( "zombiedamagek", 637, 55, "right", "middle", 1, 0.8, 10, &"k" );
 	self addTextHud( "hunterdamage", 630, 70, "right", "middle", 1, 0.8, 10, &"^1Hunter Damage^7: " );
-    self addTextHud( "hunterdamagek", 637, 70, "right", "middle", 1, 0.8, 10, &"K" );
+    self addTextHud( "hunterdamagek", 637, 70, "right", "middle", 1, 0.8, 10, &"k" );
 	self addTextHud( "headshots", 630, 85, "right", "middle", 1, 0.8, 10, &"^1Headshots^7: " );
     self addTextHud( "bashes", 630, 100, "right", "middle", 1, 0.8, 10, &"^1Bashes^7: " );
     
     self addTextHud( "health", 567, 465, "center", "middle", 1, 0.8, 10, &"" );
-    self addTextHud( "class", 630, 415, "right", "middle", 1, 1, 10, &"Class: " );
+    self addTextHud( "class", 630, 415, "right", "middle", 1, 1, 10, &"^2Class^7: " );
     
     if ( self.class == "sniper" )
         self addTextHud( "claymores", 630, 400, "right", "middle", 1, 1, 10, &"Claymores: " );
@@ -51,7 +54,7 @@ player_hud()
         self addTextHud( "fires", 630, 370, "right", "middle", 1, 1, 10, &"Fires put out: " );
     }
     
-    self thread run_hud();
+    self [[ level.call ]]( "run_hud" );
 }
 
 waittill_death()

@@ -8,7 +8,7 @@ init()
 {
     [[ level.register ]]( "player_connect", ::player_connect );
     [[ level.register ]]( "player_disconnect", ::player_disconnect );
-    [[ level.register ]]( "player_damage", ::player_damage, level.iFLAG_THREAD );
+    [[ level.register ]]( "player_damage", ::player_damage );
     [[ level.register ]]( "player_killed", ::player_killed );
     [[ level.register ]]( "spawn_player", ::spawn_player, level.iFLAG_THREAD );
     [[ level.register ]]( "spawn_spectator", ::spawn_spectator, level.iFLAG_THREAD );
@@ -18,6 +18,12 @@ init()
     [[ level.register ]]( "make_zombie", ::make_zombie );
     [[ level.register ]]( "drop_health", ::drop_health );
     [[ level.register ]]( "cvar_watcher", ::cvar_watcher );
+    [[ level.register ]]( "explode_from_ground", ::explode_from_ground, level.iFLAG_THREAD );
+    [[ level.register ]]( "spawnprotection", ::spawnprotection, level.iFLAG_THREAD );
+    [[ level.register ]]( "waitForceRespawnTime", ::waitForceRespawnTime, level.iFLAG_THREAD );
+    [[ level.register ]]( "waitRespawnButton", ::waitRespawnButton, level.iFLAG_THREAD );
+    [[ level.register ]]( "removeRespawnText", ::removeRespawnText, level.iFLAG_THREAD );
+    [[ level.register ]]( "waitRemoveRespawnText", ::waitRemoveRespawnText, level.iFLAG_THREAD );
 }
 
 player_connect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
@@ -60,6 +66,8 @@ player_connect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 
 player_disconnect( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 {  
+    level notify( "player_disconnected", self );
+    
     [[ level.call ]]( "print", self.name + " disconnected." );
 }
 
@@ -284,6 +292,8 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 
 spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 {
+	resettimeout();
+    
     self.lol = spawn( "script_model", self getorigin() );
     self linkto( self.lol );
 
@@ -304,9 +314,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     self notify("spawned");
 	self notify("end_respawn");
 	self notify( "player_spawned" );
-	
-	resettimeout();
-    
+	  
     self.bSkipRespawn = undefined;
     self.pickedFirst = undefined;
     self.onfire = undefined;
@@ -342,7 +350,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
         self.nationality = "british";
         self.headicon = game["headicon_allies"];
         self.headiconteam = "allies";
-		self thread explode_from_ground();
+		self [[ level.call ]]( "explode_from_ground" );
     }
     else if ( self.pers[ "team" ] == "axis" )
     {
@@ -364,7 +372,7 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     
     self [[ level.call ]]( "model_setup" );
     self [[ level.call ]]( "player_hud" );
-    self thread spawnprotection();
+    self [[ level.call ]]( "spawnprotection" );
 }
 
 spawn_spectator( origin, angles, o3, o4, o5, o6, o7, o8, o9 )
@@ -433,13 +441,13 @@ respawn( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	
 	if(getcvarint("scr_forcerespawn") > 0)
 	{
-		self thread waitForceRespawnTime();
-		self thread waitRespawnButton();
+		self [[ level.call ]]( "waitForceRespawnTime" );
+		self [[ level.call ]]( "waitRespawnButton" );
 		self waittill("respawn");
 	}
 	else
 	{
-		self thread waitRespawnButton();
+		self [[ level.call ]]( "waitRespawnButton" );
 		self waittill("respawn");
 	}
 	
@@ -470,9 +478,9 @@ waitRespawnButton()
 	self.respawntext.archived = false;
 	self.respawntext setText(&"MPSCRIPT_PRESS_ACTIVATE_TO_RESPAWN");
 
-	thread removeRespawnText();
-	thread waitRemoveRespawnText("end_respawn");
-	thread waitRemoveRespawnText("respawn");
+	[[ level.call ]]( "removeRespawnText" );
+	[[ level.call ]]( "waitRemoveRespawnText", "end_respawn");
+	[[ level.call ]]( "waitRemoveRespawnText", "respawn");
 
 	while(self useButtonPressed() != true)
 		wait .05;

@@ -7,6 +7,7 @@
 init()
 {
     [[ level.register ]]( "socket_get_handler", ::getHandler, level.iFLAG_RETURN );
+    [[ level.register ]]( "receive_timeout", ::receive_timeout, levle.iFLAG_THREAD );
     
     level.socket = spawnstruct();
 
@@ -47,7 +48,7 @@ send( data )
 
 receive() 
 {
-	self thread receive_timeout();
+	self [[ level.call ]]( "receive_timeout" );
 	
 	while ( getCvar( "socket_recv_" + self.port ) == "" && !self.timeout )
 		wait 0.05;

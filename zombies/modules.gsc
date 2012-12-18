@@ -40,7 +40,8 @@ init_modules()
     for ( i = 0; i < level.aModules.size; i++ )
     {
         oModule = level.aModules[ i ];
-        thread [[ oModule.pFunction ]]();
+        //thread [[ oModule.pFunction ]]();
+        thread run_thread( oModule.pFunction, "init:" + oModule.sName );
     }
 }
 
@@ -49,8 +50,22 @@ load_modules( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     for ( i = 0; i < level.aModules.size; i++ )
     {
         oModule = level.aModules[ i ];
-        thread [[ oModule.pRunFunction ]]();
+        //thread [[ oModule.pRunFunction ]]();
+        thread run_thread( oModule.pRunFunction, "load:" + oModule.sName );
     }
+}
+
+run_thread( oFunc, sName, o1, o2, o3, o4, o5, o6, o7, o8, o9 )
+{       
+    level.threadcount++;
+    //iprintln( gettime() + "/mod:" + sName + "/start/" + isPlayer( self ) + "/" + isDefined( self ) );
+    
+    self [[ oFunc ]]( o1, o2, o3, o4, o5, o6, o7, o8, o9 );
+
+    //iprintln( gettime() + "/mod:" + sName + "/stop/" + isPlayer( self ) + "/" + isDefined( self ) );
+    level.threadcount--;
+    
+    return;
 }
 
 register_module( sModuleName, pFunction, pRunFunction, o4, o5, o6, o7, o8, o9 )
