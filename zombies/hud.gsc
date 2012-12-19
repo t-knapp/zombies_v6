@@ -7,7 +7,7 @@
 init()
 {
     [[ level.register ]]( "player_hud", ::player_hud );
-    [[ level.register ]]( "hud_remove", ::hud_remove, level.iFLAG_THREAD );
+    [[ level.register ]]( "hud_remove", ::hud_remove );
     [[ level.register ]]( "run_hud", ::run_hud, level.iFLAG_THREAD );
     
     [[ level.call ]]( "precache", &"^1Zombies Killed^7: ", "string" );
@@ -17,6 +17,7 @@ init()
     [[ level.call ]]( "precache", &"^1Headshots^7: ", "string" );
     [[ level.call ]]( "precache", &"^1Bashes^7: ", "string" );
     [[ level.call ]]( "precache", &"k", "string" );
+    [[ level.call ]]( "precache", &"^3Spectating is not allowed.", "string" );
     
     [[ level.call ]]( "precache", &"^2Class^7: ", "string" );
     [[ level.call ]]( "precache", &"Claymores: ", "string" );
@@ -70,6 +71,9 @@ hud_remove()
     if ( isDefined( self.hud[ "healpoints" ] ) )            self.hud[ "healpoints" ] destroy();
     if ( isDefined( self.hud[ "infections" ] ) )            self.hud[ "infections" ] destroy();
     if ( isDefined( self.hud[ "fires" ] ) )                 self.hud[ "fires" ] destroy();
+    
+    if ( isDefined( self.spechud ) )                        self.spechud destroy();
+    if ( isDefined( self.spechudtext ) )                    self.spechudtext destroy();
 }
 
 run_hud()

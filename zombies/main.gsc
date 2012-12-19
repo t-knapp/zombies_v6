@@ -10,6 +10,7 @@ init()
     
     level.register = ::register;
     level.call = ::call;
+    level.maxclients = getCvarInt( "sv_maxclients" );
     level.threadcount = 0;
     level.threads = [];
     
