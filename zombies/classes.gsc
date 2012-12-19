@@ -536,7 +536,7 @@ be_poisoned( dude )
 		
 		dmg = 5;
 		
-		self finishPlayerDamage( dude, dude, dmg, 0, "MOD_MELEE", "bren_mp", self.origin, ( 0, 0, 0 ), "none" );
+		self [[ level.call ]]( "player_damage", dude, dude, dmg, 0, "MOD_MELEE", "bren_mp", self.origin + ( 0, 0, 32 ), ( 0, 0, 0 ), "none" );
 		
 		wait 2;
 		
@@ -574,7 +574,7 @@ firemonitor( dude )
 		players = [[ level.call ]]( "get_good_players" );
 		for ( i = 0; i < players.size; i++ )
 		{
-			if ( players[ i ] != self && ( distance( self.origin + ( 0, 0, 32 ), players[ i ].origin + ( 0, 0, 32 ) ) < 48 && !isDefined( players[ i ].onfire ) && !isDefined( players[ i ].firetimeout ) ) && players[ i ].pers[ "team" ] == "axis" )
+			if ( players[ i ] != self && ( distance( self.origin + ( 0, 0, 32 ), players[ i ].origin + ( 0, 0, 32 ) ) < 40 && !isDefined( players[ i ].onfire ) && !isDefined( players[ i ].firetimeout ) ) && players[ i ].pers[ "team" ] == "axis" )
 				players[ i ] [[ level.call ]]( "firemonitor", dude );
 		}
 		
@@ -590,7 +590,7 @@ firedeath( dude )
 	{
 		oldhealth = self.health;
 		
-		self finishPlayerDamage( dude, dude, 3, 0, "MOD_MELEE", "enfield_mp", self.origin, ( 0, 0, 0 ), "none" );
+		self [[ level.call ]]( "player_damage", dude, dude, 3, 0, "MOD_MELEE", "enfield_mp", self.origin + ( 0, 0, 32 ), ( 0, 0, 0 ), "none" );
 		
 		wait 0.75;
 		
@@ -1499,18 +1499,46 @@ ammobox_think( box )
             {
                 // stolen from kill3r's mod
                 // this way is better suited for this version of zombies, since we're not actually giving health anymore
-                players[ i ] playlocalsound( "weap_pickup" );
-
                 oldamountpri = players[ i ] getWeaponSlotAmmo( "primary" );
                 oldamountprib = players[ i ] getWeaponSlotAmmo( "primaryb" );
                 oldamountpistol = players[ i ] getWeaponSlotAmmo( "pistol" );
-    
-                if ( players[ i ] getWeaponSlotWeapon( "primary" ) != "panzerfaust" )
-                    players[ i ] setWeaponSlotAmmo( "primary", ( oldamountpri + 5 ) );
-                else
-                    players[ i ] setWeaponSlotAmmo( "primary", ( oldamountpri + 1 ) );
-                players[ i ] setWeaponSlotAmmo( "primaryb", ( oldamountprib + 5 ) );
-                players[ i ] setWeaponSlotAmmo( "pistol", ( oldamountpistol + 5 ) );
+                
+                maxpri = [[ level.call ]]( "get_weapon_max_ammo", players[ i ] getWeaponSlotWeapon( "primary" ) );
+                maxprib = [[ level.call ]]( "get_weapon_max_ammo", players[ i ] getWeaponSlotWeapon( "primaryb" ) );
+                maxpistol = [[ level.call ]]( "get_weapon_max_ammo", players[ i ] getWeaponSlotWeapon( "pistol" ) );
+                
+                // do we even need ammo?
+                if ( oldamountpri == maxpri && oldamountprib == maxprib && oldamountpistol == maxpistol )
+                    continue;
+                
+                players[ i ] playlocalsound( "weap_pickup" );
+                self playlocalsound( "weap_pickup" );
+
+                if ( oldamountpri < maxpri )
+                {
+                    if ( players[ i ] getWeaponSlotWeapon( "primary" ) != "panzerfaust_mp" ) 
+                        players[ i ] setWeaponSlotAmmo( "primary", ( oldamountpri + 5 ) );
+                    else
+                        players[ i ] setWeaponSlotAmmo( "primary", ( oldamountpri + 1 ) );
+                }
+                if ( oldamountprib < maxprib )
+                    players[ i ] setWeaponSlotAmmo( "primaryb", ( oldamountprib + 5 ) );
+                if ( oldamountpistol < maxpistol )
+                    players[ i ] setWeaponSlotAmmo( "pistol", ( oldamountpistol + 5 ) );
+                    
+                newamountpri = players[ i ] getWeaponSlotAmmo( "primary" );
+                newamountprib = players[ i ] getWeaponSlotAmmo( "primaryb" );
+                newamountpistol = players[ i ] getWeaponSlotAmmo( "pistol" );
+                
+                ammogiven = ( newamountpri - oldamountpri ) + ( newamountprib - oldamountprib ) + ( newamountpistol - oldamountpistol );
+                if ( players[ i ] getWeaponSlotWeapon( "primary" ) == "panzerfaust_mp" )
+                    ammogiven -= ( newamountpri - oldamountpri );
+                    
+                if ( players[ i ] != self )
+                {
+                    self.stats[ "ammoPoints" ] += (int)( ammogiven / 5 );
+                    self.stats[ "ammoGivenOut" ] += ammogiven;
+                }
             }
 		}
 	}

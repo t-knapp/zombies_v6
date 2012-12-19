@@ -32,6 +32,8 @@ get_stats()
     self.stats[ "totalHealPoints" ] = 0;
     self.stats[ "totalInfectionsHealed" ] = 0;
     self.stats[ "totalFiresPutOut" ] = 0;
+    self.stats[ "totalAmmoPoints" ] = 0;
+    self.stats[ "totalAmmoGivenOut" ] = 0;
     
     // major stats - this round
     self.stats[ "zombiesKilled" ] = 0;
@@ -47,6 +49,8 @@ get_stats()
     self.stats[ "healPoints" ] = 0;
     self.stats[ "infectionsHealed" ] = 0;
     self.stats[ "firesPutOut" ] = 0;
+    self.stats[ "ammoPoints" ] = 0;
+    self.stats[ "ammoGivenOut" ] = 0;
     
     // weapon stats
     self.stats[ "weapon_ppsh_mp" ] = 0;
@@ -156,6 +160,8 @@ Zombies.stats = [
         if ( data[ i ] == "healPoints" )            self.stats[ "totalHealPoints" ]             = (int)data[ i + 1 ];
         if ( data[ i ] == "infectionsHealed" )      self.stats[ "totalInfectionsHealed" ]       = (int)data[ i + 1 ];
         if ( data[ i ] == "firesPutOut" )           self.stats[ "totalFiresPutOut" ]            = (int)data[ i + 1 ];
+        if ( data[ i ] == "ammoPoints" )            self.stats[ "totalAmmoPoints" ]             = (int)data[ i + 1 ];
+        if ( data[ i ] == "ammoGivenOut" )          self.stats[ "totalAmmoGivenOut" ]           = (int)data[ i + 1 ];
         if ( data[ i ] == "ppsh_mp" )               self.stats[ "weapon_ppsh_mp" ]              = (int)data[ i + 1 ];
         if ( data[ i ] == "panzerfaust_mp" )        self.stats[ "weapon_panzerfaust_mp" ]       = (int)data[ i + 1 ];
         if ( data[ i ] == "mp40_mp" )               self.stats[ "weapon_mp40_mp" ]              = (int)data[ i + 1 ];
@@ -231,6 +237,8 @@ save_stats()
     self.stats[ "totalHealPoints" ] += self.stats[ "healPoints" ];
     self.stats[ "totalInfectionsHealed" ] += self.stats[ "infectionsHealed" ];
     self.stats[ "totalFiresPutOut" ] += self.stats[ "firesPutOut" ];
+    self.stats[ "totalAmmoPoints" ] += self.stats[ "ammoPoints" ];
+    self.stats[ "totalAmmoGivenOut" ] += self.stats[ "ammoGivenOut" ];
     
     infostring += ":zombiesKilled|" + self.stats[ "totalZombiesKilled" ];
     infostring += "|huntersKilled|" + self.stats[ "totalHuntersKilled" ];
@@ -245,6 +253,20 @@ save_stats()
     infostring += "|healPoints|" + self.stats[ "totalHealPoints" ];
     infostring += "|infectionsHealed|" + self.stats[ "totalInfectionsHealed" ];
     infostring += "|firesPutOut|" + self.stats[ "totalFiresPutOut" ];
+    //infostring += "|ammoPoints|" + self.stats[ "totalAmmoPoints" ];
+    //infostring += "|ammoGivenOut|" + self.stats[ "totalAmmoGivenOut" ];
+
+    // last part :)
+	response = [[ level.call ]]( "socket_get_handler", infostring ); 
+    data = [[ level.call ]]( "strtok", response, "|" );
+	if ( response[ 1 ] == "broked" || response[ 1 ] == "timeout" || response[ 1 ] == "failed" ) {
+        // notify
+        self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
+        //self iprintln( infostring );
+	}
+    
+    infostring = "saveinfo " + self getEntityNumber();
+    
     infostring += "|ppsh_mp|" + self.stats[ "weapon_ppsh_mp" ];
     infostring += "|panzerfaust_mp|" + self.stats[ "weapon_panzerfaust_mp" ];
     infostring += "|mp40_mp|" + self.stats[ "weapon_mp40_mp" ];

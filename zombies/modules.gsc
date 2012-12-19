@@ -28,6 +28,7 @@ init()
     register_module( "weather", zombies\weather::init, zombies\weather::main );
     register_module( "logo", zombies\logo::init, zombies\logo::main );
     register_module( "exploitfixes", zombies\exploitfixes::init, zombies\exploitfixes::main );
+    register_module( "weapons", zombies\weapons::init, zombies\weapons::main );
     register_module( "base", zombies\base::init, zombies\base::main );                  // last :)
     
     init_modules();

@@ -23,6 +23,8 @@ init()
     [[ level.call ]]( "precache", &"Heal points: ", "string" );
     [[ level.call ]]( "precache", &"Infections healed: ", "string" );
     [[ level.call ]]( "precache", &"Fires put out: ", "string" );
+    [[ level.call ]]( "precache", &"Ammo points: ", "string" );
+    [[ level.call ]]( "precache", &"Bullets given out: ", "string" );
 }
 
 player_hud()
@@ -49,6 +51,12 @@ player_hud()
         self addTextHud( "infections", 630, 385, "right", "middle", 1, 1, 10, &"Infections healed: " );
         self addTextHud( "fires", 630, 370, "right", "middle", 1, 1, 10, &"Fires put out: " );
     }
+    else if ( self.class == "support" )
+    {
+        self addTextHud( "ammopoints", 630, 400, "right", "middle", 1, 1, 10, &"Ammo points: " );
+        self addTextHud( "ammoout", 630, 385, "right", "middle", 1, 1, 10, &"Bullets given out: " );
+        self addTextHud( "ammooutk", 638, 385, "right", "middle", 1, 1, 10, &"k" );
+    }
     
     self [[ level.call ]]( "run_hud" );
 }
@@ -70,6 +78,9 @@ hud_remove()
     if ( isDefined( self.hud[ "healpoints" ] ) )            self.hud[ "healpoints" ] destroy();
     if ( isDefined( self.hud[ "infections" ] ) )            self.hud[ "infections" ] destroy();
     if ( isDefined( self.hud[ "fires" ] ) )                 self.hud[ "fires" ] destroy();
+    if ( isDefined( self.hud[ "ammopoints" ] ) )            self.hud[ "ammopoints" ] destroy();
+    if ( isDefined( self.hud[ "ammoout" ] ) )               self.hud[ "ammoout" ] destroy();
+    if ( isDefined( self.hud[ "ammooutk" ] ) )              self.hud[ "ammooutk" ] destroy();
     
     if ( isDefined( self.spechud ) )                        self.spechud destroy();
     if ( isDefined( self.spechudtext ) )                    self.spechudtext destroy();
@@ -102,6 +113,11 @@ run_hud()
             self.hud[ "healpoints" ] setValue( self.stats[ "totalHealPoints" ] + self.stats[ "healPoints" ] );
             self.hud[ "infections" ] setValue( self.stats[ "totalInfectionsHealed" ] + self.stats[ "infectionsHealed" ] );
             self.hud[ "fires" ] setValue( self.stats[ "totalFiresPutOut" ] + self.stats[ "firesPutOut" ] );
+        }
+        else if ( self.class == "support" )
+        {
+            self.hud[ "ammopoints" ] setValue( self.stats[ "totalAmmoPoints" ] + self.stats[ "ammoPoints" ] );
+            self.hud[ "ammoout" ] setValue( (float)(self.stats[ "totalAmmoGivenOut" ] + self.stats[ "ammoGivenOut" ])/1000 );
         }
         
         wait 0.1;
