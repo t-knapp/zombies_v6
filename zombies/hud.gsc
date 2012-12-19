@@ -17,7 +17,6 @@ init()
     [[ level.call ]]( "precache", &"^1Headshots^7: ", "string" );
     [[ level.call ]]( "precache", &"^1Bashes^7: ", "string" );
     [[ level.call ]]( "precache", &"k", "string" );
-    [[ level.call ]]( "precache", &"^3Spectating is not allowed.", "string" );
     
     [[ level.call ]]( "precache", &"^2Class^7: ", "string" );
     [[ level.call ]]( "precache", &"Claymores: ", "string" );

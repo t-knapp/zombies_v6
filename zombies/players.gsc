@@ -379,6 +379,8 @@ spawn_spectator( origin, angles, o3, o4, o5, o6, o7, o8, o9 )
 	self notify("end_respawn");
 
 	resettimeout();
+    
+    self [[ level.call ]]( "hud_remove" );
 
     if ( ( level.iGameFlags & level.iFLAG_GAME_OVER ) == 0 )
         self.sessionteam = "spectator";
@@ -406,9 +408,6 @@ spawn_spectator( origin, angles, o3, o4, o5, o6, o7, o8, o9 )
 	}
 
 	self setClientCvar("cg_objectiveText", &"TDM_ALLIES_KILL_AXIS_PLAYERS");
-    
-    //if ( ( level.iGameFlags & level.iFLAG_GAME_OVER ) == 0 )
-    //    self thread manage_spectate();
 }
 
 spawn_intermission( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
@@ -417,6 +416,8 @@ spawn_intermission( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	self notify("end_respawn");
 
 	resettimeout();
+    
+    self [[ level.call ]]( "hud_remove" );
 
  	self.sessionstate = "intermission";
 	self.spectatorclient = -1;
@@ -602,166 +603,4 @@ cvar_watcher()
         
         wait 1;
     }
-}
-
-// ripped from codam
-// modified by cheese
-manage_spectate()
-{
-	level endon( "intermission" );
-
-	self notify( "end_spectate" );
-	self endon( "end_spectate" );
-	self endon( "spawned" );
-    
-    if ( getCvar( "zom_specmode" ) == "" )
-        setCvar( "zom_specmode", "default" );
-
-	if ( !isPlayer( self ) )
-		return;
-
-	// If killcam is active, wait for it to complete ...
-	while ( isdefined( self.killcam ) ||
-		self.archivetime )
-		wait( 0.05 );
-
-	team = "allies";
-
-	if ( ( getCvar( "zom_specmode" ) == "free" ) ||
-	     ( isdefined( team ) && ( team == "spectator" ) ) )
-	{
-		// Specmode 3: free spectate starting from above dead body
-		self.spectatorclient = -1;
-		self.sessionstate = "spectator";
-		self spawn( self.origin + ( 0, 0, 10 ), self.angles );
-		return;
-	}
-
-	_emptyTeamList = [];
-	for ( i = 0; i < level.maxclients; i++ )
-		_emptyTeamList[ i ] = false;
-
-	_myEnt = self getEntityNumber();
-
-	cur = self.spectatorclient;
-	if ( ( cur < 0 ) || ( cur >= level.maxclients ) )
-		cur = _myEnt;	// Start with me
-
-	_doNext = true;	// First time through ... find next live teammate
-	_doPrev = false;
-	for (;;)
-	{      
-		// Identify this team's current players
-		_team = _emptyTeamList;
-		players = getentarray( "player", "classname" );
-		for ( i = 0; i < players.size; i++ )
-		{
-			player = players[ i ];
-
-			// Is player alive?
-			if ( player.sessionstate != "playing" )
-				continue;
-
-			// Get player's proper team
-			pteam = player.sessionteam;
-			if ( !isdefined( pteam ) || ( pteam == "none" ) )
-				pteam = player.pers[ "team" ];
-
-			// Mark all players in my team
-			if ( isdefined( pteam ) && ( pteam == team ) )
-				_team[ player getEntityNumber() ] = true;
-		}
-
-		if ( _doPrev )
-		{
-			// Find previous team member to spectate on ...
-			for ( i = 0; i < _team.size; i++ )
-			{
-				cur--;
-				if ( cur < 0 )
-					cur = level.maxclients - 1;
-				if ( _team[ cur ] )
-					break;	// Found previous teammate
-			}
-		}
-		else
-		{
-			// Find next team member to spectate on ...
-			for ( i = 0; i < _team.size; i++ )
-			{
-				cur++;
-				if ( cur >= level.maxclients )
-					cur = 0;
-				if ( _team[ cur ] )
-					break;	// Found next teammate
-			}
-		}
-
-		if ( i >= _team.size )
-		{
-            if ( ( level.iGameFlags & level.iFLAG_GAME_STARTED ) == 0 )
-            {
-                // free spec before the round starts
-                self.spectatorclient = -1;
-                self.sessionstate = "spectator";
-                wait( 0.05 );
-                continue;
-            }
-		}
-
-		_doNext = false;
-		_doPrev = false;
-		_inUse = true;
-
-		// Wait for button press ...
-		while ( !( _doNext || _doPrev ) )
-		{
-			if ( self.sessionstate == "playing" )
-				return;	// hmm, endon's didn't work??!!
-
-			nteam = self.pers[ "team" ];
-			if ( !isdefined( nteam ) || ( nteam == "spectator" ) )
-			{
-				// Cannot determine player's team???
-				// Must do something, simply mark as dead
-				// to force dropping to ground.
-				self.sessionstate = "dead";
-				return;	// Can't determine player's team?????
-			}
-			else if ( nteam != team )
-			{
-				// Switched teams while spectating???
-				team = nteam;
-				_doNext = true;
-				wait( 0.05 );
-				continue;
-			}
-
-			player = getEntByNum( cur );
-			if ( isdefined( player ) &&
-			     ( player.sessionstate != "playing" ) )
-			{
-				// Current team player went away or died
-				_doNext = true;
-			}
-			else
-			{
-				self.sessionstate = "spectator";
-				self.spectatorclient = cur;
-
-				_doNext = self attackButtonPressed();
-				_doPrev = self meleeButtonPressed();
-				if ( _inUse )
-				{
-					_inUse = ( _doNext || _doPrev );
-					_doNext = false;
-					_doPrev = false;
-				}
-			}
-
-			wait( 0.05 );
-		}
-        
-        wait 0.05;
-	}
 }
