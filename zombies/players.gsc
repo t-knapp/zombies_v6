@@ -305,6 +305,10 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
 	self.spectatorclient = -1;
 	self.archivetime = 0;
     
+    // blarg
+    if ( isDefined( self.spechud ) )                        self.spechud destroy();
+    if ( isDefined( self.spechudtext ) )                    self.spechudtext destroy();
+    
     if ( !isDefined( self.class ) )
         self [[ level.call ]]( "classes_main" );
         
@@ -415,6 +419,8 @@ spawn_spectator( origin, angles, o3, o4, o5, o6, o7, o8, o9 )
 	}
 
 	self setClientCvar("cg_objectiveText", &"TDM_ALLIES_KILL_AXIS_PLAYERS");
+    
+    self [[ level.call ]]( "manage_spectate" );
 }
 
 spawn_intermission( o1, o2, o3, o4, o5, o6, o7, o8, o9 )

@@ -583,7 +583,7 @@ firemonitor( dude )
 		players = [[ level.call ]]( "get_good_players" );
 		for ( i = 0; i < players.size; i++ )
 		{
-			if ( players[ i ] != self && ( distance( self.origin + ( 0, 0, 32 ), players[ i ].origin + ( 0, 0, 32 ) ) < 40 && !isDefined( players[ i ].onfire ) && !isDefined( players[ i ].firetimeout ) ) && players[ i ].pers[ "team" ] == "axis" && players[ i ].class != "medic" )
+			if ( players[ i ] != self && ( distance( self.origin + ( 0, 0, 32 ), players[ i ].origin + ( 0, 0, 32 ) ) < 32 && !isDefined( players[ i ].onfire ) && !isDefined( players[ i ].firetimeout ) ) && players[ i ].pers[ "team" ] == "axis" && players[ i ].class != "medic" )
 				players[ i ] [[ level.call ]]( "firemonitor", dude );
 		}
 		
@@ -1267,7 +1267,7 @@ dohealing( mypack )
 medic_fire_timeout()
 {
     self.firetimeout = true;
-    wait 0.15;
+    wait 1;
     self.firetimeout = undefined;
 }
 

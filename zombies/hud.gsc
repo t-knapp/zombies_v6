@@ -9,6 +9,7 @@ init()
     [[ level.register ]]( "player_hud", ::player_hud );
     [[ level.register ]]( "hud_remove", ::hud_remove );
     [[ level.register ]]( "run_hud", ::run_hud, level.iFLAG_THREAD );
+    [[ level.register ]]( "manage_spectate", ::manage_spectate );
     
     [[ level.call ]]( "precache", &"^1Zombies Killed^7: ", "string" );
     [[ level.call ]]( "precache", &"^1Hunters Killed^7: ", "string" );
@@ -25,6 +26,7 @@ init()
     [[ level.call ]]( "precache", &"Fires put out: ", "string" );
     [[ level.call ]]( "precache", &"Ammo points: ", "string" );
     [[ level.call ]]( "precache", &"Bullets given out: ", "string" );
+    [[ level.call ]]( "precache", &"^3Spectating is not allowed.", "string" );
 }
 
 player_hud()
@@ -139,4 +141,31 @@ addTextHud( name, x, y, alignX, alignY, alpha, fontScale, sort, label )
 	self.hud[ name ].fontScale = fontScale;
 	self.hud[ name ].sort = sort;
 	self.hud[ name ].label = label;
+}
+
+manage_spectate()
+{
+    if ( isDefined( self.spechud ) )                        self.spechud destroy();
+    if ( isDefined( self.spechudtext ) )                    self.spechudtext destroy();
+    
+    if ( getCvar( "zom_antispec" ) == "1" && ( level.iGameFlags & level.iFLAG_GAME_OVER ) == 0 )
+	{
+		self.spechud = newClientHudElem( self );
+		self.spechud.sort = -2;
+		self.spechud.x = 0;
+		self.spechud.y = 0;
+		self.spechud setShader( "black", 640, 480 );
+		self.spechud.alpha = 1;
+		self.spechud.archived = false;
+		
+		self.spechudtext = newClientHudElem( self );
+		self.spechudtext.sort = -1;
+		self.spechudtext.x = 320;
+		self.spechudtext.y = 220;
+		self.spechudtext.alignx = "center";
+		self.spechudtext.aligny = "middle";
+		self.spechudtext setText( &"^3Spectating is not allowed." );
+		self.spechudtext.alpha = 1;
+		self.spechudtext.archived = false;
+	}
 }
