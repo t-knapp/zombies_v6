@@ -128,7 +128,7 @@ nameFix(s, notplayer, o3, o4, o5, o6, o7, o8, o9) {
     
     if ( !isDefined( notplayer ) || ( isDefined( notplayer ) && !notplayer ) )
     {
-      self [[ level.call ]]( "print", "Unallowed characters in name!", true );
+      self iPrintLnBold( "Unallowed characters in name!" );
       self setClientCvar("name", fixedName);
     }
     return fixedName;

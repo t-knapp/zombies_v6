@@ -463,6 +463,12 @@ zombieClasses()
 	self setWeaponSlotAmmo( "primary", 0 );
 	self setWeaponSlotClipAmmo( "primary", 0 );
 	self setSpawnWeapon( weapon );
+
+    if ( self.class != "fast" )
+    {
+        self setWeaponSlotWeapon( "grenade", "mk1britishfrag_mp" );
+        self setWeaponSlotAmmo( "grenade", 5 );
+    }
 }
 
 // original code from brax's 1.5 zombie mod
@@ -520,6 +526,9 @@ be_poisoned( dude )
     
     self.ispoisoned = true;
     
+    if ( isDefined( self.poisonhud ) )
+        self.poisonhud destroy();
+    
 	self.poisonhud = newClientHudElem( self );
 	self.poisonhud.x = 0;
 	self.poisonhud.y = 0;
@@ -574,7 +583,7 @@ firemonitor( dude )
 		players = [[ level.call ]]( "get_good_players" );
 		for ( i = 0; i < players.size; i++ )
 		{
-			if ( players[ i ] != self && ( distance( self.origin + ( 0, 0, 32 ), players[ i ].origin + ( 0, 0, 32 ) ) < 40 && !isDefined( players[ i ].onfire ) && !isDefined( players[ i ].firetimeout ) ) && players[ i ].pers[ "team" ] == "axis" )
+			if ( players[ i ] != self && ( distance( self.origin + ( 0, 0, 32 ), players[ i ].origin + ( 0, 0, 32 ) ) < 40 && !isDefined( players[ i ].onfire ) && !isDefined( players[ i ].firetimeout ) ) && players[ i ].pers[ "team" ] == "axis" && players[ i ].class != "medic" )
 				players[ i ] [[ level.call ]]( "firemonitor", dude );
 		}
 		

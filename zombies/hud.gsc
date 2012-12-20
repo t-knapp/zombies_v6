@@ -84,6 +84,8 @@ hud_remove()
     
     if ( isDefined( self.spechud ) )                        self.spechud destroy();
     if ( isDefined( self.spechudtext ) )                    self.spechudtext destroy();
+    
+    if ( isDefined( self.poisonhud ) )                      self.poisonhud destroy();
 }
 
 run_hud()

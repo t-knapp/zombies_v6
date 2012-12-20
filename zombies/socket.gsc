@@ -120,5 +120,5 @@ getHandler( request )
 	if ( !timedout ) 
 		return recvData;
 	else
-		return request + "|timeout";
+		return "timeout";
 }

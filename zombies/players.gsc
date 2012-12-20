@@ -82,7 +82,7 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
         }
         
         // disable friendlyfire and specnades
-        if ( eAttacker.pers[ "team" ] == "spectator" || eAttacker.pers[ "team" ] == self.pers[ "team" ] || ( eAttacker.pers[ "team" ] == "allies" && [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" ) )
+        if ( eAttacker.pers[ "team" ] == "spectator" || eAttacker.pers[ "team" ] == self.pers[ "team" ] || ( eAttacker.pers[ "team" ] == "allies" && [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" && sWeapon == "stielhandgranate_mp" ) )
             return;
     }
   
@@ -124,7 +124,14 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
             {
                 // poison zombie?
                 if ( isDefined( eAttacker.class ) && eAttacker.class == "poison" && !isDefined( self.ispoisoned ) )
-                    self [[ level.call ]]( "be_poisoned", eAttacker );
+                {
+                    poison = false;
+                    if ( ( [[ level.call ]]( "get_weapon_type", sWeapon ) == "grenade" && [[ level.call ]]( "rand", 100 ) > 90 ) || [[ level.call ]]( "get_weapon_type", sWeapon ) != "grenade" )
+                        poison = true;
+                        
+                    if ( poison )
+                        self [[ level.call ]]( "be_poisoned", eAttacker );
+                }
                 else if ( isDefined( eAttacker.class ) && eAttacker.class == "shocker" )
                     self [[ level.call ]]( "be_shocked", eAttacker );
             }

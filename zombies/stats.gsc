@@ -160,8 +160,8 @@ Zombies.stats = [
         if ( data[ i ] == "healPoints" )            self.stats[ "totalHealPoints" ]             = (int)data[ i + 1 ];
         if ( data[ i ] == "infectionsHealed" )      self.stats[ "totalInfectionsHealed" ]       = (int)data[ i + 1 ];
         if ( data[ i ] == "firesPutOut" )           self.stats[ "totalFiresPutOut" ]            = (int)data[ i + 1 ];
-        if ( data[ i ] == "ammoPoints" )            self.stats[ "totalAmmoPoints" ]             = (int)data[ i + 1 ];
-        if ( data[ i ] == "ammoGivenOut" )          self.stats[ "totalAmmoGivenOut" ]           = (int)data[ i + 1 ];
+        //if ( data[ i ] == "ammoPoints" )            self.stats[ "totalAmmoPoints" ]             = (int)data[ i + 1 ];
+        //if ( data[ i ] == "ammoGivenOut" )          self.stats[ "totalAmmoGivenOut" ]           = (int)data[ i + 1 ];
         if ( data[ i ] == "ppsh_mp" )               self.stats[ "weapon_ppsh_mp" ]              = (int)data[ i + 1 ];
         if ( data[ i ] == "panzerfaust_mp" )        self.stats[ "weapon_panzerfaust_mp" ]       = (int)data[ i + 1 ];
         if ( data[ i ] == "mp40_mp" )               self.stats[ "weapon_mp40_mp" ]              = (int)data[ i + 1 ];
@@ -219,6 +219,9 @@ update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vD
 
 save_stats()
 {
+    if ( !self.isRegistered )
+        return;
+        
     self iprintln( "saving stats..." );
     
     infostring = "saveinfo " + self getEntityNumber();
@@ -237,8 +240,8 @@ save_stats()
     self.stats[ "totalHealPoints" ] += self.stats[ "healPoints" ];
     self.stats[ "totalInfectionsHealed" ] += self.stats[ "infectionsHealed" ];
     self.stats[ "totalFiresPutOut" ] += self.stats[ "firesPutOut" ];
-    self.stats[ "totalAmmoPoints" ] += self.stats[ "ammoPoints" ];
-    self.stats[ "totalAmmoGivenOut" ] += self.stats[ "ammoGivenOut" ];
+    //self.stats[ "totalAmmoPoints" ] += self.stats[ "ammoPoints" ];
+    //self.stats[ "totalAmmoGivenOut" ] += self.stats[ "ammoGivenOut" ];
     
     infostring += ":zombiesKilled|" + self.stats[ "totalZombiesKilled" ];
     infostring += "|huntersKilled|" + self.stats[ "totalHuntersKilled" ];
@@ -259,7 +262,7 @@ save_stats()
     // last part :)
 	response = [[ level.call ]]( "socket_get_handler", infostring ); 
     data = [[ level.call ]]( "strtok", response, "|" );
-	if ( response[ 1 ] == "broked" || response[ 1 ] == "timeout" || response[ 1 ] == "failed" ) {
+	if ( response == "failed" || response == "broked" || response == "timedout" ) {
         // notify
         self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
         //self iprintln( infostring );
@@ -282,7 +285,7 @@ save_stats()
     // last part :)
 	response = [[ level.call ]]( "socket_get_handler", infostring ); 
     data = [[ level.call ]]( "strtok", response, "|" );
-	if ( response[ 1 ] == "broked" || response[ 1 ] == "timeout" || response[ 1 ] == "failed" ) {
+	if ( response == "failed" || response == "broked" || response == "timedout" ) {
         // notify
         self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
         //self iprintln( infostring );
