@@ -7,7 +7,7 @@
 init()
 {
     [[ level.register ]]( "get_stats", ::get_stats );
-    [[ level.register ]]( "update_stats", ::update_stats, level.iFLAG_THREAD );
+    [[ level.register ]]( "update_stats", ::update_stats );
     [[ level.register ]]( "save_stats", ::save_stats, level.iFLAG_THREAD, level.iPRIORITY_HIGH );
     
     [[ level.call ]]( "precache", &"^3Retrieving stats...", "string" );
@@ -98,55 +98,66 @@ get_stats()
     
     self.isRegistered = false;
 	
-	infostring = "getinfo " + self getEntityNumber();
-    achievementstring = "getachievements " + self getEntityNumber();
-	mystats = [[ level.call ]]( "socket_get_handler", infostring ); 
+	mystats = [[ level.call ]]( "socket_request", "getinfo", self getEntityNumber() ); 
     
-    data = [[ level.call ]]( "strtok", mystats, "|" );
-	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" || data[ 1 ] == "timeout" ) {
-        // try again
-        self.statshud2.alpha = 1;
-        mystats = [[ level.call ]]( "socket_get_handler", infostring ); 
-	}
-	
-	data = [[ level.call ]]( "strtok", mystats, "|" );
-	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" || data[ 1 ] == "timeout" ) {
-		// not registered, stop here
+    wait 0.05;
+    
+    if ( [[ level.call ]]( "contains", mystats, "error: " ) ) 
+    {
+        self iPrintLnBold( mystats );
+        setCvar( "server_reply", "" );
+        level.server_request.locked = false;
+        
+        mystats = undefined;
+    }
+    
+    if ( !isDefined( mystats ) )
+    {
+        // something broke, get out of here
 		self.statshud destroy();
         self.statshud2 destroy();
 		self.black destroy();
 		return;
-	}
-	
-	for ( i = 0; i < data.size; i++ ) {
-    /*
-Zombies.stats = [
-    // major stats
-    "zombiesKilled",
-    "huntersKilled",
-    "timesSurvived",
-    "zombieDamageDealt",
-    "hunterDamageDealt",
-    "pistolKills",
-    "claymoreKills",
-    "sentryKills",
-    "headshotKills",
-    "meleeKills",
+    }
     
-    // weapon stats
-    "ppsh_mp",
-    "panzerfaust_mp",
-    "mp40_mp",
-    "kar98k_sniper_mp",
-    "mp44_mp",
-    "thompson_mp",
-    "m1garand_mp",
-    "fg42_mp",
-    "bar_mp",
-    "colt_mp",
-    "luger_mp"
-];
-*/       
+    stuff = [[ level.call ]]( "socket_get_handler", mystats );
+    
+    if ( !isDefined( stuff ) )
+    {
+        iprintln( "undefined stuff" );
+        // something broke, get out of here
+		self.statshud destroy();
+        self.statshud2 destroy();
+		self.black destroy();
+		return;
+    }
+    
+    iprintln( stuff );
+    
+    /*
+    data = [[ level.call ]]( "strtok", mystats, "|" );
+	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" || data[ 1 ] == "timeout" ) {
+        // try again
+        self.statshud2.alpha = 1;
+        mystats = [[ level.call ]]( "socket_request", infostring ); 
+	}
+    
+    tmp = [[ level.call ]]( "strtok", data[ 0 ], " " );
+    if ( (int)(tmp[ 1 ]) != self getEntityNumber() ) {
+        // wrong stats?
+        iprintln( "got wrong stats" );
+    }
+	
+	data = [[ level.call ]]( "strtok", mystats, "|" );
+	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" || data[ 1 ] == "timeout" ) {
+		// not registered, stop here*/
+		self.statshud destroy();
+        self.statshud2 destroy();
+		self.black destroy();
+		return;
+	//}
+	
+	for ( i = 0; i < data.size; i++ ) { 
         if ( data[ i ] == "zombiesKilled" )         self.stats[ "totalZombiesKilled" ]          = (int)data[ i + 1 ];
         if ( data[ i ] == "huntersKilled" )         self.stats[ "totalHuntersKilled" ]          = (int)data[ i + 1 ];
         if ( data[ i ] == "timesSurvived" )         self.stats[ "totalTimesSurvived" ]          = (int)data[ i + 1 ];
@@ -227,6 +238,7 @@ save_stats()
     infostring = "saveinfo " + self getEntityNumber();
     
     // add up our totals
+    // this is now ONLY for endgame hud use
     self.stats[ "totalZombiesKilled" ] += self.stats[ "zombiesKilled" ];
     self.stats[ "totalHuntersKilled" ] += self.stats[ "huntersKilled" ];
     self.stats[ "totalTimesSurvived" ] += self.stats[ "timesSurvived" ];
@@ -243,24 +255,24 @@ save_stats()
     //self.stats[ "totalAmmoPoints" ] += self.stats[ "ammoPoints" ];
     //self.stats[ "totalAmmoGivenOut" ] += self.stats[ "ammoGivenOut" ];
     
-    infostring += ":zombiesKilled|" + self.stats[ "totalZombiesKilled" ];
-    infostring += "|huntersKilled|" + self.stats[ "totalHuntersKilled" ];
-    infostring += "|timesSurvived|" + self.stats[ "totalTimesSurvived" ];
-    infostring += "|zombieDamageDealt|" + self.stats[ "totalZombieDamageDealt" ];
-    infostring += "|hunterDamageDealt|" + self.stats[ "totalHunterDamageDealt" ];
-    infostring += "|pistolKills|" + self.stats[ "totalPistolKills" ];
-    infostring += "|claymoreKills|" + self.stats[ "totalClaymoreKills" ];
-    infostring += "|sentryKills|" + self.stats[ "totalSentryKills" ];
-    infostring += "|headshotKills|" + self.stats[ "totalHeadshotKills" ];
-    infostring += "|meleeKills|" + self.stats[ "totalMeleeKills" ];
-    infostring += "|healPoints|" + self.stats[ "totalHealPoints" ];
-    infostring += "|infectionsHealed|" + self.stats[ "totalInfectionsHealed" ];
-    infostring += "|firesPutOut|" + self.stats[ "totalFiresPutOut" ];
+    infostring += ":zombiesKilled|" + self.stats[ "zombiesKilled" ];
+    infostring += "|huntersKilled|" + self.stats[ "huntersKilled" ];
+    infostring += "|timesSurvived|" + self.stats[ "timesSurvived" ];
+    infostring += "|zombieDamageDealt|" + self.stats[ "zombieDamageDealt" ];
+    infostring += "|hunterDamageDealt|" + self.stats[ "hunterDamageDealt" ];
+    infostring += "|pistolKills|" + self.stats[ "pistolKills" ];
+    infostring += "|claymoreKills|" + self.stats[ "claymoreKills" ];
+    infostring += "|sentryKills|" + self.stats[ "sentryKills" ];
+    infostring += "|headshotKills|" + self.stats[ "headshotKills" ];
+    infostring += "|meleeKills|" + self.stats[ "meleeKills" ];
+    infostring += "|healPoints|" + self.stats[ "healPoints" ];
+    infostring += "|infectionsHealed|" + self.stats[ "infectionsHealed" ];
+    infostring += "|firesPutOut|" + self.stats[ "firesPutOut" ];
     //infostring += "|ammoPoints|" + self.stats[ "totalAmmoPoints" ];
     //infostring += "|ammoGivenOut|" + self.stats[ "totalAmmoGivenOut" ];
 
     // last part :)
-	response = [[ level.call ]]( "socket_get_handler", infostring ); 
+	response = [[ level.call ]]( "socket_request", infostring ); 
     data = [[ level.call ]]( "strtok", response, "|" );
 	if ( response == "failed" || response == "broked" || response == "timedout" ) {
         // notify
@@ -270,7 +282,7 @@ save_stats()
     
     infostring = "saveinfo " + self getEntityNumber();
     
-    infostring += "|ppsh_mp|" + self.stats[ "weapon_ppsh_mp" ];
+    infostring += ":ppsh_mp|" + self.stats[ "weapon_ppsh_mp" ];
     infostring += "|panzerfaust_mp|" + self.stats[ "weapon_panzerfaust_mp" ];
     infostring += "|mp40_mp|" + self.stats[ "weapon_mp40_mp" ];
     infostring += "|kar98k_sniper_mp|" + self.stats[ "weapon_kar98k_sniper_mp" ];

@@ -207,6 +207,8 @@ player_killed( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
     // only show if we're not on hardcore
     if ( ( level.iGamemode & level.iFLAG_GAMEMODE_HARDCORE ) == 0 )
         obituary(self, eAttacker, sWeapon, sMeansOfDeath);
+        
+    self [[ level.call ]]( "hud_remove" );
 	
 	self.sessionstate = "dead";
 	self.statusicon = "gfx/hud/hud@status_dead.tga";
@@ -321,8 +323,6 @@ spawn_player( o1, o2, o3, o4, o5, o6, o7, o8, o9 )
     self notify("spawned");
 	self notify("end_respawn");
 	self notify( "player_spawned" );
-    
-    self [[ level.call ]]( "hud_remove" );
 	  
     self.bSkipRespawn = undefined;
     self.pickedFirst = undefined;
@@ -419,7 +419,7 @@ spawn_spectator( origin, angles, o3, o4, o5, o6, o7, o8, o9 )
 	}
 
 	self setClientCvar("cg_objectiveText", &"TDM_ALLIES_KILL_AXIS_PLAYERS");
-    
+
     self [[ level.call ]]( "manage_spectate" );
 }
 

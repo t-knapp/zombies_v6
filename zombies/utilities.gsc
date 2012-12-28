@@ -37,6 +37,8 @@ init()
     [[ level.register ]]( "scripted_radius_damage", ::scripted_radius_damage );
     [[ level.register ]]( "waittill_any", ::waittill_any );
     [[ level.register ]]( "waittill_string", ::waittill_string, level.iFLAG_THREAD );
+	[[ level.register ]]( "substring", ::substring, level.iFLAG_RETURN );
+    [[ level.register ]]( "contains", ::contains, level.iFLAG_RETURN );
 	
 	// math stuff
 	[[ level.register ]]( "abs", ::abs, level.iFLAG_RETURN );
@@ -204,6 +206,9 @@ array_shuffle(arr, o2, o3, o4, o5, o6, o7, o8, o9) {
 }
 
 strTok(longStr, separator, o3, o4, o5, o6, o7, o8, o9)  {
+   if(!contains(longStr,separator))
+     return "";
+     
    sepcount = 0; //Seperation Counts    -1 default
    string = [];
    longStr += ""; // turn it into a string if it isn't  already   
@@ -809,4 +814,62 @@ waittill_string (msg, ent)
 	ent endon( "die" );
 	self waittill( msg );
 	ent notify( "returned" );
+}
+
+substring( sString, iStart, iEnd )
+{
+    if ( !isDefined( iStart ) )
+        return sString;
+        
+    if ( !isDefined( iEnd ) )
+        iEnd = sString.size;
+        
+    sNewString = "";
+    j = 0;
+    
+    for ( i = iStart; i < iEnd.size; i++ )
+    {
+        sNewString[ j ] = sString[ i ];
+        j++;
+    }
+    
+    return sNewString;
+}
+
+contains( sString, sOtherString )
+{
+    bMatch = false;
+    
+    // loop through the string to check
+    for ( i = 0; i < sString.size; i++ )
+    {
+		x = 0;
+		tmp = "";
+		
+        // string to check against
+        for ( j = 0; j < sOtherString.size; j++ )
+        {
+			cur = sOtherString[ j ];
+			
+			if ( ( i + j ) > sString.size )
+				break;
+				
+			next = sString[ i + j ];
+			
+            if ( cur == next ) 
+            {
+				tmp += cur;
+				x++;
+                continue;
+            }
+			
+			break;
+        }
+        
+        // looped through entire string, found it
+        if ( x == sOtherString.size && tmp == sOtherString )
+            return true;
+    }
+    
+    return false;
 }

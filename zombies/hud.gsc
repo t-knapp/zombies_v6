@@ -60,7 +60,7 @@ player_hud()
         self addTextHud( "ammooutk", 638, 385, "right", "middle", 1, 1, 10, &"k" );
     }
     
-    self [[ level.call ]]( "run_hud" );
+    self thread run_hud();
 }
 
 hud_remove()
@@ -126,8 +126,6 @@ run_hud()
         
         wait 0.1;
     }
-    
-    self [[ level.call ]]( "hud_remove" );
 }
 
 addTextHud( name, x, y, alignX, alignY, alpha, fontScale, sort, label )
