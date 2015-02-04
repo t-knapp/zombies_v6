@@ -17,7 +17,7 @@ init()
 get_stats()
 {  
     self.stats = [];
-    
+        
     // major stats - totals
     self.stats[ "totalZombiesKilled" ] = 0;
     self.stats[ "totalHuntersKilled" ] = 0;
@@ -98,7 +98,7 @@ get_stats()
     
     self.isRegistered = false;
 	
-	infostring = "getinfo " + self getEntityNumber();
+	infostring = "getinfo " + self getEntityNumber();   
     achievementstring = "getachievements " + self getEntityNumber();
 	mystats = [[ level.call ]]( "socket_get_handler", infostring ); 
     
@@ -118,34 +118,36 @@ get_stats()
 		return;
 	}
 	
-	for ( i = 0; i < data.size; i++ ) {
-    /*
-Zombies.stats = [
-    // major stats
-    "zombiesKilled",
-    "huntersKilled",
-    "timesSurvived",
-    "zombieDamageDealt",
-    "hunterDamageDealt",
-    "pistolKills",
-    "claymoreKills",
-    "sentryKills",
-    "headshotKills",
-    "meleeKills",
+    println(mystats);
     
-    // weapon stats
-    "ppsh_mp",
-    "panzerfaust_mp",
-    "mp40_mp",
-    "kar98k_sniper_mp",
-    "mp44_mp",
-    "thompson_mp",
-    "m1garand_mp",
-    "fg42_mp",
-    "bar_mp",
-    "colt_mp",
-    "luger_mp"
-];
+	for ( i = 0; i < data.size; i++ ) {
+/*
+    Zombies.stats = [
+        // major stats
+        "zombiesKilled",
+        "huntersKilled",
+        "timesSurvived",
+        "zombieDamageDealt",
+        "hunterDamageDealt",
+        "pistolKills",
+        "claymoreKills",
+        "sentryKills",
+        "headshotKills",
+        "meleeKills",
+        
+        // weapon stats
+        "ppsh_mp",
+        "panzerfaust_mp",
+        "mp40_mp",
+        "kar98k_sniper_mp",
+        "mp44_mp",
+        "thompson_mp",
+        "m1garand_mp",
+        "fg42_mp",
+        "bar_mp",
+        "colt_mp",
+        "luger_mp"
+    ];
 */       
         if ( data[ i ] == "zombiesKilled" )         self.stats[ "totalZombiesKilled" ]          = (int)data[ i + 1 ];
         if ( data[ i ] == "huntersKilled" )         self.stats[ "totalHuntersKilled" ]          = (int)data[ i + 1 ];
@@ -270,7 +272,7 @@ save_stats()
     
     infostring = "saveinfo " + self getEntityNumber();
     
-    infostring += "|ppsh_mp|" + self.stats[ "weapon_ppsh_mp" ];
+    infostring += ":ppsh_mp|" + self.stats[ "weapon_ppsh_mp" ];
     infostring += "|panzerfaust_mp|" + self.stats[ "weapon_panzerfaust_mp" ];
     infostring += "|mp40_mp|" + self.stats[ "weapon_mp40_mp" ];
     infostring += "|kar98k_sniper_mp|" + self.stats[ "weapon_kar98k_sniper_mp" ];
