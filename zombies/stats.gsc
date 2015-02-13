@@ -1,7 +1,8 @@
 /*
     File:           stats.gsc
     Author:         Cheese
-    Last update:    11/14/2012
+                    Nuke (adjustments)
+    Last update:    13/02/2015
 */
 
 init()
@@ -19,51 +20,51 @@ get_stats()
     self.stats = [];
 
     // major stats - totals
-    self.stats[ "totalZombiesKilled" ] = 0;
-    self.stats[ "totalHuntersKilled" ] = 0;
-    self.stats[ "totalTimesSurvived" ] = 0;
+    self.stats[ "totalZombiesKilled" ]     = 0;
+    self.stats[ "totalHuntersKilled" ]     = 0;
+    self.stats[ "totalTimesSurvived" ]     = 0;
     self.stats[ "totalZombieDamageDealt" ] = 0;
     self.stats[ "totalHunterDamageDealt" ] = 0;
-    self.stats[ "totalPistolKills" ] = 0;
-    self.stats[ "totalClaymoreKills" ] = 0;
-    self.stats[ "totalSentryKills" ] = 0;
-    self.stats[ "totalHeadshotKills" ] = 0;
-    self.stats[ "totalMeleeKills" ] = 0;
-    self.stats[ "totalHealPoints" ] = 0;
-    self.stats[ "totalInfectionsHealed" ] = 0;
-    self.stats[ "totalFiresPutOut" ] = 0;
-    self.stats[ "totalAmmoPoints" ] = 0;
-    self.stats[ "totalAmmoGivenOut" ] = 0;
+    self.stats[ "totalPistolKills" ]       = 0;
+    self.stats[ "totalClaymoreKills" ]     = 0;
+    self.stats[ "totalSentryKills" ]       = 0;
+    self.stats[ "totalHeadshotKills" ]     = 0;
+    self.stats[ "totalMeleeKills" ]        = 0;
+    self.stats[ "totalHealPoints" ]        = 0;
+    self.stats[ "totalInfectionsHealed" ]  = 0;
+    self.stats[ "totalFiresPutOut" ]       = 0;
+    self.stats[ "totalAmmoPoints" ]        = 0;
+    self.stats[ "totalAmmoGivenOut" ]      = 0;
 
     // major stats - this round
-    self.stats[ "zombiesKilled" ] = 0;
-    self.stats[ "huntersKilled" ] = 0;
-    self.stats[ "timesSurvived" ] = 0;
+    self.stats[ "zombiesKilled" ]     = 0;
+    self.stats[ "huntersKilled" ]     = 0;
+    self.stats[ "timesSurvived" ]     = 0;
     self.stats[ "zombieDamageDealt" ] = 0;
     self.stats[ "hunterDamageDealt" ] = 0;
-    self.stats[ "pistolKills" ] = 0;
-    self.stats[ "claymoreKills" ] = 0;
-    self.stats[ "sentryKills" ] = 0;
-    self.stats[ "headshotKills" ] = 0;
-    self.stats[ "meleeKills" ] = 0;
-    self.stats[ "healPoints" ] = 0;
-    self.stats[ "infectionsHealed" ] = 0;
-    self.stats[ "firesPutOut" ] = 0;
-    self.stats[ "ammoPoints" ] = 0;
-    self.stats[ "ammoGivenOut" ] = 0;
+    self.stats[ "pistolKills" ]       = 0;
+    self.stats[ "claymoreKills" ]     = 0;
+    self.stats[ "sentryKills" ]       = 0;
+    self.stats[ "headshotKills" ]     = 0;
+    self.stats[ "meleeKills" ]        = 0;
+    self.stats[ "healPoints" ]        = 0;
+    self.stats[ "infectionsHealed" ]  = 0;
+    self.stats[ "firesPutOut" ]       = 0;
+    self.stats[ "ammoPoints" ]        = 0;
+    self.stats[ "ammoGivenOut" ]      = 0;
     
     // weapon stats
-    self.stats[ "weapon_ppsh_mp" ] = 0;
-    self.stats[ "weapon_panzerfaust_mp" ] = 0;
-    self.stats[ "weapon_mp40_mp" ] = 0;
+    self.stats[ "weapon_ppsh_mp" ]          = 0;
+    self.stats[ "weapon_panzerfaust_mp" ]   = 0;
+    self.stats[ "weapon_mp40_mp" ]          = 0;
     self.stats[ "weapon_kar98k_sniper_mp" ] = 0;
-    self.stats[ "weapon_mp44_mp" ] = 0;
-    self.stats[ "weapon_thompson_mp" ] = 0;
-    self.stats[ "weapon_m1garand_mp" ] = 0;
-    self.stats[ "weapon_fg42_mp" ] = 0;
-    self.stats[ "weapon_bar_mp" ] = 0;
-    self.stats[ "weapon_colt_mp" ] = 0;
-    self.stats[ "weapon_luger_mp" ] = 0;
+    self.stats[ "weapon_mp44_mp" ]          = 0;
+    self.stats[ "weapon_thompson_mp" ]      = 0;
+    self.stats[ "weapon_m1garand_mp" ]      = 0;
+    self.stats[ "weapon_fg42_mp" ]          = 0;
+    self.stats[ "weapon_bar_mp" ]           = 0;
+    self.stats[ "weapon_colt_mp" ]          = 0;
+    self.stats[ "weapon_luger_mp" ]         = 0;
     
     if ( getCvar( "skipstats" ) == "1" )
     {
@@ -72,32 +73,32 @@ get_stats()
     }
     
     self.black = newClientHudElem( self );
-	self.black.x = 0;
-	self.black.y = 0;
-	self.black setShader( "black", 640, 480 );
-	self.black.sort = 9020;
-	
-	self.statshud = newClientHudElem( self );
-	self.statshud.x = 320;
-	self.statshud.y = 240;
-	self.statshud.alignx = "center";
-	self.statshud.aligny = "middle";
-	self.statshud setText( &"^3Retrieving stats..." );
-	self.statshud.fontscale = 1.5;
-	self.statshud.sort = 9021;
+    self.black.x = 0;
+    self.black.y = 0;
+    self.black setShader( "black", 640, 480 );
+    self.black.sort = 9020;
+    
+    self.statshud = newClientHudElem( self );
+    self.statshud.x = 320;
+    self.statshud.y = 240;
+    self.statshud.alignx = "center";
+    self.statshud.aligny = "middle";
+    self.statshud setText( &"^3Retrieving stats..." );
+    self.statshud.fontscale = 1.5;
+    self.statshud.sort = 9021;
     
     self.statshud2 = newClientHudElem( self );
-	self.statshud2.x = 320;
-	self.statshud2.y = 260;
-	self.statshud2.alignx = "center";
-	self.statshud2.aligny = "middle";
-	self.statshud2 setText( &"^3This is taking longer than usual..." );
-	self.statshud2.fontscale = 1.5;
+    self.statshud2.x = 320;
+    self.statshud2.y = 260;
+    self.statshud2.alignx = "center";
+    self.statshud2.aligny = "middle";
+    self.statshud2 setText( &"^3This is taking longer than usual..." );
+    self.statshud2.fontscale = 1.5;
     self.statshud2.alpha = 0;
-	self.statshud2.sort = 9021;
+    self.statshud2.sort = 9021;
     
     self.isRegistered = false;
-	
+
     //TODO: separate method
     //Get zomid from user
     sZomid = undefined;
@@ -127,16 +128,16 @@ get_stats()
 
     lNumRows = mysql_num_rows(lResult);
     if( lNumRows == 0 ){
-      //no stats for zomid found. assuming player is not registered
+        //no stats for zomid found. assuming player is not registered
 
-      //cleanup memory
-      mysql_free_result(lResult);
+        //cleanup memory
+        mysql_free_result(lResult);
 
-      //not registered, so quit here 
-      self.statshud destroy();
-      self.statshud2 destroy();
-      self.black destroy();
-      return;
+        //not registered, so quit here 
+        self.statshud destroy();
+        self.statshud2 destroy();
+        self.black destroy();
+        return;
     }
     
     lNumFields = mysql_num_fields(lResult); //works
@@ -146,7 +147,7 @@ get_stats()
         //get fieldname
         lField = mysql_fetch_field(lResult);
 
-	//assign values
+        //assign values
         if ( lField == "zombiesKilled" )         self.stats[ "totalZombiesKilled" ]          = (int)lRow[ i ];
         if ( lField == "huntersKilled" )         self.stats[ "totalHuntersKilled" ]          = (int)lRow[ i ];
         if ( lField == "timesSurvived" )         self.stats[ "totalTimesSurvived" ]          = (int)lRow[ i ];
@@ -268,6 +269,7 @@ save_stats()
     //self.stats[ "totalAmmoPoints" ] += self.stats[ "ammoPoints" ];
     //self.stats[ "totalAmmoGivenOut" ] += self.stats[ "ammoGivenOut" ];
     
+    //Header
     queryColl = "INSERT INTO `zombies`.`players` (";
     queryVals = "VALUES (";
     
@@ -285,7 +287,7 @@ save_stats()
     queryColl += "`zombiesKilled`, ";
     queryVals += "'" + self.stats[ "totalZombiesKilled" ] + "', ";
     
-    queryColl  += "`huntersKilled`, ";
+    queryColl += "`huntersKilled`, ";
     queryVals += "'" + self.stats[ "totalHuntersKilled" ] + "', ";
     
     queryColl += "`timesSurvived`, "; 
@@ -324,18 +326,6 @@ save_stats()
     //infostring += "|ammoPoints|" + self.stats[ "totalAmmoPoints" ];
     //infostring += "|ammoGivenOut|" + self.stats[ "totalAmmoGivenOut" ];
 
-    /*
-    // last part :)
-    response = [[ level.call ]]( "socket_get_handler", infostring ); 
-    data = [[ level.call ]]( "strtok", response, "|" );
-    if ( response == "failed" || response == "broked" || response == "timedout" ) {
-      // notify
-      self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
-      //self iprintln( infostring );
-    }
-    infostring = "saveinfo " + self getEntityNumber();
-    */
-
     queryColl += "`ppsh_mp`, ";
     queryVals += "'" + self.stats[ "weapon_ppsh_mp" ] + "', ";
     
@@ -372,17 +362,6 @@ save_stats()
     queryColl += queryVals;
     
     //printconsole( queryColl );
-
-    /*
-    // last part :)
-    response = [[ level.call ]]( "socket_get_handler", infostring ); 
-    data = [[ level.call ]]( "strtok", response, "|" );
-    if ( response == "failed" || response == "broked" || response == "timedout" ) {
-      // notify
-      self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
-      //self iprintln( infostring );
-    }
-    */
     
     //Save to MySQL
     lConnection = mysql_get_connection(); //Gets connection initialized with config cvars
