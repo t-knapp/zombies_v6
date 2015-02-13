@@ -15,9 +15,9 @@ init()
 }
 
 get_stats()
-{  
+{
     self.stats = [];
-        
+
     // major stats - totals
     self.stats[ "totalZombiesKilled" ] = 0;
     self.stats[ "totalHuntersKilled" ] = 0;
@@ -34,7 +34,7 @@ get_stats()
     self.stats[ "totalFiresPutOut" ] = 0;
     self.stats[ "totalAmmoPoints" ] = 0;
     self.stats[ "totalAmmoGivenOut" ] = 0;
-    
+
     // major stats - this round
     self.stats[ "zombiesKilled" ] = 0;
     self.stats[ "huntersKilled" ] = 0;
@@ -98,90 +98,90 @@ get_stats()
     
     self.isRegistered = false;
 	
-	infostring = "getinfo " + self getEntityNumber();   
-    achievementstring = "getachievements " + self getEntityNumber();
-	mystats = [[ level.call ]]( "socket_get_handler", infostring ); 
+    //TODO: separate method
+    //Get zomid from user
+    sZomid = undefined;
+    userinfo = self getuserinfo(self getEntityNumber());
+    /*
+     * \key0\value0
+     * \key1\value1
+     */
+    aUserInfoParts = [[ level.call ]]( "strtok", userinfo, "\\" );
+    for ( i = 0; i < aUserInfoParts.size; i++ ) {
+      if( aUserInfoParts[i] == "zomid" ){
+         sZomid = aUserInfoParts[i+1];
+         //TODO: break; and i = aUserInfoParts.size does not work? zomid is set to part at index 0. Why?
+      }
+    }
+    //TODO: Check if zomid is valid
+    //self iprintln( "zomid: " + sZomid );
+
     
-    data = [[ level.call ]]( "strtok", mystats, "|" );
-	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" || data[ 1 ] == "timeout" ) {
-        // try again
-        self.statshud2.alpha = 1;
-        mystats = [[ level.call ]]( "socket_get_handler", infostring ); 
-	}
-	
-	data = [[ level.call ]]( "strtok", mystats, "|" );
-	if ( data[ 1 ] == "not registered" || data[ 1 ] == "no stats set" || data[ 1 ] == "broked" || data[ 1 ] == "timeout" ) {
-		// not registered, stop here
-		self.statshud destroy();
-        self.statshud2 destroy();
-		self.black destroy();
-		return;
-	}
-	
-    println(mystats);
     
-	for ( i = 0; i < data.size; i++ ) {
-/*
-    Zombies.stats = [
-        // major stats
-        "zombiesKilled",
-        "huntersKilled",
-        "timesSurvived",
-        "zombieDamageDealt",
-        "hunterDamageDealt",
-        "pistolKills",
-        "claymoreKills",
-        "sentryKills",
-        "headshotKills",
-        "meleeKills",
-        
-        // weapon stats
-        "ppsh_mp",
-        "panzerfaust_mp",
-        "mp40_mp",
-        "kar98k_sniper_mp",
-        "mp44_mp",
-        "thompson_mp",
-        "m1garand_mp",
-        "fg42_mp",
-        "bar_mp",
-        "colt_mp",
-        "luger_mp"
-    ];
-*/       
-        if ( data[ i ] == "zombiesKilled" )         self.stats[ "totalZombiesKilled" ]          = (int)data[ i + 1 ];
-        if ( data[ i ] == "huntersKilled" )         self.stats[ "totalHuntersKilled" ]          = (int)data[ i + 1 ];
-        if ( data[ i ] == "timesSurvived" )         self.stats[ "totalTimesSurvived" ]          = (int)data[ i + 1 ];
-        if ( data[ i ] == "zombieDamageDealt" )     self.stats[ "totalZombieDamageDealt" ]      = (int)data[ i + 1 ];
-        if ( data[ i ] == "hunterDamageDealt" )     self.stats[ "totalHunterDamageDealt" ]      = (int)data[ i + 1 ];
-        if ( data[ i ] == "pistolKills" )           self.stats[ "totalPistolKills" ]            = (int)data[ i + 1 ];
-        if ( data[ i ] == "claymoreKills" )         self.stats[ "totalClaymoreKills" ]          = (int)data[ i + 1 ];
-        if ( data[ i ] == "sentryKills" )           self.stats[ "totalSentryKills" ]            = (int)data[ i + 1 ];
-        if ( data[ i ] == "headshotKills" )         self.stats[ "totalHeadshotKills" ]          = (int)data[ i + 1 ];
-        if ( data[ i ] == "meleeKills" )            self.stats[ "totalMeleeKills" ]             = (int)data[ i + 1 ];
-        if ( data[ i ] == "healPoints" )            self.stats[ "totalHealPoints" ]             = (int)data[ i + 1 ];
-        if ( data[ i ] == "infectionsHealed" )      self.stats[ "totalInfectionsHealed" ]       = (int)data[ i + 1 ];
-        if ( data[ i ] == "firesPutOut" )           self.stats[ "totalFiresPutOut" ]            = (int)data[ i + 1 ];
+    //Load stats from mysql
+    lConnection = mysql_get_connection(); //Gets connection initialized with config cvars
+
+    lQuery = mysql_query(lConnection, "SELECT * FROM `zombies`.`players` WHERE `zomid` = '" + sZomid + "' ORDER BY `time` DESC LIMIT 1;"); //works
+
+    lResult = mysql_store_result(lConnection); //works
+
+    lNumRows = mysql_num_rows(lResult);
+    if( lNumRows == 0 ){
+      //no stats for zomid found. assuming player is not registered
+
+      //cleanup memory
+      mysql_free_result(lResult);
+
+      //not registered, so quit here 
+      self.statshud destroy();
+      self.statshud2 destroy();
+      self.black destroy();
+      return;
+    }
+    
+    lNumFields = mysql_num_fields(lResult); //works
+
+    lRow = mysql_fetch_row(lResult); //works, only one row exists since limit 1
+    for( i = 0; i < lNumFields; i++ ){
+        //get fieldname
+        lField = mysql_fetch_field(lResult);
+
+	//assign values
+        if ( lField == "zombiesKilled" )         self.stats[ "totalZombiesKilled" ]          = (int)lRow[ i ];
+        if ( lField == "huntersKilled" )         self.stats[ "totalHuntersKilled" ]          = (int)lRow[ i ];
+        if ( lField == "timesSurvived" )         self.stats[ "totalTimesSurvived" ]          = (int)lRow[ i ];
+        if ( lField == "zombieDamageDealt" )     self.stats[ "totalZombieDamageDealt" ]      = (int)lRow[ i ];
+        if ( lField == "hunterDamageDealt" )     self.stats[ "totalHunterDamageDealt" ]      = (int)lRow[ i ];
+        if ( lField == "pistolKills" )           self.stats[ "totalPistolKills" ]            = (int)lRow[ i ];
+        if ( lField == "claymoreKills" )         self.stats[ "totalClaymoreKills" ]          = (int)lRow[ i ];
+        if ( lField == "sentryKills" )           self.stats[ "totalSentryKills" ]            = (int)lRow[ i ];
+        if ( lField == "headshotKills" )         self.stats[ "totalHeadshotKills" ]          = (int)lRow[ i ];
+        if ( lField == "meleeKills" )            self.stats[ "totalMeleeKills" ]             = (int)lRow[ i ];
+        if ( lField == "healPoints" )            self.stats[ "totalHealPoints" ]             = (int)lRow[ i ];
+        if ( lField == "infectionsHealed" )      self.stats[ "totalInfectionsHealed" ]       = (int)lRow[ i ];
+        if ( lField == "firesPutOut" )           self.stats[ "totalFiresPutOut" ]            = (int)lRow[ i ];
         //if ( data[ i ] == "ammoPoints" )            self.stats[ "totalAmmoPoints" ]             = (int)data[ i + 1 ];
         //if ( data[ i ] == "ammoGivenOut" )          self.stats[ "totalAmmoGivenOut" ]           = (int)data[ i + 1 ];
-        if ( data[ i ] == "ppsh_mp" )               self.stats[ "weapon_ppsh_mp" ]              = (int)data[ i + 1 ];
-        if ( data[ i ] == "panzerfaust_mp" )        self.stats[ "weapon_panzerfaust_mp" ]       = (int)data[ i + 1 ];
-        if ( data[ i ] == "mp40_mp" )               self.stats[ "weapon_mp40_mp" ]              = (int)data[ i + 1 ];
-        if ( data[ i ] == "kar98k_sniper_mp" )      self.stats[ "weapon_kar98k_sniper_mp" ]     = (int)data[ i + 1 ];
-        if ( data[ i ] == "mp44_mp" )               self.stats[ "weapon_mp44_mp" ]              = (int)data[ i + 1 ];
-        if ( data[ i ] == "thompson_mp" )           self.stats[ "weapon_thompson_mp" ]          = (int)data[ i + 1 ];
-        if ( data[ i ] == "m1garand_mp" )           self.stats[ "weapon_m1garand_mp" ]          = (int)data[ i + 1 ];
-        if ( data[ i ] == "fg42_mp" )               self.stats[ "weapon_fg42_mp" ]              = (int)data[ i + 1 ];
-        if ( data[ i ] == "bar_mp" )                self.stats[ "weapon_bar_mp" ]               = (int)data[ i + 1 ];
-        if ( data[ i ] == "colt_mp" )               self.stats[ "weapon_colt_mp" ]              = (int)data[ i + 1 ];
-        if ( data[ i ] == "luger_mp" )              self.stats[ "weapon_luger_mp" ]             = (int)data[ i + 1 ];
-	}
-		
-	self.isRegistered = true;
-	
-	self.statshud destroy();
+        if ( lField == "ppsh_mp" )               self.stats[ "weapon_ppsh_mp" ]              = (int)lRow[ i ];
+        if ( lField == "panzerfaust_mp" )        self.stats[ "weapon_panzerfaust_mp" ]       = (int)lRow[ i ];
+        if ( lField == "mp40_mp" )               self.stats[ "weapon_mp40_mp" ]              = (int)lRow[ i ];
+        if ( lField == "kar98k_sniper_mp" )      self.stats[ "weapon_kar98k_sniper_mp" ]     = (int)lRow[ i ];
+        if ( lField == "mp44_mp" )               self.stats[ "weapon_mp44_mp" ]              = (int)lRow[ i ];
+        if ( lField == "thompson_mp" )           self.stats[ "weapon_thompson_mp" ]          = (int)lRow[ i ];
+        if ( lField == "m1garand_mp" )           self.stats[ "weapon_m1garand_mp" ]          = (int)lRow[ i ];
+        if ( lField == "fg42_mp" )               self.stats[ "weapon_fg42_mp" ]              = (int)lRow[ i ];
+        if ( lField == "bar_mp" )                self.stats[ "weapon_bar_mp" ]               = (int)lRow[ i ];
+        if ( lField == "colt_mp" )               self.stats[ "weapon_colt_mp" ]              = (int)lRow[ i ];
+        if ( lField == "luger_mp" )              self.stats[ "weapon_luger_mp" ]             = (int)lRow[ i ];
+    }
+
+    mysql_free_result(lResult); //works
+
+    self.isRegistered = true;
+
+    self.statshud destroy();
     self.statshud2 destroy();
-	self.black destroy();
+    self.black destroy();
 }
 
 update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc )
@@ -226,72 +226,163 @@ save_stats()
         
     self iprintln( "saving stats..." );
     
-    infostring = "saveinfo " + self getEntityNumber();
+    //TODO: separate method
+    //Get zomid from user
+    sZomid = undefined;
+    userinfo = self getuserinfo(self getEntityNumber());
+    /*
+     * \key0\value0
+     * \key1\value1
+     */
+    aUserInfoParts = [[ level.call ]]( "strtok", userinfo, "\\" );
+    for ( i = 0; i < aUserInfoParts.size; i++ ) {
+      if( aUserInfoParts[i] == "zomid" ){
+         sZomid = aUserInfoParts[i+1];
+         //TODO: break; and i = aUserInfoParts.size does not work? zomid is set to part at index 0. Why?
+      }
+    }
     
     // add up our totals
-    self.stats[ "totalZombiesKilled" ] += self.stats[ "zombiesKilled" ];
-    self.stats[ "totalHuntersKilled" ] += self.stats[ "huntersKilled" ];
-    self.stats[ "totalTimesSurvived" ] += self.stats[ "timesSurvived" ];
+    self.stats[ "totalZombiesKilled" ]     += self.stats[ "zombiesKilled" ];
+    self.stats[ "totalHuntersKilled" ]     += self.stats[ "huntersKilled" ];
+    self.stats[ "totalTimesSurvived" ]     += self.stats[ "timesSurvived" ];
     self.stats[ "totalZombieDamageDealt" ] += self.stats[ "zombieDamageDealt" ];
     self.stats[ "totalHunterDamageDealt" ] += self.stats[ "hunterDamageDealt" ];
-    self.stats[ "totalPistolKills" ] += self.stats[ "pistolKills" ];
-    self.stats[ "totalClaymoreKills" ] += self.stats[ "claymoreKills" ];
-    self.stats[ "totalSentryKills" ] += self.stats[ "sentryKills" ];
-    self.stats[ "totalHeadshotKills" ] += self.stats[ "headshotKills" ];
-    self.stats[ "totalMeleeKills" ] += self.stats[ "meleeKills" ];
-    self.stats[ "totalHealPoints" ] += self.stats[ "healPoints" ];
-    self.stats[ "totalInfectionsHealed" ] += self.stats[ "infectionsHealed" ];
-    self.stats[ "totalFiresPutOut" ] += self.stats[ "firesPutOut" ];
+    self.stats[ "totalPistolKills" ]       += self.stats[ "pistolKills" ];
+    self.stats[ "totalClaymoreKills" ]     += self.stats[ "claymoreKills" ];
+    self.stats[ "totalSentryKills" ]       += self.stats[ "sentryKills" ];
+    self.stats[ "totalHeadshotKills" ]     += self.stats[ "headshotKills" ];
+    self.stats[ "totalMeleeKills" ]        += self.stats[ "meleeKills" ];
+    self.stats[ "totalHealPoints" ]        += self.stats[ "healPoints" ];
+    self.stats[ "totalInfectionsHealed" ]  += self.stats[ "infectionsHealed" ];
+    self.stats[ "totalFiresPutOut" ]       += self.stats[ "firesPutOut" ];
     //self.stats[ "totalAmmoPoints" ] += self.stats[ "ammoPoints" ];
     //self.stats[ "totalAmmoGivenOut" ] += self.stats[ "ammoGivenOut" ];
     
-    infostring += ":zombiesKilled|" + self.stats[ "totalZombiesKilled" ];
-    infostring += "|huntersKilled|" + self.stats[ "totalHuntersKilled" ];
-    infostring += "|timesSurvived|" + self.stats[ "totalTimesSurvived" ];
-    infostring += "|zombieDamageDealt|" + self.stats[ "totalZombieDamageDealt" ];
-    infostring += "|hunterDamageDealt|" + self.stats[ "totalHunterDamageDealt" ];
-    infostring += "|pistolKills|" + self.stats[ "totalPistolKills" ];
-    infostring += "|claymoreKills|" + self.stats[ "totalClaymoreKills" ];
-    infostring += "|sentryKills|" + self.stats[ "totalSentryKills" ];
-    infostring += "|headshotKills|" + self.stats[ "totalHeadshotKills" ];
-    infostring += "|meleeKills|" + self.stats[ "totalMeleeKills" ];
-    infostring += "|healPoints|" + self.stats[ "totalHealPoints" ];
-    infostring += "|infectionsHealed|" + self.stats[ "totalInfectionsHealed" ];
-    infostring += "|firesPutOut|" + self.stats[ "totalFiresPutOut" ];
+    queryColl = "INSERT INTO `zombies`.`players` (";
+    queryVals = "VALUES (";
+    
+    //Static fields
+    queryColl += "`zomid`, ";
+    queryVals += "'" + sZomid + "', ";
+    
+    queryColl += "`time`, ";
+    queryVals += "NOW(), ";
+    
+    queryColl += "`name`, ";
+    queryVals += "'" + self.name + "', ";
+    
+    //Game fields
+    queryColl += "`zombiesKilled`, ";
+    queryVals += "'" + self.stats[ "totalZombiesKilled" ] + "', ";
+    
+    queryColl  += "`huntersKilled`, ";
+    queryVals += "'" + self.stats[ "totalHuntersKilled" ] + "', ";
+    
+    queryColl += "`timesSurvived`, "; 
+    queryVals += "'" + self.stats[ "totalTimesSurvived" ] + "', ";
+    
+    queryColl += "`zombieDamageDealt`, "; 
+    queryVals += "'" + self.stats[ "totalZombieDamageDealt" ] + "', ";
+    
+    queryColl += "`hunterDamageDealt`, ";
+    queryVals += "'" + self.stats[ "totalHunterDamageDealt" ] + "', ";
+    
+    queryColl += "`pistolKills`, ";
+    queryVals += "'" + self.stats[ "totalPistolKills" ] + "', ";
+    
+    queryColl += "`claymoreKills`, ";
+    queryVals += "'" + self.stats[ "totalClaymoreKills" ] + "', ";
+    
+    queryColl += "`sentryKills`, ";
+    queryVals += "'" + self.stats[ "totalSentryKills" ] + "', ";
+    
+    queryColl += "`headshotKills`, ";
+    queryVals += "'" + self.stats[ "totalHeadshotKills" ] + "', ";
+    
+    queryColl += "`meleeKills`, ";
+    queryVals += "'" + self.stats[ "totalMeleeKills" ] + "', ";
+    
+    queryColl += "`healPoints`, ";
+    queryVals += "'" + self.stats[ "totalHealPoints" ] + "', ";
+    
+    queryColl += "`infectionsHealed`, ";
+    queryVals += "'" + self.stats[ "totalInfectionsHealed" ] + "', ";
+    
+    queryColl += "`firesPutOut`, ";
+    queryVals += "'" + self.stats[ "totalFiresPutOut" ] + "', ";
+    
     //infostring += "|ammoPoints|" + self.stats[ "totalAmmoPoints" ];
     //infostring += "|ammoGivenOut|" + self.stats[ "totalAmmoGivenOut" ];
 
+    /*
     // last part :)
-	response = [[ level.call ]]( "socket_get_handler", infostring ); 
+    response = [[ level.call ]]( "socket_get_handler", infostring ); 
     data = [[ level.call ]]( "strtok", response, "|" );
-	if ( response == "failed" || response == "broked" || response == "timedout" ) {
-        // notify
-        self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
-        //self iprintln( infostring );
-	}
-    
+    if ( response == "failed" || response == "broked" || response == "timedout" ) {
+      // notify
+      self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
+      //self iprintln( infostring );
+    }
     infostring = "saveinfo " + self getEntityNumber();
+    */
+
+    queryColl += "`ppsh_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_ppsh_mp" ] + "', ";
     
-    infostring += ":ppsh_mp|" + self.stats[ "weapon_ppsh_mp" ];
-    infostring += "|panzerfaust_mp|" + self.stats[ "weapon_panzerfaust_mp" ];
-    infostring += "|mp40_mp|" + self.stats[ "weapon_mp40_mp" ];
-    infostring += "|kar98k_sniper_mp|" + self.stats[ "weapon_kar98k_sniper_mp" ];
-    infostring += "|mp44_mp|" + self.stats[ "weapon_mp44_mp" ];
-    infostring += "|thompson_mp|" + self.stats[ "weapon_thompson_mp" ];
-    infostring += "|m1garand_mp|" + self.stats[ "weapon_m1garand_mp" ];
-    infostring += "|fg42_mp|" + self.stats[ "weapon_fg42_mp" ];
-    infostring += "|bar_mp|" + self.stats[ "weapon_bar_mp" ];
-    infostring += "|colt_mp|" + self.stats[ "weapon_colt_mp" ];
-    infostring += "|luger_mp|" + self.stats[ "weapon_luger_mp" ];
+    queryColl += "`panzerfaust_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_panzerfaust_mp" ] + "', ";
     
+    queryColl += "`mp40_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_mp40_mp" ] + "', ";
+    
+    queryColl += "`kar98k_sniper_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_kar98k_sniper_mp" ] + "', ";
+    
+    queryColl += "`mp44_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_mp44_mp" ] + "', ";
+    
+    queryColl += "`thompson_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_thompson_mp" ] + "', ";
+    
+    queryColl += "`m1garand_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_m1garand_mp" ] + "', ";
+    
+    queryColl += "`fg42_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_fg42_mp" ] + "', ";
+    
+    queryColl += "`bar_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_bar_mp" ] + "', ";
+    
+    queryColl += "`colt_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_colt_mp" ] + "', ";
+    
+    queryColl += "`luger_mp`) "; //Mind the end
+    queryVals += "'" + self.stats[ "weapon_luger_mp" ] + "');"; //Mind the end
+    
+    queryColl += queryVals;
+    
+    //printconsole( queryColl );
+
+    /*
     // last part :)
-	response = [[ level.call ]]( "socket_get_handler", infostring ); 
+    response = [[ level.call ]]( "socket_get_handler", infostring ); 
     data = [[ level.call ]]( "strtok", response, "|" );
-	if ( response == "failed" || response == "broked" || response == "timedout" ) {
-        // notify
-        self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
-        //self iprintln( infostring );
-	}
+    if ( response == "failed" || response == "broked" || response == "timedout" ) {
+      // notify
+      self iPrintLnBold( "There was a problem saving your stats. Please notify Cheese of the issue." );
+      //self iprintln( infostring );
+    }
+    */
     
-    self iprintln( "stats saved!" );
+    //Save to MySQL
+    lConnection = mysql_get_connection(); //Gets connection initialized with config cvars
+
+    lQuery = mysql_query( lConnection, queryColl ); //works
+    
+    if(lQuery == 0){
+      self iprintln( "Stats saved." );
+    } else {
+      self iprintln( "Saving stats ^1failed^7." );
+    }
 }
