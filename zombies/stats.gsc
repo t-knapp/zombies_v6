@@ -193,7 +193,10 @@ update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vD
     // don't update if the attacker was themselves
     if ( player == eAttacker )
         return;
-        
+    
+    //Axis   = hunters
+    //Allies = zombies
+    
     // melee/headshot kills
     if ( sMeansOfDeath == "MOD_MELEE" )
         eAttacker.stats[ "meleeKills" ]++;
@@ -203,8 +206,9 @@ update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vD
     // team-specific checks
     if ( eAttacker.pers[ "team" ] == "axis" )
     {
-        if ( player.pers[ "team" ] == "allies" )
+        if ( player.pers[ "team" ] == "allies" ){
             eAttacker.stats[ "zombiesKilled" ]++;
+	}
             
         if ( isDefined( eAttacker.stats[ "weapon_" + sWeapon ] ) )
             eAttacker.stats[ "weapon_" + sWeapon ]++;
@@ -214,8 +218,13 @@ update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vD
     }
     else if ( eAttacker.pers[ "team" ] == "allies" )
     {
-        if ( player.pers[ "team" ] == "axis" )
-            eAttacker.stats[ "huntersKilled" ]++;
+        //this is always false b.c. if player dies, he immediately changes pers to allies (zombies)
+        //Workaround: assume when pers is allies, this player was a hunter before.
+        //Another assumption: If player dies (this function is called if he dies) and 
+        //attacker is allies (zombie) then, increase attackers score.
+        //if ( player.pers[ "team" ] == "axis" ){ 
+        eAttacker.stats[ "huntersKilled" ]++;
+        //}
     }
 }
 
