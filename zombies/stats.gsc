@@ -269,6 +269,15 @@ save_stats()
     //self.stats[ "totalAmmoPoints" ] += self.stats[ "ammoPoints" ];
     //self.stats[ "totalAmmoGivenOut" ] += self.stats[ "ammoGivenOut" ];
     
+    //Calculate points	
+    points = 0;
+    points += self.stats[ "totalZombieDamageDealt" ];
+    points += self.stats[ "totalHunterDamageDealt" ];
+    points += (self.stats[ "totalZombiesKilled" ] * 10);
+    points += (self.stats[ "totalHuntersKilled" ] * 50);
+    //points += self.stats[ "totalAmmoPoints" ];
+    //points += self.stats[ "totalAmmoGivenOut" ];
+    
     //Header
     queryColl = "INSERT INTO `zombies`.`players` (";
     queryVals = "VALUES (";
@@ -282,6 +291,8 @@ save_stats()
     
     queryColl += "`name`, ";
     queryVals += "'" + self.name + "', ";
+    
+    //TODO: Add map
     
     //Game fields
     queryColl += "`zombiesKilled`, ";
@@ -356,8 +367,11 @@ save_stats()
     queryColl += "`colt_mp`, ";
     queryVals += "'" + self.stats[ "weapon_colt_mp" ] + "', ";
     
-    queryColl += "`luger_mp`) "; //Mind the end
-    queryVals += "'" + self.stats[ "weapon_luger_mp" ] + "');"; //Mind the end
+    queryColl += "`luger_mp`, ";
+    queryVals += "'" + self.stats[ "weapon_luger_mp" ] + "', ";
+    
+    queryColl += "`points`) "; //Mind the end
+    queryVals += "'" + points + "');"; //Mind the end
     
     queryColl += queryVals;
     
