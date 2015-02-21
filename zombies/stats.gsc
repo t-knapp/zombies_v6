@@ -278,6 +278,10 @@ save_stats()
     //points += self.stats[ "totalAmmoPoints" ];
     //points += self.stats[ "totalAmmoGivenOut" ];
     
+    //Escape playername
+    lConnection = mysql_get_connection(); //Gets connection initialized with config cvars
+    escapedName = mysql_real_escape_string(lConnection, self.name);
+    
     //Header
     queryColl = "INSERT INTO `zombies`.`stats` (";
     queryVals = "VALUES (";
@@ -289,8 +293,9 @@ save_stats()
     queryColl += "`time`, ";
     queryVals += "NOW(), ";
     
+    
     queryColl += "`name`, ";
-    queryVals += "'" + self.name + "', ";
+    queryVals += "'" + escapedName + "', ";
 
     //Add map
     queryColl += "`map`, ";
@@ -380,7 +385,7 @@ save_stats()
     //printconsole( queryColl );
     
     //Save to MySQL
-    lConnection = mysql_get_connection(); //Gets connection initialized with config cvars
+    //lConnection = mysql_get_connection(); //Gets connection initialized with config cvars
 
     lQuery = mysql_query( lConnection, queryColl ); //works
     
