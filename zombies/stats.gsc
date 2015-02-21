@@ -291,9 +291,11 @@ save_stats()
     
     queryColl += "`name`, ";
     queryVals += "'" + self.name + "', ";
-    
-    //TODO: Add map
-    
+
+    //Add map
+    queryColl += "`map`, ";
+    queryVals += "'" + level.sMapName + "', ";
+
     //Game fields
     queryColl += "`zombiesKilled`, ";
     queryVals += "'" + self.stats[ "totalZombiesKilled" ] + "', ";
