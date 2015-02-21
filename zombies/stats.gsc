@@ -122,7 +122,7 @@ get_stats()
     //Load stats from mysql
     lConnection = mysql_get_connection(); //Gets connection initialized with config cvars
 
-    lQuery = mysql_query(lConnection, "SELECT * FROM `zombies`.`players` WHERE `zomid` = '" + sZomid + "' ORDER BY `time` DESC LIMIT 1;"); //works
+    lQuery = mysql_query(lConnection, "SELECT * FROM `zombies`.`stats` WHERE `zomid` = '" + sZomid + "' ORDER BY `time` DESC LIMIT 1;"); //works
 
     lResult = mysql_store_result(lConnection); //works
 
@@ -270,7 +270,7 @@ save_stats()
     //self.stats[ "totalAmmoGivenOut" ] += self.stats[ "ammoGivenOut" ];
     
     //Header
-    queryColl = "INSERT INTO `zombies`.`players` (";
+    queryColl = "INSERT INTO `zombies`.`stats` (";
     queryVals = "VALUES (";
     
     //Static fields
