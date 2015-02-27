@@ -240,8 +240,12 @@ end_map( sWinner )
         
         for ( i = 0; i < aPlayers.size; i++ )
         {
+	    //TODO: Only increase hunters timesSurvived - TODO: Test
             ePlayer = aPlayers[ i ];
-            ePlayer.stats[ "timesSurvived" ]++;
+	    
+	    if( ePlayer.pers[ "team" ] == "axis" ){
+                ePlayer.stats[ "timesSurvived" ]++;
+	    }
         }
         
         wait 2;
