@@ -87,7 +87,7 @@ init()
     [[ level.call ]]( "precache", "xmodel/mg42_bipod", "model" );
     
     //        <team>        <localized>     <string>                <description>                                                   line break|                                                              line break|                                                              line break|
-    addClass( "hunters",    &"Default",     "default",              &"To access more classes, visit http://1.1zombies.com and register! It's free!", &"" );
+    addClass( "hunters",    &"Default",     "default",              &"To access more classes, visit http://codzombies.de and register! It's free!", &"" );
     addClass( "hunters",    &"Recon",       "scout",                &"The recon is a fast hunter with the ability to double jump and a shotgun\nthat does massive damage at close range.", &"Health: 125\nMove Speed: 1.3x" );
     addClass( "hunters",    &"Explosives Expert",     "soldier",    &"The Explosives Expert is an explosives specialist with a panzerfaust and\nan MP40. He can destroy entire groups of zombies with splash damage from\nhis panzerfaust and grenades and then switch to his mp40 for personal\ndefence.", &"Health: 200\nMove Speed: 1x" );
     addClass( "hunters",    &"Sharpshooter",      "sniper",         &"The Sharpshooter is a fast moving, long range assassin. Able to take out\nmany zombies in 1 hit with his sniper, he also does massive damage with a\nheadshot. He also has the ability to place claymore mines in key positions\nto prevent zombies from rushing in.", &"" );
@@ -98,13 +98,13 @@ init()
     addClass( "hunters",    &"Random",      "random",               &"Let the game decide a class for you.", &"Will be determined once spawned." );
     
     //        <team>        <localized>     <string>    <description>                                                   line break|                                                              line break|                                                              line break|
-    addClass( "zombies",    &"Default",     "default",  &"To access more classes, visit http://1.1zombies.com and register! It's free!", &"" );
-	addClass( "zombies",    &"Fast",        "fast",     &"The fast zombie is the fastest zombie in the game. Able to quickly get in and\nout of a crowd of hunters, this zombie is very good for hit and run tactics. But\nwatch out! This class also has the lowest health of any zombie in the game.", &"Health: 150\nMove Speed: 1.5x" );
-	addClass( "zombies",    &"Inferno",     "inferno",  &"FIRE! This zombie really turns up the heat with its intense flames. It can\neven turn it up more by hitting hunters with its Springfield and finishing\nthem off by setting them on fire.", &"Health: 200\nMove Speed: 1.0x" );
-	addClass( "zombies",    &"Jumper",      "jumper",   &"Lurking on all the high places, this zombie brings a new meaning to the\nterm \"airstrike\". Able to jump high into the air it can land in a group of\nhunters and do a lot of damage.", &"Health: 200\nMove Speed: 1.0x" );
-	addClass( "zombies",    &"Poison",      "poison",   &"The poison zombie is one powerful but slow moving being. Able to one hit\nmany hunters with its Bren, this zombie can also poison hunters for even\nmore added damage.", &"Health: 300\nMove Speed: 0.9x" );
-	addClass( "zombies",    &"Shocker",     "shocker",  &"This electrifying zombie can really amp up the competition. Able to slow\ndown hunters by shocking them, as well as disabling sentry turrets, this\nzombie can be an excellent supporting class.", &"Health: 200\nMove Speed: 1.0x" );
-	addClass( "zombies",    &"Random",      "random",   &"Let the game decide a class for you.", &"Will be determined once spawned." );
+    addClass( "zombies",    &"Default",     "default",  &"To access more classes, visit http://codzombies.de and register! It's free!", &"" );
+    addClass( "zombies",    &"Fast",        "fast",     &"The fast zombie is the fastest zombie in the game. Able to quickly get in and\nout of a crowd of hunters, this zombie is very good for hit and run tactics. But\nwatch out! This class also has the lowest health of any zombie in the game.", &"Health: 150\nMove Speed: 1.5x" );
+    addClass( "zombies",    &"Inferno",     "inferno",  &"FIRE! This zombie really turns up the heat with its intense flames. It can\neven turn it up more by hitting hunters with its Springfield and finishing\nthem off by setting them on fire.", &"Health: 200\nMove Speed: 1.0x" );
+    addClass( "zombies",    &"Jumper",      "jumper",   &"Lurking on all the high places, this zombie brings a new meaning to the\nterm \"airstrike\". Able to jump high into the air it can land in a group of\nhunters and do a lot of damage.", &"Health: 200\nMove Speed: 1.0x" );
+    addClass( "zombies",    &"Poison",      "poison",   &"The poison zombie is one powerful but slow moving being. Able to one hit\nmany hunters with its Bren, this zombie can also poison hunters for even\nmore added damage.", &"Health: 300\nMove Speed: 0.9x" );
+    addClass( "zombies",    &"Shocker",     "shocker",  &"This electrifying zombie can really amp up the competition. Able to slow\ndown hunters by shocking them, as well as disabling sentry turrets, this\nzombie can be an excellent supporting class.", &"Health: 200\nMove Speed: 1.0x" );
+    addClass( "zombies",    &"Random",      "random",   &"Let the game decide a class for you.", &"Will be determined once spawned." );
 }
 
 addClass( team, lName, sName, lDescription, lPerks ) 

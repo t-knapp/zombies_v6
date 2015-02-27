@@ -55,7 +55,7 @@ init()
 	precacheObject( &"Press [{+activate}] to spawn", "string" );
 	precacheObject( &"Description:\n    ", "string" );
 	precacheObject( &"Perks:\n", "string" );
-	precacheObject( &"^3You need to be registered to have access\nto the other classes listed here.\n\nRegister now at www.1.1zombies.com!", "string" );
+	precacheObject( &"^3You need to be registered to have access\nto the other classes listed here.\n\nRegister now at http://codzombies.de!", "string" );
     precacheObject( &"MPSCRIPT_PRESS_ACTIVATE_TO_RESPAWN", "string" );
     precacheObject( &"^7Players needed until game starts: ^1", "string" );
     precacheObject( &"^7Game starts in: ^2", "string" );
