@@ -13,6 +13,7 @@ init()
     
     [[ level.call ]]( "precache", &"^3Retrieving stats...", "string" );
     [[ level.call ]]( "precache", &"^3This is taking longer than usual...", "string" );
+    [[ level.call ]]( "precache", &"^1You are not registered! ^7Register for free at ^1codzombies.de^7!" );
 }
 
 get_stats()
@@ -129,6 +130,15 @@ get_stats()
     lNumRows = mysql_num_rows(lResult);
     if( lNumRows == 0 ){
         //no stats for zomid found. assuming player is not registered
+        //Show hint in hud
+        self.hud_notReg = newClientHudElem( self );
+	self.hud_notReg.x = 320;
+	self.hud_notReg.y = 10;
+	self.hud_notReg.alignx = "center";
+	self.hud_notReg.aligny = "middle";
+	self.hud_notReg setText( &"^1You are not registered! ^7Register for free at ^1codzombies.de^7!" );
+	self.hud_notReg.fontscale = 1;
+	self.hud_notReg.sort = 9021;
 
         //cleanup memory
         mysql_free_result(lResult);
@@ -234,7 +244,7 @@ save_stats()
     if ( !self.isRegistered )
         return;
         
-    self iprintln( "saving stats..." );
+    self iprintln( "Saving stats ..." );
     
     //TODO: separate method
     //Get zomid from user
@@ -390,7 +400,7 @@ save_stats()
     lQuery = mysql_query( lConnection, queryColl ); //works
     
     if(lQuery == 0){
-      self iprintln( "Stats saved." );
+      self iprintln( "Stats ^3saved^7." );
     } else {
       self iprintln( "Saving stats ^1failed^7." );
     }
