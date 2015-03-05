@@ -1,8 +1,10 @@
 init()
 {
-    [[ level.call ]]( "precache", &"^1zomb^7ies ^2beta", "string" );
-    [[ level.call ]]( "precache", &"mod by ^3cheese", "string" );
-    [[ level.call ]]( "precache", &"xfire^2:^7 thecheeseman999", "string" );
+    [[ level.call ]]( "precache", &"^1codzombies.de ^7STATSAVE", "string" );
+    [[ level.call ]]( "precache", &"forked from ^3cheese^7's beta_v6", "string" );
+    [[ level.call ]]( "precache", &"Stats getting saved if you are registered!", "string" );
+    [[ level.call ]]( "precache", &"^1Register at ^7codzombies.de", "string" );
+    
 }
 
 main()
@@ -18,7 +20,7 @@ main()
 	while ( 1 )
 	{
 		level.logo.alpha = 0;
-		level.logo setText( &"^1zomb^7ies ^2beta" );
+		level.logo setText( &"^1codzombies.de ^7STATSAVE" );
 		level.logo fadeOverTime( 2 );
 		level.logo.alpha = 1;
 		
@@ -29,7 +31,7 @@ main()
 		
 		wait 2;
 		
-		level.logo setText( &"mod by ^3cheese" );
+		level.logo setText( &"forked from ^3cheese^7's beta_v6" );
 		level.logo fadeOverTime( 2 );
 		level.logo.alpha = 1;
 		
@@ -40,7 +42,19 @@ main()
 		
 		wait 2;
 		
-		level.logo setText( &"xfire^2:^7 thecheeseman999" );
+		level.logo setText( &"Stats getting saved if you are registered!" );
+		level.logo fadeOverTime( 2 );
+		level.logo.alpha = 1;
+		
+		wait 8;
+		
+		level.logo fadeOverTime( 2 );
+		level.logo.alpha = 0;
+		
+		wait 2;
+		
+		//Register
+		level.logo setText( &"^1Register at ^7codzombies.de");
 		level.logo fadeOverTime( 2 );
 		level.logo.alpha = 1;
 		
