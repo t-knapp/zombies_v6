@@ -184,9 +184,11 @@ player_damage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, 
         {
             eAttacker.deaths += finalDamage;
             eAttacker.stats[ "zombieDamageDealt" ] += finalDamage;
+	    eAttacker.stats[ "points" ] += finalDamage;
         }
         else if ( eAttacker.pers[ "team" ] == "axis" )
             eAttacker.stats[ "hunterDamageDealt" ] += finalDamage;
+	    eAttacker.stats[ "points" ] += finalDamage;
     }
 
 	self finishPlayerDamage( eInflictor, eAttacker, finalDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc );

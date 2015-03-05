@@ -27,6 +27,8 @@ init()
     [[ level.call ]]( "precache", &"Ammo points: ", "string" );
     [[ level.call ]]( "precache", &"Bullets given out: ", "string" );
     [[ level.call ]]( "precache", &"^3Spectating is not allowed.", "string" );
+    
+    [[ level.call ]]( "precache", &"^2XP^7: ", "string" );
 }
 
 player_hud()
@@ -44,6 +46,9 @@ player_hud()
     
     self addTextHud( "health", 567, 465, "center", "middle", 1, 0.8, 10, &"" );
     self addTextHud( "class", 630, 415, "right", "middle", 1, 1, 10, &"^2Class^7: " );
+    
+    //Total Points (XP)
+    self addTextHud( "points", 630, 355, "right", "middle", 1,1,10, &"^2XP^7: " );
     
     if ( self.class == "sniper" )
         self addTextHud( "claymores", 630, 400, "right", "middle", 1, 1, 10, &"Claymores: " );
@@ -65,6 +70,7 @@ player_hud()
 
 hud_remove()
 {   
+    if ( isDefined( self.hud[ "points" ] ) )                self.hud[ "points" ] destroy();
     if ( isDefined( self.hud[ "zombieskilled" ] ) )         self.hud[ "zombieskilled" ] destroy();
     if ( isDefined( self.hud[ "hunterskilled" ] ) )         self.hud[ "hunterskilled" ] destroy();
     if ( isDefined( self.hud[ "zombiedamage" ] ) )          self.hud[ "zombiedamage" ] destroy();
@@ -108,8 +114,11 @@ run_hud()
         self.hud[ "headshots" ] setValue( self.stats[ "totalHeadshotKills" ] + self.stats[ "headshotKills" ] );
         self.hud[ "bashes" ] setValue( self.stats[ "totalMeleeKills" ] + self.stats[ "meleeKills" ] );
         
+        //XP
+        self.hud[ "points" ] setValue( (self.stats[ "totalPoints" ] + self.stats[ "points" ]) );
+
         self.hud[ "health" ] setValue( self.health );
-        
+
         if ( self.class == "sniper" )
             self.hud[ "claymores" ] setValue( self.claymores );
         else if ( self.class == "medic" )

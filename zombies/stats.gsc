@@ -21,6 +21,7 @@ get_stats()
     self.stats = [];
 
     // major stats - totals
+    self.stats[ "totalPoints" ]            = 0;
     self.stats[ "totalZombiesKilled" ]     = 0;
     self.stats[ "totalHuntersKilled" ]     = 0;
     self.stats[ "totalTimesSurvived" ]     = 0;
@@ -38,6 +39,7 @@ get_stats()
     self.stats[ "totalAmmoGivenOut" ]      = 0;
 
     // major stats - this round
+    self.stats[ "points" ]            = 0;
     self.stats[ "zombiesKilled" ]     = 0;
     self.stats[ "huntersKilled" ]     = 0;
     self.stats[ "timesSurvived" ]     = 0;
@@ -158,6 +160,7 @@ get_stats()
         lField = mysql_fetch_field(lResult);
 
         //assign values
+        if ( lField == "points" )                self.stats[ "totalPoints" ]                 = (int)lRow[ i ];
         if ( lField == "zombiesKilled" )         self.stats[ "totalZombiesKilled" ]          = (int)lRow[ i ];
         if ( lField == "huntersKilled" )         self.stats[ "totalHuntersKilled" ]          = (int)lRow[ i ];
         if ( lField == "timesSurvived" )         self.stats[ "totalTimesSurvived" ]          = (int)lRow[ i ];
@@ -219,6 +222,8 @@ update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vD
     {
         if ( player.pers[ "team" ] == "allies" ){
             eAttacker.stats[ "zombiesKilled" ]++;
+	    
+	    eAttacker.stats[ "points" ] += 10; // + 10 XP
 	}
             
         if ( isDefined( eAttacker.stats[ "weapon_" + sWeapon ] ) )
@@ -235,6 +240,7 @@ update_stats( player, eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vD
         //attacker is allies (zombie) then, increase attackers score.
         //if ( player.pers[ "team" ] == "axis" ){ 
         eAttacker.stats[ "huntersKilled" ]++;
+	eAttacker.stats[ "points" ] += 50; // + 50 XP
         //}
     }
 }
@@ -263,6 +269,7 @@ save_stats()
     }
     
     // add up our totals
+    self.stats[ "totalPoints" ]            += self.stats[ "points" ];
     self.stats[ "totalZombiesKilled" ]     += self.stats[ "zombiesKilled" ];
     self.stats[ "totalHuntersKilled" ]     += self.stats[ "huntersKilled" ];
     self.stats[ "totalTimesSurvived" ]     += self.stats[ "timesSurvived" ];
@@ -280,11 +287,11 @@ save_stats()
     //self.stats[ "totalAmmoGivenOut" ] += self.stats[ "ammoGivenOut" ];
     
     //Calculate points	
-    points = 0;
+    /*points = 0;
     points += self.stats[ "totalZombieDamageDealt" ];
     points += self.stats[ "totalHunterDamageDealt" ];
     points += (self.stats[ "totalZombiesKilled" ] * 10);
-    points += (self.stats[ "totalHuntersKilled" ] * 50);
+    points += (self.stats[ "totalHuntersKilled" ] * 50);*/
     //points += self.stats[ "totalAmmoPoints" ];
     //points += self.stats[ "totalAmmoGivenOut" ];
     
@@ -388,7 +395,7 @@ save_stats()
     queryVals += "'" + self.stats[ "weapon_luger_mp" ] + "', ";
     
     queryColl += "`points`) "; //Mind the end
-    queryVals += "'" + points + "');"; //Mind the end
+    queryVals += "'" + self.stats[ "totalPoints" ] + "');"; //Mind the end
     
     queryColl += queryVals;
     
