@@ -34,12 +34,12 @@ player_hud()
     self.hud = [];
     
     self addTextHud( "zombieskilled", 630, 25, "right", "middle", 1, 0.8, 10, &"^1Zombies Killed^7: " );
-	self addTextHud( "hunterskilled", 630, 40, "right", "middle", 1, 0.8, 10, &"^1Hunters Killed^7: " );
-	self addTextHud( "zombiedamage", 630, 55, "right", "middle", 1, 0.8, 10, &"^1Zombie Damage^7: " );
+    self addTextHud( "hunterskilled", 630, 40, "right", "middle", 1, 0.8, 10, &"^1Hunters Killed^7: " );
+    self addTextHud( "zombiedamage", 630, 55, "right", "middle", 1, 0.8, 10, &"^1Zombie Damage^7: " );
     self addTextHud( "zombiedamagek", 637, 55, "right", "middle", 1, 0.8, 10, &"k" );
-	self addTextHud( "hunterdamage", 630, 70, "right", "middle", 1, 0.8, 10, &"^1Hunter Damage^7: " );
+    self addTextHud( "hunterdamage", 630, 70, "right", "middle", 1, 0.8, 10, &"^1Hunter Damage^7: " );
     self addTextHud( "hunterdamagek", 637, 70, "right", "middle", 1, 0.8, 10, &"k" );
-	self addTextHud( "headshots", 630, 85, "right", "middle", 1, 0.8, 10, &"^1Headshots^7: " );
+    self addTextHud( "headshots", 630, 85, "right", "middle", 1, 0.8, 10, &"^1Headshots^7: " );
     self addTextHud( "bashes", 630, 100, "right", "middle", 1, 0.8, 10, &"^1Bashes^7: " );
     
     self addTextHud( "health", 567, 465, "center", "middle", 1, 0.8, 10, &"" );
@@ -132,15 +132,15 @@ run_hud()
 
 addTextHud( name, x, y, alignX, alignY, alpha, fontScale, sort, label )
 {
-	self.hud[ name ] = newClientHudElem( self );
-	self.hud[ name ].x = x;
-	self.hud[ name ].y = y;
-	self.hud[ name ].alignX = alignX;
-	self.hud[ name ].alignY = alignY;
-	self.hud[ name ].alpha = alpha;
-	self.hud[ name ].fontScale = fontScale;
-	self.hud[ name ].sort = sort;
-	self.hud[ name ].label = label;
+    self.hud[ name ] = newClientHudElem( self );
+    self.hud[ name ].x = x;
+    self.hud[ name ].y = y;
+    self.hud[ name ].alignX = alignX;
+    self.hud[ name ].alignY = alignY;
+    self.hud[ name ].alpha = alpha;
+    self.hud[ name ].fontScale = fontScale;
+    self.hud[ name ].sort = sort;
+    self.hud[ name ].label = label;
 }
 
 manage_spectate()
@@ -149,23 +149,23 @@ manage_spectate()
     if ( isDefined( self.spechudtext ) )                    self.spechudtext destroy();
     
     if ( getCvar( "zom_antispec" ) == "1" && ( level.iGameFlags & level.iFLAG_GAME_OVER ) == 0 )
-	{
-		self.spechud = newClientHudElem( self );
-		self.spechud.sort = -2;
-		self.spechud.x = 0;
-		self.spechud.y = 0;
-		self.spechud setShader( "black", 640, 480 );
-		self.spechud.alpha = 1;
-		self.spechud.archived = false;
-		
-		self.spechudtext = newClientHudElem( self );
-		self.spechudtext.sort = -1;
-		self.spechudtext.x = 320;
-		self.spechudtext.y = 220;
-		self.spechudtext.alignx = "center";
-		self.spechudtext.aligny = "middle";
-		self.spechudtext setText( &"^3Spectating is not allowed." );
-		self.spechudtext.alpha = 1;
-		self.spechudtext.archived = false;
-	}
+    {
+        self.spechud = newClientHudElem( self );
+        self.spechud.sort = -2;
+        self.spechud.x = 0;
+        self.spechud.y = 0;
+        self.spechud setShader( "black", 640, 480 );
+        self.spechud.alpha = 1;
+        self.spechud.archived = false;
+
+        self.spechudtext = newClientHudElem( self );
+        self.spechudtext.sort = -1;
+        self.spechudtext.x = 320;
+        self.spechudtext.y = 220;
+        self.spechudtext.alignx = "center";
+        self.spechudtext.aligny = "middle";
+        self.spechudtext setText( &"^3Spectating is not allowed." );
+        self.spechudtext.alpha = 1;
+        self.spechudtext.archived = false;
+    }
 }
