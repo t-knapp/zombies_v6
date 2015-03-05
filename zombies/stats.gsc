@@ -400,7 +400,7 @@ save_stats()
     lQuery = mysql_query( lConnection, queryColl ); //works
     
     if(lQuery == 0){
-      self iprintln( "Stats ^3saved^7." );
+      self iprintln( "Stats ^2saved^7." );
     } else {
       self iprintln( "Saving stats ^1failed^7." );
     }
