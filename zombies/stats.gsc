@@ -135,12 +135,12 @@ get_stats()
         //Show hint in hud
         self.hud_notReg = newClientHudElem( self );
 	self.hud_notReg.x = 320;
-	self.hud_notReg.y = 10;
+	self.hud_notReg.y = 30;
 	self.hud_notReg.alignx = "center";
 	self.hud_notReg.aligny = "middle";
 	self.hud_notReg setText( &"^1You are not registered! ^7Register for free at ^1codzombies.de^7!" );
-	self.hud_notReg.fontscale = 1;
-	self.hud_notReg.sort = 9021;
+	self.hud_notReg.fontscale = 1.5;
+	self.hud_notReg.sort = 9025;
 
         //cleanup memory
         mysql_free_result(lResult);
@@ -160,6 +160,7 @@ get_stats()
         lField = mysql_fetch_field(lResult);
 
         //assign values
+        if ( lField == "name" )                  self.stats[ "lastName" ]                    = lRow[i];
         if ( lField == "points" )                self.stats[ "totalPoints" ]                 = (int)lRow[ i ];
         if ( lField == "zombiesKilled" )         self.stats[ "totalZombiesKilled" ]          = (int)lRow[ i ];
         if ( lField == "huntersKilled" )         self.stats[ "totalHuntersKilled" ]          = (int)lRow[ i ];
@@ -192,6 +193,8 @@ get_stats()
     mysql_free_result(lResult); //works
 
     self.isRegistered = true;
+
+    [[ level.call ]]( "print", "^7Welcome back " + self.name + " ^7aka. " + self.stats[ "lastName" ] );
 
     self.statshud destroy();
     self.statshud2 destroy();
