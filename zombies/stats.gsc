@@ -13,7 +13,13 @@ init()
     
     [[ level.call ]]( "precache", &"^3Retrieving stats...", "string" );
     [[ level.call ]]( "precache", &"^3This is taking longer than usual...", "string" );
-    [[ level.call ]]( "precache", &"^1You are not registered! ^7Register for free at ^1codzombies.de^7!" );
+    [[ level.call ]]( "precache", &"^1You are not registered! ^7Register for free at ^1codzombies.de^7!", "string" );
+
+    [[ level.call ]]( "precache", &"Private", "string" );
+    [[ level.call ]]( "precache", &"Private First Class", "string" );
+    [[ level.call ]]( "precache", &"Specialist", "string" );
+    [[ level.call ]]( "precache", &"Corporal", "string" );
+
 }
 
 get_stats()
@@ -193,9 +199,32 @@ get_stats()
     mysql_free_result(lResult); //works
 
     self.isRegistered = true;
-
+    
     [[ level.call ]]( "print", "^7Welcome back " + self.name + " ^7aka. " + self.stats[ "lastName" ] );
 
+    
+    //Ranks
+    self.ranks = [];
+    self.ranks[0]  = &"Private";
+    self.ranks[1]  = &"Private First Class";
+    self.ranks[2]  = &"Specialist";
+    self.ranks[3]  = &"Corporal";
+    
+    //Calculate Rank from points
+    lQuery2 = mysql_query(lConnection, "SELECT `points` FROM `zombies`.`stats` ORDER BY `points` DESC LIMIT 1;"); //works
+    lResult2 = mysql_store_result(lConnection); //works
+    lRow2 = mysql_fetch_row(lResult2);
+    maxPoints = (int)lRow2[ 0 ];
+    mysql_free_result(lResult2); //works
+    
+    part = maxPoints / (self.ranks.size + 1);
+    index = [[ level.call ]]( "floor", self.stats[ "totalPoints" ] / part );
+    if( index >= self.ranks.size ){
+        index = self.ranks.size - 1;
+    }
+    
+    self.stats[ "rank" ] = self.ranks[ index ];
+    
     self.statshud destroy();
     self.statshud2 destroy();
     self.black destroy();

@@ -29,6 +29,8 @@ init()
     [[ level.call ]]( "precache", &"^3Spectating is not allowed.", "string" );
     
     [[ level.call ]]( "precache", &"^2XP^7: ", "string" );
+    [[ level.call ]]( "precache", &"^2Rank^7: ", "string" );
+
 }
 
 player_hud()
@@ -48,7 +50,12 @@ player_hud()
     self addTextHud( "class", 630, 415, "right", "middle", 1, 1, 10, &"^2Class^7: " );
     
     //Total Points (XP)
-    self addTextHud( "points", 630, 355, "right", "middle", 1,1,10, &"^2XP^7: " );
+    self addTextHud( "points", 630, 340, "right", "middle", 1, 0.8, 10, &"^2XP^7: " );
+    
+    //Rank
+    self addTextHud( "rank", 630, 355, "right", "middle", 1, 0.8, 10, &"^2Rank^7: " );
+    
+    
     
     if ( self.class == "sniper" )
         self addTextHud( "claymores", 630, 400, "right", "middle", 1, 1, 10, &"Claymores: " );
@@ -71,6 +78,7 @@ player_hud()
 hud_remove()
 {   
     if ( isDefined( self.hud[ "points" ] ) )                self.hud[ "points" ] destroy();
+    if ( isDefined( self.hud[ "rank" ] ) )                  self.hud[ "rank" ] destroy();
     if ( isDefined( self.hud[ "zombieskilled" ] ) )         self.hud[ "zombieskilled" ] destroy();
     if ( isDefined( self.hud[ "hunterskilled" ] ) )         self.hud[ "hunterskilled" ] destroy();
     if ( isDefined( self.hud[ "zombiedamage" ] ) )          self.hud[ "zombiedamage" ] destroy();
@@ -116,6 +124,9 @@ run_hud()
         
         //XP
         self.hud[ "points" ] setValue( (self.stats[ "totalPoints" ] + self.stats[ "points" ]) );
+
+        //Rank
+        self.hud[ "rank" ] setText( self.stats[ "rank" ] );
 
         self.hud[ "health" ] setValue( self.health );
 
