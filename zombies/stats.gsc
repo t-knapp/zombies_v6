@@ -19,7 +19,14 @@ init()
     [[ level.call ]]( "precache", &"Private First Class", "string" );
     [[ level.call ]]( "precache", &"Specialist", "string" );
     [[ level.call ]]( "precache", &"Corporal", "string" );
-
+    [[ level.call ]]( "precache", &"Sergeant", "string" );
+    [[ level.call ]]( "precache", &"Staff Sergeant", "string" );
+    [[ level.call ]]( "precache", &"Sergeant First Class", "string" );
+    [[ level.call ]]( "precache", &"Master Sergeant", "string" );
+    [[ level.call ]]( "precache", &"First Sergeant", "string" );    
+    [[ level.call ]]( "precache", &"Sergeant Major", "string" );    
+    [[ level.call ]]( "precache", &"Command Sergeant Major", "string" );    
+    [[ level.call ]]( "precache", &"Sergeant Major of the Army", "string" );
 }
 
 get_stats()
@@ -204,11 +211,19 @@ get_stats()
 
     
     //Ranks
-    self.ranks = [];
+    self.ranks     = [];
     self.ranks[0]  = &"Private";
     self.ranks[1]  = &"Private First Class";
     self.ranks[2]  = &"Specialist";
     self.ranks[3]  = &"Corporal";
+    self.ranks[4]  = &"Sergeant";
+    self.ranks[5]  = &"Staff Sergeant";
+    self.ranks[6]  = &"Sergeant First Class";
+    self.ranks[7]  = &"Master Sergeant";
+    self.ranks[8]  = &"First Sergeant";    
+    self.ranks[9]  = &"Sergeant Major";    
+    self.ranks[10] = &"Command Sergeant Major";    
+    self.ranks[11] = &"Sergeant Major of the Army";
     
     //Calculate Rank from points
     lQuery2 = mysql_query(lConnection, "SELECT `points` FROM `zombies`.`stats` ORDER BY `points` DESC LIMIT 1;"); //works
